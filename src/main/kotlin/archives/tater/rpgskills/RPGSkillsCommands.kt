@@ -12,6 +12,7 @@ import net.minecraft.command.argument.EntityArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
+import net.minecraft.util.Util.createTranslationKey
 
 object RPGSkillsCommands : CommandRegistrationCallback {
     override fun register(
@@ -25,8 +26,8 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                     argument("player", EntityArgumentType.player()) {
                         executes { command ->
                             command.source.sendFeedback(Text.literal("Skills: ").apply {
-                                for (skill in command.source.server.registryManager[Skill.REGISTRY_KEY]) {
-                                    append(skill.icon.toHoverableText())
+                                for (entry in command.source.server.registryManager[Skill.REGISTRY_KEY].indexedEntries) {
+                                    append(createTranslationKey("skill", entry.key.get().value))
                                     append(Text.literal(",  "))
                                 }
                             }, false)
