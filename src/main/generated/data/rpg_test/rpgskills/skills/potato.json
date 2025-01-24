@@ -1,0 +1,22 @@
+{
+  "icon": {
+    "Count": 1,
+    "id": "minecraft:potato"
+  },
+  "levels": [
+    {
+      "cost": 1,
+      "unlock_items": [
+        "minecraft:potato",
+        "minecraft:poisonous_potato"
+      ]
+    },
+    {
+      "cost": 2,
+      "unlock_items": [
+        "minecraft:potato",
+        "minecraft:poisonous_potato"
+      ]
+    }
+  ]
+}
