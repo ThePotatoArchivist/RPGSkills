@@ -1,10 +1,7 @@
 package archives.tater.rpgskills
 
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.util.argument
-import archives.tater.rpgskills.util.command
-import archives.tater.rpgskills.util.sendFeedback
-import archives.tater.rpgskills.util.sub
+import archives.tater.rpgskills.util.*
 import com.mojang.brigadier.CommandDispatcher
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandRegistryAccess
@@ -26,8 +23,9 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                     argument("player", EntityArgumentType.player()) {
                         executes { command ->
                             command.source.sendFeedback(Text.literal("Skills: ").apply {
-                                for (entry in command.source.server.registryManager[Skill.REGISTRY_KEY].indexedEntries) {
+                                for (entry in command.source.server.registryManager[Skill].indexedEntries) {
                                     append(createTranslationKey("skill", entry.key.get().value))
+                                    append(entry.value.levels[1].unlocks.items.getOrNull(0)?.translationKey)
                                     append(Text.literal(",  "))
                                 }
                             }, false)

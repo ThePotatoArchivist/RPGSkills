@@ -6,17 +6,20 @@
   "levels": [
     {
       "cost": 1,
-      "unlock_items": [
-        "minecraft:potato",
-        "minecraft:poisonous_potato"
-      ]
+      "unlocks": {
+        "items": [
+          "minecraft:potato",
+          "minecraft:poisonous_potato"
+        ]
+      }
     },
     {
       "cost": 2,
-      "unlock_items": [
-        "minecraft:potato",
-        "minecraft:poisonous_potato"
-      ]
+      "unlocks": {
+        "items": [
+          "minecraft:trident"
+        ]
+      }
     }
   ]
 }

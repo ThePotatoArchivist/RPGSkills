@@ -15,10 +15,9 @@ class DefaultSkillGenerator(dataOutput: FabricDataOutput) : SkillProvider(dataOu
                 ItemStack(Items.POTATO),
                 listOf(
                     Skill.Level(1, unlockItems = listOf(Items.POTATO, Items.POISONOUS_POTATO)),
-                    Skill.Level(2, unlockItems = listOf(Items.POTATO, Items.POISONOUS_POTATO)),
+                    Skill.Level(2, unlockItems = listOf(Items.TRIDENT)),
                 )
             )
         )
 	}
-
 }
