@@ -43,3 +43,17 @@ internal fun ArgumentBuilder<ServerCommandSource, *>.argumentExec(name: String, 
         executes(command)
     }
 }
+
+internal fun RequiredArgumentBuilder<ServerCommandSource, *>.arguments(vararg arguments: RequiredArgumentBuilder<ServerCommandSource, *>, init: RequiredArgumentBuilder<ServerCommandSource, *>.() -> Unit) {
+    arguments.foldRight(init) { arg, acc ->
+        {
+            then(arg).acc()
+        }
+    }.invoke(this)
+}
+
+internal fun RequiredArgumentBuilder<ServerCommandSource, *>.argumentsExec(vararg arguments: RequiredArgumentBuilder<ServerCommandSource, *>, command: Command<ServerCommandSource>) {
+    arguments(*arguments) {
+        executes(command)
+    }
+}

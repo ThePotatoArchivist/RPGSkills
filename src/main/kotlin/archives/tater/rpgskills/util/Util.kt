@@ -3,6 +3,10 @@ package archives.tater.rpgskills.util
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import dev.onyxstudios.cca.api.v3.component.Component
+import dev.onyxstudios.cca.api.v3.component.ComponentKey
+import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.minecraft.registry.DynamicRegistryManager
@@ -49,7 +53,6 @@ fun SimpleSynchronousResourceReloadListener(fabricId: Identifier, reload: (Resou
     }
 
     override fun getFabricId(): Identifier = fabricId
-
 }
 
 interface RegistryKeyHolder<T> {
@@ -58,3 +61,19 @@ interface RegistryKeyHolder<T> {
 
 operator fun <E> DynamicRegistryManager.get(holder: RegistryKeyHolder<out Registry<out E>?>): Registry<E> =
     this[holder.key]
+
+@Suppress("UnstableApiUsage")
+interface AttachmentTypeHolder<T> {
+    val attachmentType: AttachmentType<T>
+}
+
+@Suppress("UnstableApiUsage")
+operator fun <T> AttachmentTarget.get(attachmentType: AttachmentType<T>): T = getAttachedOrCreate(attachmentType)
+@Suppress("UnstableApiUsage")
+operator fun <T> AttachmentTarget.get(holder: AttachmentTypeHolder<T>): T = this[holder.attachmentType]
+
+interface ComponentKeyHolder<C : Component, T> {
+    val key: ComponentKey<C>
+}
+
+operator fun <C : Component, T: Any> T.get(keyHolder: ComponentKeyHolder<C, T>): C = keyHolder.key.get(this)

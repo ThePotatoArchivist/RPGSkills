@@ -14,20 +14,17 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
-    @Shadow public abstract Item getItem();
-
     @WrapOperation(
             method = "useOnBlock",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;")
     )
     private ActionResult checkLock(Item instance, ItemUsageContext context, Operation<ActionResult> original) {
         var player = context.getPlayer();
-        return player != null && LockedItems.isItemLocked(instance, player) ? ActionResult.PASS : original.call(instance, context);
+        return player != null && LockedItems.isItemLocked(this, player) ? ActionResult.PASS : original.call(instance, context);
     }
 
     @WrapOperation(
@@ -35,7 +32,7 @@ public abstract class ItemStackMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")
     )
     private TypedActionResult<ItemStack> checkLock(Item instance, World world, PlayerEntity user, Hand hand, Operation<TypedActionResult<ItemStack>> original) {
-        return LockedItems.isItemLocked(instance, user) ? TypedActionResult.pass(user.getStackInHand(hand)) : original.call(instance, world, user, hand);
+        return LockedItems.isItemLocked(this, user) ? TypedActionResult.pass(user.getStackInHand(hand)) : original.call(instance, world, user, hand);
     }
 
     @ModifyExpressionValue(
@@ -43,6 +40,6 @@ public abstract class ItemStackMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;isEnabled(Lnet/minecraft/resource/featuretoggle/FeatureSet;)Z")
     )
     private boolean addTooltip(boolean original, @Local(argsOnly = true) PlayerEntity player) {
-        return original && !LockedItems.isItemLocked(getItem(), player);
+        return original && !LockedItems.isItemLocked(this, player);
     }
 }

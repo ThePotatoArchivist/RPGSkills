@@ -32,6 +32,17 @@
 				"value": "archives.tater.rpgskills.RPGSkillsDataGenerator",
 				"adapter": "kotlin"
 			}
+		],
+		"cardinal-components": [
+			{
+				"value": "archives.tater.rpgskills.RPGSkillsComponents",
+				"adapter": "kotlin"
+			}
+		]
+	},
+	"custom": {
+		"cardinal-components": [
+			"rpgskills:skills"
 		]
 	},
 	"mixins": [
@@ -41,6 +52,7 @@
 			"environment": "client"
 		}
 	],
+	"accesswidener": "rpgskills.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.16.10",
 		"minecraft": "~1.20.1",

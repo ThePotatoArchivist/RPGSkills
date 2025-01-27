@@ -20,6 +20,14 @@
           "minecraft:trident"
         ]
       }
+    },
+    {
+      "cost": 3,
+      "unlocks": {
+        "items": [
+          "#minecraft:buttons"
+        ]
+      }
     }
   ]
 }

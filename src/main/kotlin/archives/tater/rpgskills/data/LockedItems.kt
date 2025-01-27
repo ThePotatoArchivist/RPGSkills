@@ -3,40 +3,32 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.value
+import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.registry.DynamicRegistryManager
-import net.minecraft.registry.Registries
 
 private var locked: Skill.Locked? = null
 
-private var lockedItems: Set<Item>? = null
-
-@Suppress("DEPRECATION")
 fun findLocked(registryManager: DynamicRegistryManager) {
     val unlocks = registryManager[Skill].flatMap { skill -> skill.levels.map { it.unlocks } }
     locked = Skill.Locked(
-        items = unlocks.flatMap { it.items },
-        tags = unlocks.flatMap { it.tags },
+        items = DefaultCustomIngredients.any(*unlocks.map { it.items }.toTypedArray()),
         recipes = unlocks.flatMap { it.recipes }
-    ).also {
-        lockedItems = mutableSetOf<Item>().apply {
-            addAll(it.items)
-            addAll(Registries.ITEM.filter { item ->
-                it.tags.any { tag ->
-                    item.registryEntry.isIn(tag)
-                }
-            })
-        }
-    }
+    )
 }
 
-fun isItemLocked(item: Item, player: PlayerEntity): Boolean {
+fun isItemLocked(stack: ItemStack, player: PlayerEntity): Boolean {
     if (locked == null) findLocked(player.world.registryManager)
-    return item in lockedItems!!
+    return locked!!.items.test(stack) && !player[SkillsComponent].levels.any { (skill, level) -> skill.value.unlocksItem(level, stack) }
 }
+
+/**
+ * Only for use in [archives.tater.rpgskills.mixin.ItemStackMixin]
+ */
+fun isItemLocked(stack: Any, player: PlayerEntity) = isItemLocked(stack as ItemStack, player)
 
 fun clearLocked() {
     locked = null
-    lockedItems = null
 }
