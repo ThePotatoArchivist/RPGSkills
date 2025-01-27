@@ -4,11 +4,14 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.util.*
 import com.mojang.brigadier.CommandDispatcher
-import com.mojang.brigadier.arguments.IntegerArgumentType
+import com.mojang.brigadier.arguments.IntegerArgumentType.getInteger
+import com.mojang.brigadier.arguments.IntegerArgumentType.integer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandRegistryAccess
-import net.minecraft.command.argument.EntityArgumentType
+import net.minecraft.command.argument.EntityArgumentType.getPlayer
+import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.command.argument.RegistryEntryArgumentType
+import net.minecraft.command.argument.RegistryEntryArgumentType.getRegistryEntry
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
@@ -32,31 +35,40 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                     1
                 }
                 sub("level") {
-                    argument("player", EntityArgumentType.player()) {
+                    argument("player", player()) {
                         argument("skill", RegistryEntryArgumentType.registryEntry(registryAccess, Skill.key)) {
                             subExec("get") { command ->
-                                val level = EntityArgumentType.getPlayer(command, "player")[SkillsComponent][RegistryEntryArgumentType.getRegistryEntry(command, "skill", Skill.key)]
+                                val level = getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key)]
                                 command.source.sendFeedback(Text.literal(level.toString()), false)
                                 level
                             }
                             sub("add") {
-                                argumentExec("amount", IntegerArgumentType.integer(0)) { command ->
-                                    EntityArgumentType.getPlayer(
-                                        command,
-                                        "player"
-                                    )[SkillsComponent][RegistryEntryArgumentType.getRegistryEntry(
-                                        command,
-                                        "skill",
-                                        Skill.key
-                                    )] += IntegerArgumentType.getInteger(command, "amount")
+                                argumentExec("amount", integer(0)) { command ->
+                                    getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key)] += getInteger(command, "amount")
                                     1
                                 }
                             }
                             sub("set") {
-                                argumentExec("amount", IntegerArgumentType.integer(0)) { command ->
-                                    EntityArgumentType.getPlayer(command, "player")[SkillsComponent][RegistryEntryArgumentType.getRegistryEntry(command, "skill", Skill.key)] = IntegerArgumentType.getInteger(command, "amount")
+                                argumentExec("amount", integer(0)) { command ->
+                                    getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key)] = getInteger(command, "amount")
                                     1
                                 }
+                            }
+                        }
+                    }
+                }
+                sub("levelpoints") {
+                    argument("player", player()) {
+                        sub("set") {
+                            argumentExec("amount", integer(0)) { command ->
+                                getPlayer(command, "player")[SkillsComponent].remainingLevelPoints = getInteger(command, "amount")
+                                1
+                            }
+                        }
+                        sub("add") {
+                            argumentExec("amount", integer(0)) { command ->
+                                getPlayer(command, "player")[SkillsComponent].remainingLevelPoints += getInteger(command, "amount")
+                                1
                             }
                         }
                     }

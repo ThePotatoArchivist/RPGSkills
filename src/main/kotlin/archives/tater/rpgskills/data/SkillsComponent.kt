@@ -19,6 +19,14 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
     private var _levels = mutableMapOf<RegistryEntry<Skill>, Int>()
     val levels: Map<RegistryEntry<Skill>, Int> get() = _levels
 
+    private var _spent = 0
+    var remainingLevelPoints
+        get() = player.experienceLevel - _spent
+        set(value) {
+            _spent = player.experienceLevel - value
+            key.sync(player)
+        }
+
     operator fun get(skill: RegistryEntry<Skill>) = _levels.getOrDefault(skill, 0)
     operator fun set(skill: RegistryEntry<Skill>, level: Int) {
         _levels[skill] = level.coerceIn(0, skill.value.levels.size)
@@ -30,12 +38,14 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
 
     override fun copyFrom(other: SkillsComponent) {
         _levels = other._levels
+        _spent = other._spent
     }
 
     override fun readFromNbt(tag: NbtCompound) {
         _levels = tag.getCompound("Levels").run {
             keys.associate { player.world.registryManager[Skill].getEntry(RegistryKey.of(Skill.key, Identifier.tryParse(it))).get() to getInt(it) }
         }.toMutableMap()
+        _spent = tag.getInt("Spent")
     }
 
     override fun writeToNbt(tag: NbtCompound) {
@@ -44,9 +54,13 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
                 putInt(skill.key.get().value.toString(), level)
             }
         })
+        tag.putInt("Spent", _spent)
     }
 
     companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity> {
         override val key: ComponentKey<SkillsComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
+
+        @JvmField
+        val KEY = key
     }
 }
