@@ -1,6 +1,7 @@
 package archives.tater.rpgskills
 
 import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.clearLockCategories
 import archives.tater.rpgskills.data.clearLocked
 import archives.tater.rpgskills.util.SimpleSynchronousResourceReloadListener
 import net.fabricmc.api.ModInitializer
@@ -36,6 +37,7 @@ object RPGSkills : ModInitializer {
 
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SimpleSynchronousResourceReloadListener(id("clear_locked_items")) {
 			clearLocked()
+			clearLockCategories()
 		})
 	}
 }

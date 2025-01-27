@@ -9,16 +9,20 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraft.registry.DynamicRegistryManager
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.registry.tag.TagKey
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceReloader
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
+import com.mojang.datafixers.util.Pair as DFPair
 
 internal fun <T, C> field(name: String, getter: (C) -> T, codec: Codec<T>): RecordCodecBuilder<C, T> = codec.fieldOf(name).forGetter(getter)
 internal fun <T, C> field(name: String, getter: (C) -> T, codec: MapCodec<T>): RecordCodecBuilder<C, T> = codec.fieldOf(name).forGetter(getter)
@@ -29,7 +33,7 @@ internal inline val <T> RegistryEntry<T>.value get() = value()
 fun IdentifiableResourceReloadListener(fabricId: Identifier, reload: (
     synchronizer: ResourceReloader.Synchronizer,
     manager: ResourceManager,
-    trepareProfiler: Profiler,
+    prepareProfiler: Profiler,
     applyProfiler: Profiler,
     prepareExecutor: Executor,
     applyExecutor: Executor
@@ -77,3 +81,9 @@ interface ComponentKeyHolder<C : Component, T> {
 }
 
 operator fun <C : Component, T: Any> T.get(keyHolder: ComponentKeyHolder<C, T>): C = keyHolder.key.get(this)
+
+operator fun <T> DFPair<T, *>.component1(): T = first
+operator fun <T> DFPair<*, T>.component2(): T = second
+
+infix fun ItemStack.isOf(item: Item) = this.isOf(item)
+infix fun ItemStack.isIn(tag: TagKey<Item>) = this.isIn(tag)

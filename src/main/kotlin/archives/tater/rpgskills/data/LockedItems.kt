@@ -8,6 +8,8 @@ import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.DynamicRegistryManager
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 private var locked: Skill.Locked? = null
 
@@ -19,15 +21,16 @@ fun findLocked(registryManager: DynamicRegistryManager) {
     )
 }
 
-fun isItemLocked(stack: ItemStack, player: PlayerEntity): Boolean {
+fun isItemLocked(stack: ItemStack, player: PlayerEntity?): Boolean {
+    if (player == null) return false
     if (locked == null) findLocked(player.world.registryManager)
     return locked!!.items.test(stack) && !player[SkillsComponent].levels.any { (skill, level) -> skill.value.unlocksItem(level, stack) }
 }
 
-/**
- * Only for use in [archives.tater.rpgskills.mixin.ItemStackMixin]
- */
-fun isItemLocked(stack: Any, player: PlayerEntity) = isItemLocked(stack as ItemStack, player)
+@Deprecated("Only for convenience in mixin",
+    ReplaceWith("isItemLocked(stack as ItemStack, player)", "net.minecraft.item.ItemStack")
+)
+internal fun isItemLocked(stack: Any, player: PlayerEntity?) = isItemLocked(stack as ItemStack, player)
 
 fun clearLocked() {
     locked = null

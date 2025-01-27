@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.datagen
+package archives.tater.rpgskills.datagen.defaultpack
 
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillProvider

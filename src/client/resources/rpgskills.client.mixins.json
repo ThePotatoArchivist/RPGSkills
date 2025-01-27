@@ -3,9 +3,12 @@
 	"package": "archives.tater.rpgskills.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
-		"ExampleClientMixin"
+		"ItemFrameEntityRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
-	}
+	},
+	"mixins": [
+		"InGameHudMixin"
+	]
 }
