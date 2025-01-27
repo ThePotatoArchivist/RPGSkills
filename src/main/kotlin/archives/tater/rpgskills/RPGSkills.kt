@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resource.ResourceType
 import net.minecraft.util.Identifier
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 object RPGSkills : ModInitializer {
@@ -19,7 +20,7 @@ object RPGSkills : ModInitializer {
 
 	fun id(path: String) = Identifier(MOD_ID, path)
 
-    val logger = LoggerFactory.getLogger(MOD_ID)
+    val logger: Logger = LoggerFactory.getLogger(MOD_ID)
 
 	override fun onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.

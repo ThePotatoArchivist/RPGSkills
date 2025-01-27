@@ -10,7 +10,8 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.TagKey
 
-val INGREDIENT_CODEC = Codec.either(
+@Suppress("CAST_NEVER_SUCCEEDS")
+val INGREDIENT_CODEC: Codec<Ingredient> = Codec.either(
     TagKey.codec(RegistryKeys.ITEM).xmap(
         { TagEntryAccessor.newTagEntry(it) },
         { (it as TagEntryAccessor).tag }
