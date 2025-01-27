@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.datagen.defaultpack
 
-import archives.tater.rpgskills.data.addLockCategory
+import archives.tater.rpgskills.locking.addLockCategory
 import archives.tater.rpgskills.datagen.defaultpack.DefaultSkillsTagGenerator.Companion.LOCKED_BUTTONS
 import archives.tater.rpgskills.util.addSkill
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput

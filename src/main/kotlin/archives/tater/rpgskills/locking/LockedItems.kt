@@ -1,7 +1,9 @@
 @file:JvmName("LockedItems")
 
-package archives.tater.rpgskills.data
+package archives.tater.rpgskills.locking
 
+import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients

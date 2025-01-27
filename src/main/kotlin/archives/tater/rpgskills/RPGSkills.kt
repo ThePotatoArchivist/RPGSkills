@@ -1,8 +1,8 @@
 package archives.tater.rpgskills
 
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.data.clearLockCategories
-import archives.tater.rpgskills.data.clearLocked
+import archives.tater.rpgskills.locking.clearLockCategories
+import archives.tater.rpgskills.locking.clearLocked
 import archives.tater.rpgskills.util.SimpleSynchronousResourceReloadListener
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback

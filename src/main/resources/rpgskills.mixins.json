@@ -3,12 +3,12 @@
   "package": "archives.tater.rpgskills.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "IngredientAccessor",
-    "ItemStackMixin",
-    "PlayerEntityMixin",
-    "ServerPlayerEntityMixin",
-    "StackEntryAccessor",
-    "TagEntryAccessor"
+    "data.IngredientAccessor",
+    "locking.ItemStackMixin",
+    "xp.PlayerEntityMixin",
+    "xp.ServerPlayerEntityMixin",
+    "data.StackEntryAccessor",
+    "data.TagEntryAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

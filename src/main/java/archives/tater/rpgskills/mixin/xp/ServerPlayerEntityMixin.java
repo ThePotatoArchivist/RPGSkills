@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.mixin;
+package archives.tater.rpgskills.mixin.xp;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;

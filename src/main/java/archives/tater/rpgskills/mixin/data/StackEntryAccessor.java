@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.mixin;
+package archives.tater.rpgskills.mixin.data;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;

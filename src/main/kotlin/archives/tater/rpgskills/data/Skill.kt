@@ -1,9 +1,9 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.mixin.IngredientAccessor
-import archives.tater.rpgskills.mixin.StackEntryAccessor
-import archives.tater.rpgskills.mixin.TagEntryAccessor
+import archives.tater.rpgskills.mixin.data.IngredientAccessor
+import archives.tater.rpgskills.mixin.data.StackEntryAccessor
+import archives.tater.rpgskills.mixin.data.TagEntryAccessor
 import archives.tater.rpgskills.util.RegistryKeyHolder
 import archives.tater.rpgskills.util.field
 import com.mojang.serialization.Codec
@@ -47,7 +47,8 @@ class Skill(
             unlockItems: List<Item> = listOf(),
             unlockTags: List<TagKey<Item>> = listOf(),
             unlockRecipes: List<Identifier> = listOf(),
-        ) : this(cost, attributes, Locked(IngredientAccessor.invokeOfEntries(Stream.concat(
+        ) : this(cost, attributes, Locked(
+            IngredientAccessor.invokeOfEntries(Stream.concat(
             unlockItems.stream().map { StackEntryAccessor.newStackEntry(it.defaultStack) },
             unlockTags.stream().map { TagEntryAccessor.newTagEntry(it) }
         )), unlockRecipes))

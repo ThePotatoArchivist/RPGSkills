@@ -1,7 +1,7 @@
 package archives.tater.rpgskills.mixin.client;
 
-import archives.tater.rpgskills.data.LockCategories;
 import archives.tater.rpgskills.data.SkillsComponent;
+import archives.tater.rpgskills.locking.LockCategories;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.MinecraftClient;

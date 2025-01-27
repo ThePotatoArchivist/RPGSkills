@@ -1,7 +1,7 @@
-package archives.tater.rpgskills.mixin;
+package archives.tater.rpgskills.mixin.locking;
 
-import archives.tater.rpgskills.data.LockCategories;
-import archives.tater.rpgskills.data.LockedItems;
+import archives.tater.rpgskills.locking.LockCategories;
+import archives.tater.rpgskills.locking.LockedItems;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

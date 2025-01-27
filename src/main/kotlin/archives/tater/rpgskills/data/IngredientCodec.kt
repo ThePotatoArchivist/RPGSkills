@@ -1,8 +1,8 @@
 package archives.tater.rpgskills.data
 
-import archives.tater.rpgskills.mixin.IngredientAccessor
-import archives.tater.rpgskills.mixin.StackEntryAccessor
-import archives.tater.rpgskills.mixin.TagEntryAccessor
+import archives.tater.rpgskills.mixin.data.IngredientAccessor
+import archives.tater.rpgskills.mixin.data.StackEntryAccessor
+import archives.tater.rpgskills.mixin.data.TagEntryAccessor
 import com.mojang.datafixers.util.Either
 import com.mojang.serialization.Codec
 import net.minecraft.recipe.Ingredient

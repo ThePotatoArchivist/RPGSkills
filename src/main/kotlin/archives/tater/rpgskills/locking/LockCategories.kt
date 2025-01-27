@@ -1,6 +1,6 @@
 @file:JvmName("LockCategories")
 
-package archives.tater.rpgskills.data
+package archives.tater.rpgskills.locking
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.isIn
@@ -18,7 +18,9 @@ private var lockedCategoryTags: List<TagKey<Item>>? = null
 
 const val CATEGORY_TAG_PREFIX = "rpgskills/lockcategory/"
 
-fun categoryTagOf(category: Identifier): TagKey<Item> = TagKey.of(RegistryKeys.ITEM, category.withPrefixedPath(CATEGORY_TAG_PREFIX))
+fun categoryTagOf(category: Identifier): TagKey<Item> = TagKey.of(RegistryKeys.ITEM, category.withPrefixedPath(
+    CATEGORY_TAG_PREFIX
+))
 
 val DEFAULT_LOCK_CATEGORY = categoryTagOf(RPGSkills.id("default"))
 
@@ -30,7 +32,9 @@ fun findCategories() {
 
 fun lockCategoryOf(stack: ItemStack): Identifier {
     if (lockedCategoryTags == null) findCategories()
-    return (lockedCategoryTags!!.firstOrNull { stack isIn it } ?: DEFAULT_LOCK_CATEGORY).id.withPath { it.removePrefix(CATEGORY_TAG_PREFIX) }
+    return (lockedCategoryTags!!.firstOrNull { stack isIn it } ?: DEFAULT_LOCK_CATEGORY).id.withPath { it.removePrefix(
+        CATEGORY_TAG_PREFIX
+    ) }
 }
 
 fun lockTranslationOf(stack: ItemStack): String {

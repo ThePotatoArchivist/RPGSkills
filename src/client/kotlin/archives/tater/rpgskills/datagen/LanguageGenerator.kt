@@ -1,7 +1,7 @@
 package archives.tater.rpgskills.datagen
 
-import archives.tater.rpgskills.data.DEFAULT_LOCK_CATEGORY
-import archives.tater.rpgskills.data.addLockCategory
+import archives.tater.rpgskills.locking.DEFAULT_LOCK_CATEGORY
+import archives.tater.rpgskills.locking.addLockCategory
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 

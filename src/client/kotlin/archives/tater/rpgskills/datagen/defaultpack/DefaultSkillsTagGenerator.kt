@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.datagen.defaultpack
 
-import archives.tater.rpgskills.data.categoryTagOf
+import archives.tater.rpgskills.locking.categoryTagOf
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.registry.RegistryWrapper
