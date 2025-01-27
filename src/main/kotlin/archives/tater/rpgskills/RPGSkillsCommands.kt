@@ -43,7 +43,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                                 level
                             }
                             sub("add") {
-                                argumentExec("amount", integer(0)) { command ->
+                                argumentExec("amount", integer()) { command ->
                                     getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key)] += getInteger(command, "amount")
                                     1
                                 }
@@ -66,7 +66,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                             }
                         }
                         sub("add") {
-                            argumentExec("amount", integer(0)) { command ->
+                            argumentExec("amount", integer()) { command ->
                                 getPlayer(command, "player")[SkillsComponent].remainingLevelPoints += getInteger(command, "amount")
                                 1
                             }

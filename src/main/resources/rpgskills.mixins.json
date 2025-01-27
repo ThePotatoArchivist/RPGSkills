@@ -5,6 +5,8 @@
   "mixins": [
     "IngredientAccessor",
     "ItemStackMixin",
+    "PlayerEntityMixin",
+    "ServerPlayerEntityMixin",
     "StackEntryAccessor",
     "TagEntryAccessor"
   ],
