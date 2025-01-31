@@ -1,33 +1,13 @@
 {
+  "description": "Unlocks potatoes & other stuff",
   "icon": {
     "Count": 1,
     "id": "minecraft:potato"
   },
   "levels": [
-    {
-      "cost": 1,
-      "unlocks": {
-        "items": [
-          "minecraft:potato",
-          "minecraft:poisonous_potato"
-        ]
-      }
-    },
-    {
-      "cost": 2,
-      "unlocks": {
-        "items": [
-          "minecraft:trident"
-        ]
-      }
-    },
-    {
-      "cost": 3,
-      "unlocks": {
-        "items": [
-          "#minecraft:buttons"
-        ]
-      }
-    }
-  ]
+    1,
+    2,
+    3
+  ],
+  "name": "Potato Skill"
 }

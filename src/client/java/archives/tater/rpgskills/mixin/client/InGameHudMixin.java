@@ -1,7 +1,7 @@
 package archives.tater.rpgskills.mixin.client;
 
+import archives.tater.rpgskills.data.LockGroup;
 import archives.tater.rpgskills.data.SkillsComponent;
-import archives.tater.rpgskills.locking.LockCategories;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.MinecraftClient;
@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
+@SuppressWarnings("deprecation")
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
 	@Shadow @Final private MinecraftClient client;
@@ -23,7 +24,7 @@ public class InGameHudMixin {
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
 	)
 	private Text init(ItemStack instance, Operation<Text> original) {
-		return LockCategories.lockProcessName(instance, client.player, original.call(instance));
+		return LockGroup.nameOf(client.player, instance, original.call(instance));
 	}
 
 	@SuppressWarnings("DataFlowIssue") // client.player is definitely not null here

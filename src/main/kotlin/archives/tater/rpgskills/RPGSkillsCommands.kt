@@ -10,8 +10,8 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.command.argument.EntityArgumentType.getPlayer
 import net.minecraft.command.argument.EntityArgumentType.player
-import net.minecraft.command.argument.RegistryEntryArgumentType
 import net.minecraft.command.argument.RegistryEntryArgumentType.getRegistryEntry
+import net.minecraft.command.argument.RegistryEntryArgumentType.registryEntry
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
@@ -36,21 +36,21 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                 }
                 sub("level") {
                     argument("player", player()) {
-                        argument("skill", RegistryEntryArgumentType.registryEntry(registryAccess, Skill.key)) {
+                        argument("skill", registryEntry(registryAccess, Skill.key)) {
                             subExec("get") { command ->
-                                val level = getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key)]
+                                val level = getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key).key.get()]
                                 command.source.sendFeedback(Text.literal(level.toString()), false)
                                 level
                             }
                             sub("add") {
                                 argumentExec("amount", integer()) { command ->
-                                    getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key)] += getInteger(command, "amount")
+                                    getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key).key.get()] += getInteger(command, "amount")
                                     1
                                 }
                             }
                             sub("set") {
                                 argumentExec("amount", integer(0)) { command ->
-                                    getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key)] = getInteger(command, "amount")
+                                    getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key).key.get()] = getInteger(command, "amount")
                                     1
                                 }
                             }

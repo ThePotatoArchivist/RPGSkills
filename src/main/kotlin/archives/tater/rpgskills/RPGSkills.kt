@@ -1,7 +1,7 @@
 package archives.tater.rpgskills
 
+import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.locking.clearLockCategories
 import archives.tater.rpgskills.locking.clearLocked
 import archives.tater.rpgskills.util.SimpleSynchronousResourceReloadListener
 import net.fabricmc.api.ModInitializer
@@ -27,6 +27,7 @@ object RPGSkills : ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		DynamicRegistries.registerSynced(Skill.key, Skill.CODEC)
+		DynamicRegistries.registerSynced(LockGroup.key, LockGroup.CODEC)
 
 		CommandRegistrationCallback.EVENT.register(RPGSkillsCommands)
 
@@ -38,7 +39,7 @@ object RPGSkills : ModInitializer {
 
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SimpleSynchronousResourceReloadListener(id("clear_locked_items")) {
 			clearLocked()
-			clearLockCategories()
+			LockGroup.clearLocked()
 		})
 	}
 }

@@ -1,7 +1,6 @@
 package archives.tater.rpgskills.mixin.locking;
 
-import archives.tater.rpgskills.locking.LockCategories;
-import archives.tater.rpgskills.locking.LockedItems;
+import archives.tater.rpgskills.data.LockGroup;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -19,7 +18,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation"})
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
     @Shadow public abstract boolean hasCustomName();
@@ -30,10 +29,10 @@ public abstract class ItemStackMixin {
     )
     private ActionResult checkLock(Item instance, ItemUsageContext context, Operation<ActionResult> original) {
         var player = context.getPlayer();
-        if (player == null || !LockedItems.isItemLocked(this, player)) {
+        if (player == null || !LockGroup.isLocked(player, this)) {
             return original.call(instance, context);
         }
-        player.sendMessage(Text.translatable(LockCategories.lockTranslationOf(this, "message")), true);
+        player.sendMessage(LockGroup.messageOf(player, this), true);
         return ActionResult.CONSUME;
     }
 
@@ -42,10 +41,10 @@ public abstract class ItemStackMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")
     )
     private TypedActionResult<ItemStack> checkLock(Item instance, World world, PlayerEntity user, Hand hand, Operation<TypedActionResult<ItemStack>> original) {
-        if (!LockedItems.isItemLocked(this, user)) {
+        if (!LockGroup.isLocked(user, this)) {
             return original.call(instance, world, user, hand);
         }
-        user.sendMessage(Text.translatable(LockCategories.lockTranslationOf(this, "message")), true);
+        user.sendMessage(LockGroup.messageOf(user, this), true);
         return TypedActionResult.pass(user.getStackInHand(hand));
     }
 
@@ -54,7 +53,7 @@ public abstract class ItemStackMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;isEnabled(Lnet/minecraft/resource/featuretoggle/FeatureSet;)Z")
     )
     private boolean addTooltip(boolean original, @Local(argsOnly = true) PlayerEntity player) {
-        return original && !LockedItems.isItemLocked(this, player);
+        return original && !LockGroup.isLocked(player, this);
     }
 
     @ModifyExpressionValue(
@@ -62,6 +61,6 @@ public abstract class ItemStackMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
     )
     private Text modifyName(Text original, @Local(argsOnly = true) PlayerEntity player) {
-        return LockCategories.lockProcessName(this, player, original);
+        return LockGroup.nameOf(player, this, original);
     }
 }
