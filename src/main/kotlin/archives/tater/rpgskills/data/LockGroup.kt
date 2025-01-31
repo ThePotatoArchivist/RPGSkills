@@ -26,6 +26,14 @@ class LockGroup(
     val itemName: String? = null,
     val itemMessage: String? = null,
 ) {
+    constructor(
+        items: Ingredient = Ingredient.EMPTY,
+        recipes: List<Identifier> = listOf(),
+        requirements: Map<RegistryKey<Skill>, Int>,
+        itemName: String? = null,
+        itemMessage: String? = null
+    ) : this(items, recipes, listOf(requirements), itemName, itemMessage)
+
     fun isSatisfiedBy(player: PlayerEntity): Boolean = requirements.any {
         it.all { (skill, level) ->
             (player[SkillsComponent].levels[skill] ?: 0) >= level
