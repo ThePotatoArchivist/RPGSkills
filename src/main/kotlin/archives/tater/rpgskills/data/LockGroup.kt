@@ -34,13 +34,15 @@ class LockGroup(
         itemMessage: String? = null
     ) : this(items, recipes, listOf(requirements), itemName, itemMessage)
 
-    fun isSatisfiedBy(player: PlayerEntity): Boolean = requirements.any {
+    fun isSatisfiedBy(levels: Map<RegistryKey<Skill>, Int>) = requirements.any {
         it.all { (skill, level) ->
-            (player[SkillsComponent].levels[skill] ?: 0) >= level
+            (levels[skill] ?: 0) >= level
         }
     }
 
-    companion object : RegistryKeyHolder<Registry<LockGroup>> {
+    fun isSatisfiedBy(player: PlayerEntity): Boolean = isSatisfiedBy(player[SkillsComponent].levels)
+
+    companion object Manager : RegistryKeyHolder<Registry<LockGroup>> {
         val CODEC: Codec<LockGroup> = RecordCodecBuilder.create {
             it.group(
                 field("items", LockGroup::items, Ingredient.EMPTY, INGREDIENT_CODEC),
@@ -75,7 +77,7 @@ class LockGroup(
         fun isLocked(player: PlayerEntity, stack: ItemStack): Boolean {
             if (allLocked == null)
                 findLocked(player.world.registryManager)
-            return allLocked!!.test(stack) && of(player.world.registryManager, stack)?.value?.isSatisfiedBy(player) == false
+            return allLocked!!.test(stack) && !player[SkillsComponent].allowedItems.test(stack)
         }
 
         @JvmStatic

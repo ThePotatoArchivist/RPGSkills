@@ -66,6 +66,6 @@ public abstract class ItemStackMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
     )
     private Text modifyName(Text original, @Local(argsOnly = true) PlayerEntity player) {
-        return LockGroup.isLocked(player, this) ? original : LockGroup.nameOf(player, this, original);
+        return LockGroup.isLocked(player, this) ? LockGroup.nameOf(player, this, original) : original;
     }
 }
