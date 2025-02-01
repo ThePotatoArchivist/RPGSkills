@@ -19,12 +19,14 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class InGameHudMixin {
 	@Shadow @Final private MinecraftClient client;
 
+	@SuppressWarnings("DataFlowIssue") // client.player is definitely not null here
 	@WrapOperation(
 			method = "renderHeldItemTooltip",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
 	)
 	private Text init(ItemStack instance, Operation<Text> original) {
-		return LockGroup.nameOf(client.player, instance, original.call(instance));
+		var originalName = original.call(instance);
+		return LockGroup.isLocked(client.player, instance) ? LockGroup.nameOf(client.player, instance, originalName) : originalName;
 	}
 
 	@SuppressWarnings("DataFlowIssue") // client.player is definitely not null here

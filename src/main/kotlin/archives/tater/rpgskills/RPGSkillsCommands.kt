@@ -1,6 +1,7 @@
 package archives.tater.rpgskills
 
 import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.util.*
 import com.mojang.brigadier.CommandDispatcher
@@ -15,7 +16,6 @@ import net.minecraft.command.argument.RegistryEntryArgumentType.registryEntry
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
-import net.minecraft.util.Util.createTranslationKey
 
 object RPGSkillsCommands : CommandRegistrationCallback {
     override fun register(
@@ -29,7 +29,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                     command.source.sendFeedback(Text.literal("Skills: ").apply {
                         command.source.server.registryManager[Skill].indexedEntries.forEachIndexed { index, entry ->
                             if (index > 0) append(Text.literal(",  "))
-                            append(Text.translatable(createTranslationKey("skill", entry.key.get().value)))
+                            append(entry.name)
                         }
                     }, false)
                     1

@@ -1,0 +1,10 @@
+{
+  "item_message": "You don't know how to eat with this fork",
+  "item_name": "Unknown Fork",
+  "items": [
+    "minecraft:trident"
+  ],
+  "requirements": {
+    "rpg_test:potato": 2
+  }
+}

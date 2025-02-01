@@ -1,0 +1,10 @@
+{
+  "item_message": "You don't know what kind of button this is",
+  "item_name": "Unknown Button",
+  "items": [
+    "#minecraft:buttons"
+  ],
+  "requirements": {
+    "rpg_test:potato": 3
+  }
+}

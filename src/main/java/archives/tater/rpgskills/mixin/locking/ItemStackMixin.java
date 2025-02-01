@@ -6,11 +6,14 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.StackReference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ClickType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
@@ -22,6 +25,8 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
     @Shadow public abstract boolean hasCustomName();
+
+    @Shadow public abstract boolean onClicked(ItemStack stack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference);
 
     @WrapOperation(
             method = "useOnBlock",
@@ -61,6 +66,6 @@ public abstract class ItemStackMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
     )
     private Text modifyName(Text original, @Local(argsOnly = true) PlayerEntity player) {
-        return LockGroup.nameOf(player, this, original);
+        return LockGroup.isLocked(player, this) ? original : LockGroup.nameOf(player, this, original);
     }
 }
