@@ -1,5 +1,6 @@
 package archives.tater.rpgskills
 
+import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.SkillsComponent
@@ -18,6 +19,16 @@ import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
 
 object RPGSkillsCommands : CommandRegistrationCallback {
+    object Translations {
+        const val LIST_NONE = "commands.$MOD_ID.skills.list.none"
+        const val LIST = "commands.$MOD_ID.skills.list"
+        const val GET_LEVEL = "commands.$MOD_ID.skills.level.get"
+        const val ADD_LEVEL = "commands.$MOD_ID.skills.level.add"
+        const val SET_LEVEL = "commands.$MOD_ID.skills.level.set"
+        const val SET_POINTS = "commands.$MOD_ID.skills.levelpoints.set"
+        const val ADD_POINTS = "commands.$MOD_ID.skills.levelpoints.add"
+    }
+
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
         registryAccess: CommandRegistryAccess,
@@ -26,32 +37,53 @@ object RPGSkillsCommands : CommandRegistrationCallback {
         dispatcher.apply {
             command("skills") {
                 subExec("list") { command ->
-                    command.source.sendFeedback(Text.literal("Skills: ").apply {
-                        command.source.server.registryManager[Skill].indexedEntries.forEachIndexed { index, entry ->
-                            if (index > 0) append(Text.literal(",  "))
-                            append(entry.name)
-                        }
-                    }, false)
-                    1
+                    val skills = command.source.server.registryManager[Skill].indexedEntries
+
+                    if (skills.size() == 0)
+                        command.source.sendFeedback(Text.translatable(Translations.LIST_NONE), false)
+                    else
+                        command.source.sendFeedback(Text.translatable(Translations.LIST, skills.size(), Text.empty().apply {
+                            skills.forEachIndexed { index, entry ->
+                                if (index > 0) append(Text.literal(",  "))
+                                append(entry.name)
+                            }
+                        }), false)
+
+                    skills.size()
                 }
                 sub("level") {
                     argument("player", player()) {
                         argument("skill", registryEntry(registryAccess, Skill.key)) {
                             subExec("get") { command ->
-                                val level = getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key).key.get()]
-                                command.source.sendFeedback(Text.literal(level.toString()), false)
+                                val player = getPlayer(command, "player")
+                                val skill = getRegistryEntry(command, "skill", Skill.key)
+                                val level = player[SkillsComponent][skill.key.get()]
+
+                                command.source.sendFeedback(Text.translatable(Translations.GET_LEVEL, player.displayName, skill.name, level), false)
                                 level
                             }
                             sub("add") {
                                 argumentExec("amount", integer()) { command ->
-                                    getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key).key.get()] += getInteger(command, "amount")
-                                    1
+                                    val player = getPlayer(command, "player")
+                                    val amount = getInteger(command, "amount")
+                                    val skill = getRegistryEntry(command, "skill", Skill.key)
+
+                                    player[SkillsComponent][skill.key.get()] += amount
+
+                                    command.source.sendFeedback(Text.translatable(Translations.ADD_LEVEL, player.displayName, skill.name, amount), true)
+                                    amount
                                 }
                             }
                             sub("set") {
                                 argumentExec("amount", integer(0)) { command ->
-                                    getPlayer(command, "player")[SkillsComponent][getRegistryEntry(command, "skill", Skill.key).key.get()] = getInteger(command, "amount")
-                                    1
+                                    val player = getPlayer(command, "player")
+                                    val amount = getInteger(command, "amount")
+                                    val skill = getRegistryEntry(command, "skill", Skill.key)
+
+                                    player[SkillsComponent][skill.key.get()] = amount
+
+                                    command.source.sendFeedback(Text.translatable(Translations.SET_LEVEL, player.displayName, skill.name, amount), true)
+                                    amount
                                 }
                             }
                         }
@@ -61,14 +93,24 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                     argument("player", player()) {
                         sub("set") {
                             argumentExec("amount", integer(0)) { command ->
-                                getPlayer(command, "player")[SkillsComponent].remainingLevelPoints = getInteger(command, "amount")
-                                1
+                                val player = getPlayer(command, "player")
+                                val amount = getInteger(command, "amount")
+
+                                player[SkillsComponent].remainingLevelPoints = amount
+
+                                command.source.sendFeedback(Text.translatable(Translations.SET_POINTS, player.displayName, amount), true)
+                                amount
                             }
                         }
                         sub("add") {
                             argumentExec("amount", integer()) { command ->
-                                getPlayer(command, "player")[SkillsComponent].remainingLevelPoints += getInteger(command, "amount")
-                                1
+                                val player = getPlayer(command, "player")
+                                val amount = getInteger(command, "amount")
+
+                                player[SkillsComponent].remainingLevelPoints += amount
+
+                                command.source.sendFeedback(Text.translatable(Translations.ADD_POINTS, player.displayName, amount), true)
+                                amount
                             }
                         }
                     }

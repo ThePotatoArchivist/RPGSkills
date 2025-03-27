@@ -34,7 +34,7 @@ object RPGSkills : ModInitializer {
 		ResourceManagerHelper.registerBuiltinResourcePack(
 			id("default_pack"),
 			FabricLoader.getInstance().getModContainer(MOD_ID).get(),
-			ResourcePackActivationType.NORMAL
+			if (FabricLoader.getInstance().isDevelopmentEnvironment) ResourcePackActivationType.DEFAULT_ENABLED else ResourcePackActivationType.NORMAL
 		)
 
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SimpleSynchronousResourceReloadListener(id("clear_locked_items")) {
