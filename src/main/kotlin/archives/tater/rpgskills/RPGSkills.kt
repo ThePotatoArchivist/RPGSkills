@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 object RPGSkills : ModInitializer {
 	const val MOD_ID = "rpgskills"
 
+	@JvmStatic
 	fun id(path: String) = Identifier(MOD_ID, path)
 
     val logger: Logger = LoggerFactory.getLogger(MOD_ID)

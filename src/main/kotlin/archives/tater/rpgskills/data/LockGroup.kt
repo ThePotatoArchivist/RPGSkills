@@ -25,14 +25,16 @@ class LockGroup(
     val requirements: List<Map<RegistryKey<Skill>, Int>> = listOf(),
     val itemName: String? = null,
     val itemMessage: String? = null,
+    val recipeMessage: String? = null,
 ) {
     constructor(
         items: Ingredient = Ingredient.EMPTY,
         recipes: List<Identifier> = listOf(),
         requirements: Map<RegistryKey<Skill>, Int>,
         itemName: String? = null,
-        itemMessage: String? = null
-    ) : this(items, recipes, listOf(requirements), itemName, itemMessage)
+        itemMessage: String? = null,
+        recipeMessage: String? = null,
+    ) : this(items, recipes, listOf(requirements), itemName, itemMessage, recipeMessage)
 
     fun isSatisfiedBy(levels: Map<RegistryKey<Skill>, Int>) = requirements.any {
         it.all { (skill, level) ->
@@ -50,6 +52,7 @@ class LockGroup(
                 field("requirements", LockGroup::requirements, listOf(), Codec.unboundedMap(RegistryKey.createCodec(Skill.key), Codec.INT).singleOrList()),
                 field("item_name", LockGroup::itemName, null, Codec.STRING),
                 field("item_message", LockGroup::itemMessage, null, Codec.STRING),
+                field("recipe_message", LockGroup::recipeMessage, null, Codec.STRING),
             ).apply(it, ::LockGroup)
         }
 
@@ -73,6 +76,10 @@ class LockGroup(
         @JvmStatic
         fun of(registryManager: DynamicRegistryManager, stack: ItemStack): RegistryEntry<LockGroup>? =
             registryManager[this].indexedEntries.firstOrNull { it.value.items.test(stack) }
+
+        @JvmStatic
+        fun of(registryManager: DynamicRegistryManager, recipeId: Identifier): RegistryEntry<LockGroup>? =
+            registryManager[this].indexedEntries.firstOrNull { recipeId in it.value.recipes }
 
         @JvmStatic
         @Deprecated("Mixin convenience", ReplaceWith("of(player.world.registryManager, stack as ItemStack)", "archives.tater.rpgskills.data.LockGroup.Companion.of", "net.minecraft.item.ItemStack"))
@@ -101,7 +108,10 @@ class LockGroup(
         val RegistryEntry<LockGroup>.itemName: MutableText get() = value.itemName?.let(Text::literal) ?: Text.translatable(key.get().value.toTranslationKey("lockgroup", "name"))
         @JvmStatic
         @get:JvmName("itemMessage")
-        val RegistryEntry<LockGroup>.itemMessage: MutableText get() = value.itemMessage?.let(Text::literal) ?: Text.translatable(key.get().value.toTranslationKey("lockgroup", "message"))
+        val RegistryEntry<LockGroup>.itemMessage: MutableText get() = value.itemMessage?.let(Text::literal) ?: Text.translatable(key.get().value.toTranslationKey("lockgroup", "item_message"))
+        @JvmStatic
+        @get:JvmName("recipeMessage")
+        val RegistryEntry<LockGroup>.recipeMessage: MutableText get() = value.recipeMessage?.let(Text::literal) ?: Text.translatable(key.get().value.toTranslationKey("lockgroup", "recipe_message"))
 
         @JvmStatic
         fun nameOf(player: PlayerEntity, stack: ItemStack) = of(player.world.registryManager, stack)?.itemName
@@ -114,5 +124,8 @@ class LockGroup(
         @JvmStatic
         @Deprecated("Mixin convenience", ReplaceWith("Companion.messageOf(player, stack as ItemStack) ?: original", "archives.tater.rpgskills.data.LockGroup.Companion", "net.minecraft.item.ItemStack"))
         fun messageOf(player: PlayerEntity, stack: Any): MutableText = messageOf(player, stack as ItemStack) ?: Text.literal("")
+
+        @JvmStatic
+        fun messageOf(player: PlayerEntity, recipeId: Identifier) = of(player.world.registryManager, recipeId)?.recipeMessage
     }
 }

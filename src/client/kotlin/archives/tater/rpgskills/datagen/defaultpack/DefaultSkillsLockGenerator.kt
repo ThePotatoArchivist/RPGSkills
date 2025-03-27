@@ -18,7 +18,8 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput) : LockGroupProvid
                 DefaultSkillGenerator.POTATO_SKILL.key to 1
             ),
             itemName = "Unknown Potato",
-            itemMessage = "You don't know if this potato is safe to eat"
+            itemMessage = "You don't know if this potato is safe to eat",
+            recipeMessage = "You don't know how to cook this potato",
         ))
         provider.accept(Identifier("rpg_test", "potato2"), LockGroup(
             items = Ingredient.ofItems(Items.TRIDENT),
@@ -27,7 +28,8 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput) : LockGroupProvid
                 DefaultSkillGenerator.POTATO_SKILL.key to 2
             ),
             itemName = "Unknown Fork",
-            itemMessage = "You don't know how to eat with this fork"
+            itemMessage = "You don't know how to eat with this fork",
+            recipeMessage = "You don't know how to assemble this prismarine",
         ))
         provider.accept(Identifier("rpg_test", "potato3"), LockGroup(
             items = Ingredient.fromTag(ItemTags.BUTTONS),
@@ -36,7 +38,8 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput) : LockGroupProvid
                 DefaultSkillGenerator.POTATO_SKILL.key to 3
             ),
             itemName = "Unknown Button",
-            itemMessage = "You don't know what kind of button this is"
+            itemMessage = "You don't know what kind of button this is",
+            recipeMessage = "You don't know how to assemble this button",
         ))
     }
 }

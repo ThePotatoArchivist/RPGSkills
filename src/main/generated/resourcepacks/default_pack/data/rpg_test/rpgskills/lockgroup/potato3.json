@@ -4,6 +4,7 @@
   "items": [
     "#minecraft:buttons"
   ],
+  "recipe_message": "You don't know how to assemble this button",
   "recipes": [
     "minecraft:acacia_button",
     "minecraft:bamboo_button",

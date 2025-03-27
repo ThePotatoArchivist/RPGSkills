@@ -5,6 +5,7 @@
     "minecraft:potato",
     "minecraft:poisonous_potato"
   ],
+  "recipe_message": "You don't know how to cook this potato",
   "recipes": [
     "minecraft:baked_potato",
     "minecraft:baked_potato_from_smoking",

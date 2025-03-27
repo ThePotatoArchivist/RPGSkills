@@ -4,6 +4,7 @@
   "items": [
     "minecraft:trident"
   ],
+  "recipe_message": "You don't know how to assemble this prismarine",
   "recipes": [
     "minecraft:prismarine_bricks"
   ],
