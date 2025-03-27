@@ -5,6 +5,11 @@
     "minecraft:potato",
     "minecraft:poisonous_potato"
   ],
+  "recipes": [
+    "minecraft:baked_potato",
+    "minecraft:baked_potato_from_smoking",
+    "minecraft:baked_potato_from_campfire_cooking"
+  ],
   "requirements": {
     "rpg_test:potato": 1
   }

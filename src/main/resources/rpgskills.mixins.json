@@ -4,11 +4,12 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "data.IngredientAccessor",
-    "locking.ItemStackMixin",
-    "xp.PlayerEntityMixin",
-    "xp.ServerPlayerEntityMixin",
     "data.StackEntryAccessor",
-    "data.TagEntryAccessor"
+    "data.TagEntryAccessor",
+    "locking.ItemStackMixin",
+    "locking.RecipeUnlockerMixin",
+    "xp.PlayerEntityMixin",
+    "xp.ServerPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

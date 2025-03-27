@@ -55,14 +55,19 @@ class LockGroup(
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))
 
-        private var allLocked: Ingredient? = null
+        private var allLockedItems: Ingredient? = null
+        private var allLockedRecipes: List<Identifier>? = null
 
         private fun findLocked(registryManager: DynamicRegistryManager) {
-            allLocked = DefaultCustomIngredients.any(*registryManager[this].map { it.items }.toTypedArray())
+            allLockedItems = registryManager[this].map { it.items }.let {
+                if (it.isEmpty()) Ingredient.EMPTY else DefaultCustomIngredients.any(*it.toTypedArray())
+            }
+            allLockedRecipes = registryManager[this].flatMap { it.recipes }
         }
 
         fun clearLocked() {
-            allLocked = null
+            allLockedItems = null
+            allLockedRecipes = null
         }
 
         @JvmStatic
@@ -75,9 +80,16 @@ class LockGroup(
 
         @JvmStatic
         fun isLocked(player: PlayerEntity, stack: ItemStack): Boolean {
-            if (allLocked == null)
+            if (allLockedItems == null)
                 findLocked(player.world.registryManager)
-            return allLocked!!.test(stack) && !player[SkillsComponent].allowedItems.test(stack)
+            return allLockedItems!!.test(stack) && !player[SkillsComponent].allowedItems.test(stack)
+        }
+
+        @JvmStatic
+        fun isLocked(player: PlayerEntity, recipeId: Identifier): Boolean {
+            if (allLockedRecipes == null)
+                findLocked(player.world.registryManager)
+            return recipeId in allLockedRecipes!! && recipeId !in player[SkillsComponent].allowedRecipes
         }
 
         @JvmStatic

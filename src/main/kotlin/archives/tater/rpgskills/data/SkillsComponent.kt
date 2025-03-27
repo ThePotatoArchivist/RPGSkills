@@ -21,6 +21,8 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
 
     var allowedItems: Ingredient = findAllowedItems()
         private set
+    var allowedRecipes: List<Identifier> = findAllowedRecipes()
+        private set
 
     private var _spent = 0
     var remainingLevelPoints
@@ -33,7 +35,7 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
     operator fun get(skill: RegistryKey<Skill>) = _levels.getOrDefault(skill, 0)
     operator fun set(skill: RegistryKey<Skill>, level: Int) {
         _levels[skill] = level.coerceIn(0, player.world.registryManager[Skill][skill.value]?.levels?.size ?: 1)
-        updateAllowedItems()
+        updateAllowed()
         key.sync(player)
     }
 
@@ -43,8 +45,13 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
             if (it.isEmpty()) Ingredient.EMPTY else DefaultCustomIngredients.any(*it.toTypedArray())
         }
 
-    private fun updateAllowedItems() {
+    private fun findAllowedRecipes(): List<Identifier> = player.world.registryManager[LockGroup]
+        .filter { it.isSatisfiedBy(levels) }
+        .flatMap { it.recipes }
+
+    private fun updateAllowed() {
         allowedItems = findAllowedItems()
+        allowedRecipes = findAllowedRecipes()
     }
 
     override fun shouldCopyForRespawn(lossless: Boolean, keepInventory: Boolean, sameCharacter: Boolean): Boolean =
@@ -53,7 +60,7 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
     override fun copyFrom(other: SkillsComponent) {
         _levels = other._levels
         _spent = other._spent
-        updateAllowedItems()
+        updateAllowed()
     }
 
     override fun readFromNbt(tag: NbtCompound) {
@@ -61,7 +68,7 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
             keys.associate { RegistryKey.of(Skill.key, Identifier.tryParse(it)) to getInt(it) }
         }.toMutableMap()
         _spent = tag.getInt("Spent")
-        updateAllowedItems()
+        updateAllowed()
     }
 
     override fun writeToNbt(tag: NbtCompound) {

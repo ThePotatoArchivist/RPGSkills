@@ -4,6 +4,9 @@
   "items": [
     "minecraft:trident"
   ],
+  "recipes": [
+    "minecraft:prismarine_bricks"
+  ],
   "requirements": {
     "rpg_test:potato": 2
   }

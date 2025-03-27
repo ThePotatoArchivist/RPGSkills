@@ -13,6 +13,7 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput) : LockGroupProvid
     override fun configure(provider: BiConsumer<Identifier, LockGroup>) {
         provider.accept(Identifier("rpg_test", "potato1"), LockGroup(
             items = Ingredient.ofItems(Items.POTATO, Items.POISONOUS_POTATO),
+            recipes = listOf(Identifier("baked_potato"), Identifier("baked_potato_from_smoking"), Identifier("baked_potato_from_campfire_cooking")),
             requirements = mapOf(
                 DefaultSkillGenerator.POTATO_SKILL.key to 1
             ),
@@ -21,6 +22,7 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput) : LockGroupProvid
         ))
         provider.accept(Identifier("rpg_test", "potato2"), LockGroup(
             items = Ingredient.ofItems(Items.TRIDENT),
+            recipes = listOf(Identifier("prismarine_bricks")),
             requirements = mapOf(
                 DefaultSkillGenerator.POTATO_SKILL.key to 2
             ),
@@ -29,6 +31,7 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput) : LockGroupProvid
         ))
         provider.accept(Identifier("rpg_test", "potato3"), LockGroup(
             items = Ingredient.fromTag(ItemTags.BUTTONS),
+            recipes = listOf("acacia", "bamboo", "birch", "cherry", "crimson", "jungle", "mangrove", "oak", "spruce", "stone", "warped", "dark_oak", "polished_blackstone").map { Identifier("${it}_button") },
             requirements = mapOf(
                 DefaultSkillGenerator.POTATO_SKILL.key to 3
             ),
