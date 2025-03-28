@@ -5,12 +5,14 @@ import archives.tater.rpgskills.data.LockGroupProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.item.Items
 import net.minecraft.recipe.Ingredient
+import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.ItemTags
 import net.minecraft.util.Identifier
+import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
-class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput) : LockGroupProvider(dataOutput) {
-    override fun configure(provider: BiConsumer<Identifier, LockGroup>) {
+class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput, registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>) : LockGroupProvider(dataOutput, registriesFuture) {
+    override fun configure(provider: BiConsumer<Identifier, LockGroup>, registries: RegistryWrapper.WrapperLookup) {
         provider.accept(Identifier("rpg_test", "potato1"), LockGroup(
             items = Ingredient.ofItems(Items.POTATO, Items.POISONOUS_POTATO),
             recipes = listOf(Identifier("baked_potato"), Identifier("baked_potato_from_smoking"), Identifier("baked_potato_from_campfire_cooking")),

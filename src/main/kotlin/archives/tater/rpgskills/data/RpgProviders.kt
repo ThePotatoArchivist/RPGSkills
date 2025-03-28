@@ -3,12 +3,10 @@ package archives.tater.rpgskills.data
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider
 import net.minecraft.data.DataOutput
-import net.minecraft.registry.Registerable
-import net.minecraft.registry.Registry
-import net.minecraft.registry.RegistryBuilder
-import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.*
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.util.Identifier
+import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
 abstract class SkillProvider(
@@ -18,8 +16,8 @@ abstract class SkillProvider(
 }
 
 abstract class LockGroupProvider(
-    dataOutput: FabricDataOutput,
-) : FabricCodecDataProvider<LockGroup>(dataOutput, DataOutput.OutputType.DATA_PACK, "rpgskills/lockgroup", LockGroup.CODEC) {
+    dataOutput: FabricDataOutput, registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>,
+) : DynamicCodecDataProvider<LockGroup>(dataOutput, DataOutput.OutputType.DATA_PACK, "rpgskills/lockgroup", LockGroup.CODEC, registriesFuture) {
     override fun getName(): String = "Lock Group"
 }
 
