@@ -6,7 +6,6 @@
     "data.IngredientAccessor",
     "data.StackEntryAccessor",
     "data.TagEntryAccessor",
-    "locking.CraftingScreenHandlerAccessor",
     "locking.CraftingScreenHandlerMixin",
     "locking.ItemStackMixin",
     "locking.RecipeUnlockerMixin",
