@@ -57,7 +57,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                             subExec("get") { command ->
                                 val player = getPlayer(command, "player")
                                 val skill = getRegistryEntry(command, "skill", Skill.key)
-                                val level = player[SkillsComponent][skill.key.get()]
+                                val level = player[SkillsComponent][skill]
 
                                 command.source.sendFeedback(Text.translatable(Translations.GET_LEVEL, player.displayName, skill.name, level), false)
                                 level
@@ -68,7 +68,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                                     val amount = getInteger(command, "amount")
                                     val skill = getRegistryEntry(command, "skill", Skill.key)
 
-                                    player[SkillsComponent][skill.key.get()] += amount
+                                    player[SkillsComponent][skill] += amount
 
                                     command.source.sendFeedback(Text.translatable(Translations.ADD_LEVEL, player.displayName, skill.name, amount), true)
                                     amount
@@ -80,7 +80,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                                     val amount = getInteger(command, "amount")
                                     val skill = getRegistryEntry(command, "skill", Skill.key)
 
-                                    player[SkillsComponent][skill.key.get()] = amount
+                                    player[SkillsComponent][skill] = amount
 
                                     command.source.sendFeedback(Text.translatable(Translations.SET_LEVEL, player.displayName, skill.name, amount), true)
                                     amount

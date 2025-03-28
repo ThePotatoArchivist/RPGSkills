@@ -4,7 +4,7 @@ import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.util.wasPressed
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.networking.RecipeBlockedPacket
-import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.registryOf
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
@@ -14,6 +14,7 @@ import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
 import net.minecraft.registry.entry.RegistryEntry
 import org.lwjgl.glfw.GLFW
+import kotlin.jvm.optionals.getOrNull
 
 object RPGSkillsClient : ClientModInitializer {
 	@JvmField
@@ -30,7 +31,7 @@ object RPGSkillsClient : ClientModInitializer {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 		ClientPlayNetworking.registerGlobalReceiver(RecipeBlockedPacket.TYPE) { packet, player, _ ->
 			blockedRecipeGroup = packet.lockGroup?.let {
-				player.world.registryManager[LockGroup].getEntry(it).orElse(null)
+				registryOf(player, LockGroup).getEntry(it).getOrNull()
 			}
 		}
 		ClientTickEvents.END_CLIENT_TICK.register { client ->

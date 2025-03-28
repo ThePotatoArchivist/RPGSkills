@@ -2,7 +2,7 @@ package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.ComponentKeyHolder
-import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.registryOf
 import archives.tater.rpgskills.util.value
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
@@ -15,12 +15,14 @@ import net.minecraft.recipe.Ingredient
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.util.Identifier
-import kotlin.jvm.optionals.getOrNull
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<SkillsComponent>, AutoSyncedComponent {
-    private var _levels = mutableMapOf<RegistryKey<Skill>, Int>()
-    val levels: Map<RegistryKey<Skill>, Int> get() = _levels
+    private var _levels = mutableMapOf<RegistryEntry<Skill>, Int>()
+    val levels: Map<RegistryEntry<Skill>, Int> get() = _levels
 
     var allowedItems: Ingredient = findAllowedItems()
         private set
@@ -35,34 +37,26 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
             key.sync(player)
         }
 
-    operator fun get(skill: RegistryKey<Skill>) = _levels.getOrDefault(skill, 0)
-    operator fun set(skill: RegistryKey<Skill>, level: Int) {
-        _levels[skill] = level.coerceIn(0, player.world.registryManager[Skill][skill.value]?.levels?.size ?: 1)
+    operator fun get(skill: RegistryEntry<Skill>) = _levels.getOrDefault(skill, 0)
+    operator fun set(skill: RegistryEntry<Skill>, level: Int) {
+        _levels[skill] = level.coerceIn(0, skill.value.levels.size)
         updateAllowed()
         key.sync(player)
     }
 
     fun getUpgradeCost(skill: RegistryEntry<Skill>): Int? = skill.value.levels
-        .getOrNull(this[skill.key.get()])?.cost
-
-    fun getUpgradeCost(skill: RegistryKey<Skill>) = player.world.registryManager[Skill]
-        .getEntry(skill).getOrNull()
-        ?.let { getUpgradeCost(it) }
+        .getOrNull(this[skill])?.cost
 
     fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = getUpgradeCost(skill)
         ?.let { remainingLevelPoints >= it } ?: false
 
-    fun canUpgrade(skill: RegistryKey<Skill>): Boolean = player.world.registryManager[Skill]
-        .getEntry(skill).getOrNull()
-        ?.let { canUpgrade(it) } ?: false
-
-    private fun findAllowedItems(): Ingredient = player.world.registryManager[LockGroup]
+    private fun findAllowedItems(): Ingredient = registryOf(player, LockGroup)
         .filter { it.isSatisfiedBy(levels) }.map { it.items }
         .let {
             if (it.isEmpty()) Ingredient.EMPTY else DefaultCustomIngredients.any(*it.toTypedArray())
         }
 
-    private fun findAllowedRecipes(): List<Identifier> = player.world.registryManager[LockGroup]
+    private fun findAllowedRecipes(): List<Identifier> = registryOf(player, LockGroup)
         .filter { it.isSatisfiedBy(levels) }
         .flatMap { it.recipes }
 
@@ -81,12 +75,10 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
     }
 
     override fun readFromNbt(tag: NbtCompound) {
-        val registry = player.world.registryManager[Skill]
+        val registry = registryOf(player, Skill)
         _levels = tag.getCompound("Levels").run {
-            keys.associate { RegistryKey.of(Skill.key, Identifier.tryParse(it)) to getInt(it) }
-                .filterKeys { skill -> registry.contains(skill).also {
-                    if (!it) RPGSkills.logger.info("Discarding unknown skill {}", skill.value)
-                } }
+            // TODO catch errors here
+            keys.associate { registry.entryOf(RegistryKey.of(Skill.key, Identifier.tryParse(it))) to getInt(it) }
         }.toMutableMap()
         _spent = tag.getInt("Spent")
         updateAllowed()
@@ -95,7 +87,7 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
     override fun writeToNbt(tag: NbtCompound) {
         tag.put("Levels", NbtCompound().apply {
             for ((skill, level) in _levels) {
-                putInt(skill.value.toString(), level)
+                putInt(skill.key.get().value.toString(), level)
             }
         })
         tag.putInt("Spent", _spent)

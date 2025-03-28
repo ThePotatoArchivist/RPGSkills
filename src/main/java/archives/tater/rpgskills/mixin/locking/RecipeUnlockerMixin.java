@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+@SuppressWarnings("deprecation")
 @Mixin(RecipeUnlocker.class)
 public interface RecipeUnlockerMixin {
     @Inject(
@@ -21,7 +22,7 @@ public interface RecipeUnlockerMixin {
     private void alsoCheckSkills(World world, ServerPlayerEntity player, Recipe<?> recipe, CallbackInfoReturnable<Boolean> cir) {
         if (LockGroup.isLocked(player, recipe.getId())) {
             cir.setReturnValue(false);
-            var lockGroup = LockGroup.of(player.getWorld().getRegistryManager(), recipe.getId());
+            var lockGroup = LockGroup.of(player, recipe.getId());
             if (lockGroup != null && lockGroup.getKey().isPresent()) {
                 ServerPlayNetworking.send(player, new RecipeBlockedPacket(lockGroup.getKey().get()));
                 return;

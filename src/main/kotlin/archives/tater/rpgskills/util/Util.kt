@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
+import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.DynamicRegistryManager
@@ -65,6 +66,11 @@ interface RegistryKeyHolder<T> {
 
 operator fun <E> DynamicRegistryManager.get(holder: RegistryKeyHolder<out Registry<out E>?>): Registry<E> =
     this[holder.key]
+
+fun registriesOf(provider: Entity): DynamicRegistryManager = provider.world.registryManager
+
+fun <T> registryOf(provider: Entity, key: RegistryKey<Registry<T>>): Registry<T> = registriesOf(provider)[key]
+fun <T> registryOf(provider: Entity, holder: RegistryKeyHolder<Registry<T>>): Registry<T> = registryOf(provider, holder.key)
 
 @Suppress("UnstableApiUsage")
 interface AttachmentTypeHolder<T> {
