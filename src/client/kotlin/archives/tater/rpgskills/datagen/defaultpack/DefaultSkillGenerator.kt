@@ -14,6 +14,18 @@ import java.util.function.BiConsumer
 class DefaultSkillGenerator(dataOutput: FabricDataOutput) : SkillProvider(dataOutput) {
 	override fun configure(provider: BiConsumer<Identifier, Skill>) {
 		provider.accept(POTATO_SKILL)
+        provider.accept(Entry(Identifier("rpg_test", "cow"), Skill(
+            icon = ItemStack(Items.COW_SPAWN_EGG),
+            levels = listOf(),
+            name = "Cow Skill",
+            description = "Unlocks cows I guess"
+        )))
+        provider.accept(Entry(Identifier("rpg_test", "grass"), Skill(
+            icon = ItemStack(Items.GRASS_BLOCK),
+            levels = listOf(),
+            name = "Grass Skill",
+            description = "Unlocks cows I guess"
+        )))
     }
 
     companion object : BuildsRegistry<Skill> {

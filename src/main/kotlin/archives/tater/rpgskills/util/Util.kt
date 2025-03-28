@@ -28,7 +28,7 @@ internal fun <T, C> field(name: String, getter: (C) -> T, codec: Codec<T>): Reco
 internal fun <T, C> field(name: String, getter: (C) -> T, codec: MapCodec<T>): RecordCodecBuilder<C, T> = codec.fieldOf(name).forGetter(getter)
 internal fun <T, C> field(name: String, getter: (C) -> T, default: T, codec: Codec<T>): RecordCodecBuilder<C, T> = codec.optionalFieldOf(name, default).forGetter(getter)
 
-internal inline val <T> RegistryEntry<T>.value get() = value()
+inline val <T> RegistryEntry<T>.value: T get() = value()
 
 fun IdentifiableResourceReloadListener(fabricId: Identifier, reload: (
     synchronizer: ResourceReloader.Synchronizer,

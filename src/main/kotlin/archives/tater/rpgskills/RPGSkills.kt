@@ -2,14 +2,19 @@ package archives.tater.rpgskills
 
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.SkillsComponent
+import archives.tater.rpgskills.networking.SkillUpgradePacket
 import archives.tater.rpgskills.util.SimpleSynchronousResourceReloadListener
+import archives.tater.rpgskills.util.get
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resource.ResourceType
+import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -40,5 +45,14 @@ object RPGSkills : ModInitializer {
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SimpleSynchronousResourceReloadListener(id("clear_locked_items")) {
 			LockGroup.clearLocked()
 		})
+
+		ServerPlayNetworking.registerGlobalReceiver(SkillUpgradePacket.TYPE) { packet, player, respond ->
+			val skillsComponent = player[SkillsComponent]
+			if (skillsComponent.canUpgrade(packet.skill)) {
+				skillsComponent.remainingLevelPoints -= skillsComponent.getUpgradeCost(packet.skill)!!
+				skillsComponent[packet.skill]++
+				player.world.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
+			}
+		}
 	}
 }

@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketType
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.registry.RegistryKey
 
+@JvmRecord
 data class RecipeBlockedPacket(val lockGroup: RegistryKey<LockGroup>?) : FabricPacket {
     override fun write(buf: PacketByteBuf) {
         buf.writeBoolean(lockGroup != null)

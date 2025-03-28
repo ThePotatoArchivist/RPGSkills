@@ -1,0 +1,9 @@
+{
+  "description": "Unlocks cows I guess",
+  "icon": {
+    "Count": 1,
+    "id": "minecraft:cow_spawn_egg"
+  },
+  "levels": [],
+  "name": "Cow Skill"
+}

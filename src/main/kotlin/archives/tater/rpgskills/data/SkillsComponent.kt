@@ -3,6 +3,7 @@ package archives.tater.rpgskills.data
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.ComponentKeyHolder
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.value
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
@@ -12,7 +13,9 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.recipe.Ingredient
 import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.util.Identifier
+import kotlin.jvm.optionals.getOrNull
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<SkillsComponent>, AutoSyncedComponent {
@@ -39,6 +42,20 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
         key.sync(player)
     }
 
+    fun getUpgradeCost(skill: RegistryEntry<Skill>): Int? = skill.value.levels
+        .getOrNull(this[skill.key.get()])?.cost
+
+    fun getUpgradeCost(skill: RegistryKey<Skill>) = player.world.registryManager[Skill]
+        .getEntry(skill).getOrNull()
+        ?.let { getUpgradeCost(it) }
+
+    fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = getUpgradeCost(skill)
+        ?.let { remainingLevelPoints >= it } ?: false
+
+    fun canUpgrade(skill: RegistryKey<Skill>): Boolean = player.world.registryManager[Skill]
+        .getEntry(skill).getOrNull()
+        ?.let { canUpgrade(it) } ?: false
+
     private fun findAllowedItems(): Ingredient = player.world.registryManager[LockGroup]
         .filter { it.isSatisfiedBy(levels) }.map { it.items }
         .let {
@@ -64,8 +81,12 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
     }
 
     override fun readFromNbt(tag: NbtCompound) {
+        val registry = player.world.registryManager[Skill]
         _levels = tag.getCompound("Levels").run {
             keys.associate { RegistryKey.of(Skill.key, Identifier.tryParse(it)) to getInt(it) }
+                .filterKeys { skill -> registry.contains(skill).also {
+                    if (!it) RPGSkills.logger.info("Discarding unknown skill {}", skill.value)
+                } }
         }.toMutableMap()
         _spent = tag.getInt("Spent")
         updateAllowed()
