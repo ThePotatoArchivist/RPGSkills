@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.datagen
 
 import archives.tater.rpgskills.RPGSkillsCommands
+import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 
@@ -14,5 +15,6 @@ class LangGenerator(dataOutput: FabricDataOutput) : FabricLanguageProvider(dataO
         translationBuilder.add(RPGSkillsCommands.Translations.ADD_LEVEL, "Gave %3$s levels in skill %2$s to %1$s")
         translationBuilder.add(RPGSkillsCommands.Translations.ADD_POINTS, "Gave %2$s level points to %s")
         translationBuilder.add(RPGSkillsCommands.Translations.SET_POINTS, "Set %2$s level points on %s")
+        translationBuilder.add(SkillsScreen.NAME_TRANSLATION, "Skills")
     }
 }
