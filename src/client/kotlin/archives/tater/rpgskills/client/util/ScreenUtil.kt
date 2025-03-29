@@ -1,5 +1,9 @@
+@file:Environment(EnvType.CLIENT)
+
 package archives.tater.rpgskills.client.util
 
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.tooltip.Tooltip

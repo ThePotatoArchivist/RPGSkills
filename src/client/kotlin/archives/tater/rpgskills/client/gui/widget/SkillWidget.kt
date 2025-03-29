@@ -1,25 +1,32 @@
 package archives.tater.rpgskills.client.gui.widget
 
+import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 
+@Environment(EnvType.CLIENT)
 class SkillWidget(
     x: Int,
     y: Int,
-    player: PlayerEntity,
+    private val player: PlayerEntity,
     private val skill: RegistryEntry<Skill>,
+    private val screen: Screen? = null,
 ) : ClickableWidget(x, y, WIDTH - SkillUpgradeButton.WIDTH - 5, HEIGHT, skill.name) {
     private val skillsComponent = player[SkillsComponent]
+    private val name = skill.name
 
     private val level get() = skillsComponent[skill]
     private val maxLevel = skill.value.levels.size
@@ -27,7 +34,7 @@ class SkillWidget(
     override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         context.drawTexture(TEXTURE, x, y, 9, if (isHovered) 147 + HEIGHT else 147, WIDTH, HEIGHT)
         context.drawItem(skill.value.icon, x + 3, y + 3)
-        context.drawText(textRenderer, skill.name, x + 21, y + 4, 0xffffff, true)
+        context.drawText(textRenderer, name, x + 21, y + 4, 0xffffff, true)
 
         val level = level
         val maxLevel = maxLevel
@@ -58,7 +65,7 @@ class SkillWidget(
     }
 
     override fun onClick(mouseX: Double, mouseY: Double) {
-
+        MinecraftClient.getInstance().setScreen(SkillScreen(player, skill, screen))
     }
 
     companion object {

@@ -8,12 +8,15 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.registryOf
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.math.MathHelper.clamp
 
+@Environment(EnvType.CLIENT)
 class SkillsScreen(private val player: PlayerEntity) : Screen(Text.translatable(NAME_TRANSLATION)) {
     private var x = 0
     private var y = 0
@@ -22,14 +25,12 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(Text.translatable(
     private val canScroll get() = skillWidgets.size > MAX_VISIBLE
     private var scrolling = false
 
-    override fun shouldPause() = false
-
     override fun init() {
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
 
         skillWidgets = registryOf(player, Skill).indexedEntries.mapIndexed { index, skill -> Pair(
-            addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill)),
+            addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill, this)),
             addDrawableChild(SkillUpgradeButton(x + 197, y + index * SkillWidget.HEIGHT + 19 + 2, player, skill))
         ) }
     }

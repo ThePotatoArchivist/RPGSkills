@@ -5,9 +5,12 @@ import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.data.LockGroup.Manager.recipeMessage
 import archives.tater.rpgskills.mixin.client.HandledScreenAccessor
 import archives.tater.rpgskills.mixin.client.ScreenAccessor
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 
+@Environment(EnvType.CLIENT)
 object CrossedArrow {
     private val TEXTURE = id("textures/gui/container/crossed_arrow.png")
     private const val LARGE_WIDTH = 28

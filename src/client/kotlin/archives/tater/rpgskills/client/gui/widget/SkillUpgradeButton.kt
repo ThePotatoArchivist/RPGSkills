@@ -6,6 +6,8 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.networking.SkillUpgradePacket
 import archives.tater.rpgskills.util.get
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -15,6 +17,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
 
+@Environment(EnvType.CLIENT)
 class SkillUpgradeButton(
     x: Int,
     y: Int,
