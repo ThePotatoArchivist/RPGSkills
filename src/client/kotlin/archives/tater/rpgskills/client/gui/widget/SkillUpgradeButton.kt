@@ -5,6 +5,7 @@ import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.networking.SkillUpgradePacket
+import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -36,25 +37,28 @@ class SkillUpgradeButton(
 
     override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         val canUpgrade = canUpgrade // Performance
-
-        context.drawTexture(TEXTURE, x, y, 197, when {
-            !canUpgrade -> 2 * HEIGHT
-            isHovered -> 1 * HEIGHT
-            else -> 0
-        } + 192, WIDTH, HEIGHT)
-
         val cost = cost
-        if (cost == null)
-            context.drawTexture(TEXTURE, x + 10, y + 5, 187, 233, 9, 9)
-        else
-            context.drawOutlinedText(
-                textRenderer,
-                cost.toString() ?: "x",
-                x + 12,
-                y + 5,
-                if (canUpgrade) 0xC8FF8F else 0x8C605D,
-                if (canUpgrade) 0 else 0x47352F
-            )
+
+        context.drawTexture(TEXTURE, x, y, 61 + when {
+            cost == null -> 3 * WIDTH
+            !canUpgrade -> 2 * WIDTH
+            isHovered -> 1 * WIDTH
+            else -> 0
+        }, 192, WIDTH, HEIGHT)
+
+        if (cost == null) {
+            context.drawOutlinedText(textRenderer, MAX.text, x + (WIDTH - textRenderer.getWidth(MAX.text) - 2) / 2, y + (HEIGHT - 9) / 2)
+            return
+        }
+
+        context.drawOutlinedText(
+            textRenderer,
+            cost.toString(),
+            x + 12,
+            y + 5,
+            if (canUpgrade) 0xC8FF8F else 0x8C605D,
+            if (canUpgrade) 0 else 0x47352F
+        )
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
@@ -65,6 +69,8 @@ class SkillUpgradeButton(
         val TEXTURE = SkillsScreen.TEXTURE
         const val WIDTH = 36
         const val HEIGHT = 18
+
+        val MAX = Translation.unit("screen.rpgskills.skills.max")
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
     }

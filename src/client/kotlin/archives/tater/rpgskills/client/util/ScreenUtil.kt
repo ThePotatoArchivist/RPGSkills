@@ -62,3 +62,4 @@ fun DrawContext.drawOutlinedText(
     drawText(textRenderer, text, x + 2, y + 1, outlineColor, false)
     drawText(textRenderer, text, x + 1, y + 1, textColor, false)
 }
+

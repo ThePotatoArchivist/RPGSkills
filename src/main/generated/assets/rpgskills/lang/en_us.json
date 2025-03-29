@@ -11,5 +11,6 @@
   "rpgskills.tooltip.stack.requirement": "- %s",
   "rpgskills.tooltip.stack.requires": "Requires:",
   "rpgskills.tooltip.stack.requires.any": "Requires either:",
-  "screen.rpgskills.skills": "Skills"
+  "screen.rpgskills.skills": "Skills",
+  "screen.rpgskills.skills.max": "MAX"
 }

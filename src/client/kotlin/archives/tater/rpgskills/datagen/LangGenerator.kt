@@ -4,6 +4,7 @@ import archives.tater.rpgskills.ItemLockTooltip
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
+import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
@@ -22,6 +23,7 @@ class LangGenerator(dataOutput: FabricDataOutput) : FabricLanguageProvider(dataO
         translationBuilder.add(ItemLockTooltip.REQUIRES, "Requires:")
         translationBuilder.add(ItemLockTooltip.REQUIRES_ANY, "Requires either:")
         translationBuilder.add(ItemLockTooltip.REQUIREMENT, "- %s")
+        translationBuilder.add(SkillUpgradeButton.MAX, "MAX")
         translationBuilder.add(RPGSkillsClient.RPG_SKILLS_CATEGORY, "RPG Skills")
         translationBuilder.add(RPGSkillsClient.SKILLS_KEY_TRANSLATION, "Open Skills")
     }
