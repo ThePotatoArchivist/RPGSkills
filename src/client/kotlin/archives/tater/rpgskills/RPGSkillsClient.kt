@@ -40,14 +40,10 @@ object RPGSkillsClient : ClientModInitializer {
 		}
 
 		ClientTickEvents.END_CLIENT_TICK.register { client ->
-			while (skillsKeyBinding.wasPressed) {
+			if (skillsKeyBinding.wasPressed)
 				client.player?.let {
-					when (client.currentScreen) {
-						null -> client.setScreen(SkillsScreen(it))
-						is SkillsScreen -> client.currentScreen!!.close()
-					}
+					client.setScreen(SkillsScreen(it))
 				}
-			}
 		}
 
 		ScreenEvents.BEFORE_INIT.register { _, _, _, _ ->
