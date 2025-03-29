@@ -73,17 +73,17 @@ class LockGroup(
             allLockedRecipes = null
         }
 
-        @JvmStatic
         fun of(registry: Registry<LockGroup>, stack: ItemStack): RegistryEntry<LockGroup>? =
             registry.indexedEntries.firstOrNull { it.value.items.test(stack) }
 
-        @JvmStatic
         fun of(registry: Registry<LockGroup>, recipeId: Identifier): RegistryEntry<LockGroup>? =
             registry.indexedEntries.firstOrNull { recipeId in it.value.recipes }
 
+        fun of(player: PlayerEntity, stack: ItemStack) = of(registryOf(player, LockGroup), stack)
+
         @JvmStatic
         @Deprecated("Mixin convenience", ReplaceWith("of(player.world.registryManager, stack as ItemStack)", "archives.tater.rpgskills.data.LockGroup.Companion.of", "net.minecraft.item.ItemStack"))
-        fun of(player: PlayerEntity, stack: Any) = of(registryOf(player, LockGroup), stack as ItemStack)
+        fun of(player: PlayerEntity, stack: Any) = of(player, stack as ItemStack)
 
         @JvmStatic
         @Deprecated("Convenience", ReplaceWith("of(registryOf(player, LockGroup), recipeId)", "archives.tater.rpgskills.data.LockGroup.Manager.of", "archives.tater.rpgskills.util.registryOf"))

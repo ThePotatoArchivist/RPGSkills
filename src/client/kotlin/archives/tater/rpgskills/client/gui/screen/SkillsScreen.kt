@@ -6,6 +6,7 @@ import archives.tater.rpgskills.client.gui.widget.SkillWidget
 import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
+import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.registryOf
 import net.fabricmc.api.EnvType
@@ -13,11 +14,10 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.text.Text
 import net.minecraft.util.math.MathHelper.clamp
 
 @Environment(EnvType.CLIENT)
-class SkillsScreen(private val player: PlayerEntity) : Screen(Text.translatable(NAME_TRANSLATION)) {
+class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
     private var x = 0
     private var y = 0
     private lateinit var skillWidgets: List<Pair<SkillWidget, SkillUpgradeButton>>
@@ -113,6 +113,6 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(Text.translatable(
         const val SCROLLBAR_X = 237
         const val SCROLLBAR_Y = 19
 
-        const val NAME_TRANSLATION = "screen.rpgskills.skills"
+        val TITLE = Translation.unit("screen.rpgskills.skills")
     }
 }

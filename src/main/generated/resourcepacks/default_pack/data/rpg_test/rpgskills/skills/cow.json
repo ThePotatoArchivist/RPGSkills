@@ -4,6 +4,10 @@
     "Count": 1,
     "id": "minecraft:cow_spawn_egg"
   },
-  "levels": [],
+  "levels": [
+    1,
+    2,
+    3
+  ],
   "name": "Cow Skill"
 }

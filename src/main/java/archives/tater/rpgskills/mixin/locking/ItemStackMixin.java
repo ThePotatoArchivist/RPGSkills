@@ -1,25 +1,38 @@
 package archives.tater.rpgskills.mixin.locking;
 
+import archives.tater.rpgskills.ItemLockTooltip;
 import archives.tater.rpgskills.data.LockGroup;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.block.Block;
+import net.minecraft.block.pattern.CachedBlockPosition;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.List;
 
 @SuppressWarnings({"deprecation"})
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
+    @Shadow public abstract boolean canPlaceOn(Registry<Block> blockRegistry, CachedBlockPosition pos);
+
     @WrapOperation(
             method = "useOnBlock",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;")
@@ -45,12 +58,12 @@ public abstract class ItemStackMixin {
         return TypedActionResult.pass(user.getStackInHand(hand));
     }
 
-    @ModifyExpressionValue(
+    @Inject(
             method = "getTooltip",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;isEnabled(Lnet/minecraft/resource/featuretoggle/FeatureSet;)Z")
+            at = @At("TAIL")
     )
-    private boolean addTooltip(boolean original, @Local(argsOnly = true) PlayerEntity player) {
-        return original && !LockGroup.isLocked(player, this);
+    private void addTooltip(@Nullable PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> cir, @Local List<Text> tooltip) {
+        ItemLockTooltip.appendTooltip((ItemStack) (Object) this, player, tooltip, context);
     }
 
     @ModifyExpressionValue(

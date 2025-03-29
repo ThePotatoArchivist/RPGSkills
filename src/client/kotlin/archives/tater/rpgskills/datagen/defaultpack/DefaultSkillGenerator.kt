@@ -12,20 +12,10 @@ import net.minecraft.util.Identifier
 import java.util.function.BiConsumer
 
 class DefaultSkillGenerator(dataOutput: FabricDataOutput) : SkillProvider(dataOutput) {
-	override fun configure(provider: BiConsumer<Identifier, Skill>) {
+    override fun configure(provider: BiConsumer<Identifier, Skill>) {
 		provider.accept(POTATO_SKILL)
-        provider.accept(BuildEntry(Identifier("rpg_test", "cow"), Skill(
-            icon = ItemStack(Items.COW_SPAWN_EGG),
-            levels = listOf(),
-            name = "Cow Skill",
-            description = "Unlocks cows I guess"
-        )))
-        provider.accept(BuildEntry(Identifier("rpg_test", "grass"), Skill(
-            icon = ItemStack(Items.GRASS_BLOCK),
-            levels = listOf(),
-            name = "Grass Skill",
-            description = "Unlocks cows I guess"
-        )))
+        provider.accept(COW_SKILL)
+        provider.accept(GRASS_SKILL)
         repeat(5) {
             provider.accept(BuildEntry(Identifier("rpg_test", "test$it"), Skill(
                 icon = ItemStack(Items.IRON_INGOT),
@@ -50,8 +40,28 @@ class DefaultSkillGenerator(dataOutput: FabricDataOutput) : SkillProvider(dataOu
             description = "Unlocks potatoes & other stuff"
         ))
 
+        val COW_SKILL = BuildEntry(
+            Identifier("rpg_test", "cow"), Skill(
+                icon = ItemStack(Items.COW_SPAWN_EGG),
+                levels = listOf(1, 2, 3).map(Skill::Level),
+                name = "Cow Skill",
+                description = "Unlocks cows I guess"
+            )
+        )
+
+        val GRASS_SKILL = DefaultSkillGenerator.BuildEntry(
+            Identifier("rpg_test", "grass"), Skill(
+                icon = ItemStack(Items.GRASS_BLOCK),
+                levels = listOf(1, 2).map(Skill::Level),
+                name = "Grass Skill",
+                description = "Unlocks cows I guess"
+            )
+        )
+
         override fun bootstrap(registerable: Registerable<Skill>) {
             registerable.register(POTATO_SKILL)
+            registerable.register(COW_SKILL)
+            registerable.register(GRASS_SKILL)
         }
     }
 }

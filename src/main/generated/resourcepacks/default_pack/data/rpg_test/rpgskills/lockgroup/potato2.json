@@ -9,6 +9,7 @@
     "minecraft:prismarine_bricks"
   ],
   "requirements": {
+    "rpg_test:cow": 2,
     "rpg_test:potato": 2
   }
 }

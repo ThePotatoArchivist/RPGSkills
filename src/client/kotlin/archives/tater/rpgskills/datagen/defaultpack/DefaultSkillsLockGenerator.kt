@@ -27,7 +27,8 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput, registriesFuture:
             items = Ingredient.ofItems(Items.TRIDENT),
             recipes = listOf(Identifier("prismarine_bricks")),
             requirements = mapOf(
-                DefaultSkillGenerator.POTATO_SKILL.entry to 2
+                DefaultSkillGenerator.POTATO_SKILL.entry to 2,
+                DefaultSkillGenerator.COW_SKILL.entry to 2,
             ),
             itemName = "Unknown Fork",
             itemMessage = "You don't know how to eat with this fork",
@@ -36,8 +37,13 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput, registriesFuture:
         provider.accept(Identifier("rpg_test", "potato3"), LockGroup(
             items = Ingredient.fromTag(ItemTags.BUTTONS),
             recipes = listOf("acacia", "bamboo", "birch", "cherry", "crimson", "jungle", "mangrove", "oak", "spruce", "stone", "warped", "dark_oak", "polished_blackstone").map { Identifier("${it}_button") },
-            requirements = mapOf(
-                DefaultSkillGenerator.POTATO_SKILL.entry to 3
+            requirements = listOf(
+                mapOf(
+                    DefaultSkillGenerator.POTATO_SKILL.entry to 3
+                ),
+                mapOf(
+                    DefaultSkillGenerator.GRASS_SKILL.entry to 2
+                ),
             ),
             itemName = "Unknown Button",
             itemMessage = "You don't know what kind of button this is",

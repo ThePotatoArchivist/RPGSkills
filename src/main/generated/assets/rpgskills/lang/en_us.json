@@ -6,5 +6,8 @@
   "commands.rpgskills.skills.levelpoints.set": "Set %2$s level points on %s",
   "commands.rpgskills.skills.list": "There are %s skills: %s",
   "commands.rpgskills.skills.list.none": "There are no skills",
+  "rpgskills.tooltip.stack.requirement": "- %s",
+  "rpgskills.tooltip.stack.requires": "Requires:",
+  "rpgskills.tooltip.stack.requires_any": "Requires any of:",
   "screen.rpgskills.skills": "Skills"
 }

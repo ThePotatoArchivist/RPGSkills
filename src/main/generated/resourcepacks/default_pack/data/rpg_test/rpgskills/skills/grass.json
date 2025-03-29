@@ -4,6 +4,9 @@
     "Count": 1,
     "id": "minecraft:grass_block"
   },
-  "levels": [],
+  "levels": [
+    1,
+    2
+  ],
   "name": "Grass Skill"
 }
