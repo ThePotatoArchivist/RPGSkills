@@ -30,7 +30,7 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(Text.translatable(
         y = (height - HEIGHT) / 2
 
         skillWidgets = registryOf(player, Skill).indexedEntries.mapIndexed { index, skill -> Pair(
-            addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill, this)),
+            addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill)),
             addDrawableChild(SkillUpgradeButton(x + 197, y + index * SkillWidget.HEIGHT + 19 + 2, player, skill))
         ) }
     }

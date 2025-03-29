@@ -1,8 +1,8 @@
 package archives.tater.rpgskills.client.gui.widget
 
-import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.Skill.Companion.description
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.util.get
@@ -11,9 +11,9 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
+import net.minecraft.client.sound.SoundManager
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 
@@ -21,12 +21,12 @@ import net.minecraft.registry.entry.RegistryEntry
 class SkillWidget(
     x: Int,
     y: Int,
-    private val player: PlayerEntity,
+    player: PlayerEntity,
     private val skill: RegistryEntry<Skill>,
-    private val screen: Screen? = null,
 ) : ClickableWidget(x, y, WIDTH - SkillUpgradeButton.WIDTH - 5, HEIGHT, skill.name) {
     private val skillsComponent = player[SkillsComponent]
     private val name = skill.name
+    private val description = skill.description
 
     private val level get() = skillsComponent[skill]
     private val maxLevel = skill.value.levels.size
@@ -54,10 +54,12 @@ class SkillWidget(
                 BAR_HEIGHT
             )
         }
-//        if (level < maxLevel)
-//            context.drawTexture(TEXTURE, x + 21 + level * BAR_NOTCH_WIDTH, y + 13, 29, 192, (maxLevel - level) * BAR_NOTCH_WIDTH + 1, BAR_HEIGHT)
-//        if (level > 0)
-//            context.drawTexture(TEXTURE, x + 21, y + 13, 29, 198, level * BAR_NOTCH_WIDTH + 1, BAR_HEIGHT)
+    }
+
+    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+        super.render(context, mouseX, mouseY, delta)
+        if (hovered)
+            context.drawTooltip(textRenderer, description, mouseX, mouseY)
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
@@ -65,7 +67,11 @@ class SkillWidget(
     }
 
     override fun onClick(mouseX: Double, mouseY: Double) {
-        MinecraftClient.getInstance().setScreen(SkillScreen(player, skill, screen))
+
+    }
+
+    override fun playDownSound(soundManager: SoundManager?) {
+
     }
 
     companion object {
