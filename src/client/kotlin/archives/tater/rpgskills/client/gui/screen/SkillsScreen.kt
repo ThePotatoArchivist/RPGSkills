@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.client.gui.widget.SkillWidget
 import archives.tater.rpgskills.client.util.drawOutlinedText
@@ -113,6 +114,6 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
         const val SCROLLBAR_X = 237
         const val SCROLLBAR_Y = 19
 
-        val TITLE = Translation.unit("screen.rpgskills.skills")
+        val TITLE = Translation.unit("screen.$MOD_ID.skills")
     }
 }

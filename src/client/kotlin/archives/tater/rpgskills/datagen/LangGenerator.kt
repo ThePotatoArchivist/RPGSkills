@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.datagen
 
 import archives.tater.rpgskills.ItemLockTooltip
+import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.util.add
@@ -19,7 +20,9 @@ class LangGenerator(dataOutput: FabricDataOutput) : FabricLanguageProvider(dataO
         translationBuilder.add(RPGSkillsCommands.SET_POINTS, "Set %2$s level points on %s")
         translationBuilder.add(SkillsScreen.TITLE, "Skills")
         translationBuilder.add(ItemLockTooltip.REQUIRES, "Requires:")
-        translationBuilder.add(ItemLockTooltip.REQUIRES_ANY, "Requires any of:")
+        translationBuilder.add(ItemLockTooltip.REQUIRES_ANY, "Requires either:")
         translationBuilder.add(ItemLockTooltip.REQUIREMENT, "- %s")
+        translationBuilder.add(RPGSkillsClient.RPG_SKILLS_CATEGORY, "RPG Skills")
+        translationBuilder.add(RPGSkillsClient.SKILLS_KEY_TRANSLATION, "Open Skills")
     }
 }

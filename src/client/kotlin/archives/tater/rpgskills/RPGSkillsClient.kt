@@ -1,5 +1,6 @@
 package archives.tater.rpgskills
 
+import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.util.wasPressed
 import archives.tater.rpgskills.data.LockGroup
@@ -20,11 +21,14 @@ object RPGSkillsClient : ClientModInitializer {
 	@JvmField
 	var blockedRecipeGroup: RegistryEntry<LockGroup>? = null
 
+	const val RPG_SKILLS_CATEGORY = "category.$MOD_ID.$MOD_ID"
+	const val SKILLS_KEY_TRANSLATION = "key.$MOD_ID.screen.skills"
+
 	val skillsKeyBinding: KeyBinding = KeyBindingHelper.registerKeyBinding(KeyBinding(
-		"key.rpgskills.screen.skills",
+		SKILLS_KEY_TRANSLATION,
 		InputUtil.Type.KEYSYM,
 		GLFW.GLFW_KEY_O,
-		"category.rpgskills.rpgskills"
+		RPG_SKILLS_CATEGORY,
 	))
 
 	override fun onInitializeClient() {
@@ -34,13 +38,18 @@ object RPGSkillsClient : ClientModInitializer {
 				registryOf(player, LockGroup).getEntry(it).getOrNull()
 			}
 		}
+
 		ClientTickEvents.END_CLIENT_TICK.register { client ->
 			while (skillsKeyBinding.wasPressed) {
 				client.player?.let {
-					client.setScreen(SkillsScreen(it))
+					when (client.currentScreen) {
+						null -> client.setScreen(SkillsScreen(it))
+						is SkillsScreen -> client.currentScreen!!.close()
+					}
 				}
 			}
 		}
+
 		ScreenEvents.BEFORE_INIT.register { _, _, _, _ ->
 			blockedRecipeGroup = null
 		}

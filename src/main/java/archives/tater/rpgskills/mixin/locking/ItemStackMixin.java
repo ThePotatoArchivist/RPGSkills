@@ -6,14 +6,11 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.block.Block;
-import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -21,9 +18,9 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
@@ -31,8 +28,6 @@ import java.util.List;
 @SuppressWarnings({"deprecation"})
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
-    @Shadow public abstract boolean canPlaceOn(Registry<Block> blockRegistry, CachedBlockPosition pos);
-
     @WrapOperation(
             method = "useOnBlock",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;")
@@ -70,7 +65,18 @@ public abstract class ItemStackMixin {
             method = "getTooltip",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
     )
-    private Text modifyName(Text original, @Local(argsOnly = true) PlayerEntity player) {
+    private Text modifyName(Text original, @Local(argsOnly = true) @Nullable PlayerEntity player) {
         return player != null && LockGroup.isLocked(player, this) ? LockGroup.nameOf(player, this, original) : original;
+    }
+
+    @ModifyExpressionValue(
+            method = "getTooltip",
+            slice = @Slice(
+                    from = @At(value = "FIELD", target = "Lnet/minecraft/item/ItemStack$TooltipSection;MODIFIERS:Lnet/minecraft/item/ItemStack$TooltipSection;")
+            ),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isSectionVisible(ILnet/minecraft/item/ItemStack$TooltipSection;)Z", ordinal = 0)
+    )
+    private boolean hideModifiers(boolean original, @Local(argsOnly = true) @Nullable PlayerEntity player) {
+        return original && (player == null || !LockGroup.isLocked(player, this));
     }
 }

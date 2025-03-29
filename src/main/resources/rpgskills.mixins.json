@@ -8,7 +8,9 @@
     "data.TagEntryAccessor",
     "locking.CraftingScreenHandlerMixin",
     "locking.ItemStackMixin",
+    "locking.LivingEntityMixin",
     "locking.RecipeUnlockerMixin",
+    "locking.ServerPlayerInteractionManagerMixin",
     "xp.PlayerEntityMixin",
     "xp.ServerPlayerEntityMixin"
   ],

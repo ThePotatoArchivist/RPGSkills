@@ -12,7 +12,7 @@ import net.minecraft.util.Formatting
 
 object ItemLockTooltip {
     val REQUIRES = Translation.unit("rpgskills.tooltip.stack.requires") { formatted(Formatting.RED) }
-    val REQUIRES_ANY = Translation.unit("rpgskills.tooltip.stack.requires_any") { formatted(Formatting.RED) }
+    val REQUIRES_ANY = Translation.unit("rpgskills.tooltip.stack.requires.any") { formatted(Formatting.RED) }
     val REQUIREMENT = Translation.arg("rpgskills.tooltip.stack.requirement") { formatted(Formatting.DARK_GRAY) }
 
     @JvmStatic
@@ -29,7 +29,7 @@ object ItemLockTooltip {
                     if (index != 0)
                         append(Text.literal(" + ").formatted(Formatting.DARK_GRAY))
                     append(skill.name.formatted(Formatting.WHITE))
-                    append(Text.literal(" $level").formatted(Formatting.GRA))
+                    append(Text.literal(" $level").formatted(Formatting.GRAY))
                 }
             }))
         }

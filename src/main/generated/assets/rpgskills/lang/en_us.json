@@ -1,4 +1,5 @@
 {
+  "category.rpgskills.rpgskills": "RPG Skills",
   "commands.rpgskills.skills.level.add": "Gave %3$s levels in skill %2$s to %1$s",
   "commands.rpgskills.skills.level.get": "%s has %3$s levels in skill %2$s",
   "commands.rpgskills.skills.level.set": "Set %3$s levels in skill %2$s on %1$s",
@@ -6,8 +7,9 @@
   "commands.rpgskills.skills.levelpoints.set": "Set %2$s level points on %s",
   "commands.rpgskills.skills.list": "There are %s skills: %s",
   "commands.rpgskills.skills.list.none": "There are no skills",
+  "key.rpgskills.screen.skills": "Open Skills",
   "rpgskills.tooltip.stack.requirement": "- %s",
   "rpgskills.tooltip.stack.requires": "Requires:",
-  "rpgskills.tooltip.stack.requires_any": "Requires any of:",
+  "rpgskills.tooltip.stack.requires.any": "Requires either:",
   "screen.rpgskills.skills": "Skills"
 }
