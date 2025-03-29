@@ -40,14 +40,18 @@ class SkillUpgradeButton(
             else -> 0
         } + 192, WIDTH, HEIGHT)
 
-        context.drawOutlinedText(
-            textRenderer,
-            cost?.toString() ?: "x",
-            x + 12,
-            y + 5,
-            if (canUpgrade) 0xC8FF8F else 0x8C605D,
-            if (canUpgrade) 0 else 0x47352F
-        )
+        val cost = cost
+        if (cost == null)
+            context.drawTexture(TEXTURE, x + 10, y + 5, 187, 233, 9, 9)
+        else
+            context.drawOutlinedText(
+                textRenderer,
+                cost.toString() ?: "x",
+                x + 12,
+                y + 5,
+                if (canUpgrade) 0xC8FF8F else 0x8C605D,
+                if (canUpgrade) 0 else 0x47352F
+            )
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {

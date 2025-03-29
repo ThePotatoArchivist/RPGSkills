@@ -44,7 +44,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                     else
                         command.source.sendFeedback(Text.translatable(Translations.LIST, skills.size(), Text.empty().apply {
                             skills.forEachIndexed { index, entry ->
-                                if (index > 0) append(Text.literal(",  "))
+                                if (index > 0) append(Text.literal(", "))
                                 append(entry.name)
                             }
                         }), false)

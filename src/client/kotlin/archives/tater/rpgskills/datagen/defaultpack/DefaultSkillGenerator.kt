@@ -26,6 +26,14 @@ class DefaultSkillGenerator(dataOutput: FabricDataOutput) : SkillProvider(dataOu
             name = "Grass Skill",
             description = "Unlocks cows I guess"
         )))
+        repeat(5) {
+            provider.accept(BuildEntry(Identifier("rpg_test", "test$it"), Skill(
+                icon = ItemStack(Items.IRON_INGOT),
+                levels = List(5) { level -> Skill.Level(level + 2)},
+                name = "Test $it",
+                description = "Things"
+            )))
+        }
     }
 
     companion object : BuildsRegistry<Skill> {
