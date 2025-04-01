@@ -9,7 +9,6 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
-import archives.tater.rpgskills.util.registryOf
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.gui.DrawContext
@@ -30,10 +29,12 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
 
-        skillWidgets = registryOf(player, Skill).indexedEntries.mapIndexed { index, skill -> Pair(
-            addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill)),
-            addDrawableChild(SkillUpgradeButton(x + 197, y + index * SkillWidget.HEIGHT + 19 + 2, player, skill))
-        ) }
+        skillWidgets = player.registryManager[Skill].streamEntries().toList().mapIndexed { index, skill ->
+            Pair(
+                addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill)),
+                addDrawableChild(SkillUpgradeButton(x + 197, y + index * SkillWidget.HEIGHT + 19 + 2, player, skill))
+            )
+        }
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {

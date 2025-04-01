@@ -23,8 +23,8 @@ public interface RecipeUnlockerMixin {
         if (LockGroup.isLocked(player, recipe.id())) {
             cir.setReturnValue(false);
             var lockGroup = LockGroup.of(player, recipe.id());
-            if (lockGroup != null && lockGroup.getKey().isPresent()) {
-                ServerPlayNetworking.send(player, new RecipeBlockedPayload(lockGroup.getKey().get()));
+            if (lockGroup != null) {
+                ServerPlayNetworking.send(player, new RecipeBlockedPayload(lockGroup));
                 return;
             }
         }

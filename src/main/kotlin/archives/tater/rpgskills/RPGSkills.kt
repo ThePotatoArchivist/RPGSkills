@@ -7,7 +7,6 @@ import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.SimpleSynchronousResourceReloadListener
 import archives.tater.rpgskills.util.get
-import archives.tater.rpgskills.util.registryOf
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries
@@ -55,11 +54,20 @@ object RPGSkills : ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(SkillUpgradePayload.ID) { payload, context ->
 			val player = context.player()
 			val skillsComponent = player[SkillsComponent]
-			val skill = registryOf(player, Skill).entryOf(payload.skill)
+			val skill = payload.skill
 			if (skillsComponent.canUpgrade(skill)) {
 				skillsComponent.remainingLevelPoints -= skillsComponent.getUpgradeCost(skill)!!
 				skillsComponent[skill]++
-				player.world.playSound(null, player.x, player.y, player.z, SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
+				player.world.playSound(
+					null,
+					player.x,
+					player.y,
+					player.z,
+					SoundEvents.ENTITY_PLAYER_LEVELUP,
+					player.soundCategory,
+					1f,
+					1f
+				)
 			}
 		}
 	}

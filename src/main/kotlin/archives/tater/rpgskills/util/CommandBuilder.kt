@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package archives.tater.rpgskills.util
 
 import com.mojang.brigadier.Command

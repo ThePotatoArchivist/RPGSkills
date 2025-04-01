@@ -3,7 +3,6 @@ package archives.tater.rpgskills.data
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.ComponentKeyHolder
 import archives.tater.rpgskills.util.get
-import archives.tater.rpgskills.util.registryOf
 import archives.tater.rpgskills.util.value
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients
 import net.minecraft.entity.player.PlayerEntity
@@ -52,15 +51,19 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = getUpgradeCost(skill)
         ?.let { remainingLevelPoints >= it } ?: false
 
-    private fun findAllowedItems(): Ingredient = registryOf(player, LockGroup)
-        .filter { it.isSatisfiedBy(levels) }.map { it.items }
+    private fun findAllowedItems(): Ingredient = player.registryManager[LockGroup].streamEntries()
+        .map { it.value }
+        .filter { it.isSatisfiedBy(levels) }
+        .map { it.items }
+        .toList()
         .let {
             if (it.isEmpty()) Ingredient.EMPTY else DefaultCustomIngredients.any(*it.toTypedArray())
         }
 
-    private fun findAllowedRecipes(): List<Identifier> = registryOf(player, LockGroup)
+    private fun findAllowedRecipes(): List<Identifier> = player.registryManager[LockGroup].streamEntries()
+        .map { it.value }
         .filter { it.isSatisfiedBy(levels) }
-        .flatMap { it.recipes }
+        .flatMap { it.recipes.stream() }.toList()
 
     private fun updateAllowed() {
         allowedItems = findAllowedItems()

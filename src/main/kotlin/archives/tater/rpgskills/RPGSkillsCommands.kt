@@ -35,8 +35,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
         dispatcher.apply {
             command("skills") {
                 subExec("list") { command ->
-                    // TODO remove .server.
-                    val skills = command.source.server.registryManager[Skill].streamEntries().toList()
+                    val skills = command.source.registryManager[Skill].streamEntries().toList()
 
                     if (skills.size == 0)
                         command.source.sendFeedback(LIST_NONE.text, false)
