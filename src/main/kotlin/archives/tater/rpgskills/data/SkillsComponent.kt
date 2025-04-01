@@ -2,6 +2,7 @@ package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.ComponentKeyHolder
+import archives.tater.rpgskills.util.associateNotNull
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients
@@ -19,6 +20,7 @@ import org.ladysnake.cca.api.v3.entity.RespawnableComponent
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlin.jvm.optionals.getOrNull
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
@@ -82,8 +84,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         val registry = registryLookup[Skill]
         _levels = tag.getCompound("Levels").run {
-            // TODO catch errors here
-            keys.associate { registry.getOrThrow(RegistryKey.of(Skill.key, Identifier.tryParse(it))) to getInt(it) }
+            keys.associateNotNull { key ->
+                Identifier.tryParse(key)
+                    ?.let { registry.getOptional(RegistryKey.of(Skill.key, it)).getOrNull() }
+                    ?.let { it to getInt(key) } }
         }.toMutableMap()
         _spent = tag.getInt("Spent")
         updateAllowed()

@@ -96,3 +96,5 @@ operator fun <T> DFPair<*, T>.component2(): T = second
 
 infix fun ItemStack.isOf(item: Item) = this.isOf(item)
 infix fun ItemStack.isIn(tag: TagKey<Item>) = this.isIn(tag)
+
+fun <T, K, V> Iterable<T>.associateNotNull(transform: (T) -> Pair<K, V>?) = mapNotNull(transform).toMap()

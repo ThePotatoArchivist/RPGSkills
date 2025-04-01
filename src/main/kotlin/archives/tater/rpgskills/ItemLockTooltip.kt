@@ -17,9 +17,9 @@ object ItemLockTooltip {
 
     @JvmStatic
     fun appendTooltip(stack: ItemStack, player: PlayerEntity?, tooltip: MutableList<Text>, context: Item.TooltipContext) {
-        if (player == null) return
+        if (player == null || context.registryLookup == null) return
         if (!LockGroup.isLocked(player, stack)) return
-        val lockGroup = LockGroup.of(player, stack) ?: return
+        val lockGroup = LockGroup.of(context.registryLookup!!, stack) ?: return
 
         tooltip.add(if (lockGroup.value.requirements.size == 1) REQUIRES.text else { REQUIRES_ANY.text })
 

@@ -14,6 +14,7 @@ import net.minecraft.recipe.Ingredient
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryWrapper
+import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.MutableText
@@ -83,19 +84,20 @@ class LockGroup(
         fun of(registry: RegistryWrapper<LockGroup>, stack: ItemStack): RegistryEntry<LockGroup>? =
             registry.streamEntries().filter { it.value.items.test(stack) }.findFirst().getOrNull()
 
+        @JvmStatic
+        fun of(wrapperLookup: WrapperLookup, stack: ItemStack): RegistryEntry<LockGroup>? = of(wrapperLookup[LockGroup], stack)
+
         fun of(registry: RegistryWrapper<LockGroup>, recipeId: Identifier): RegistryEntry<LockGroup>? =
             registry.streamEntries().filter { recipeId in it.value.recipes }.findFirst().getOrNull()
+
+        @JvmStatic
+        fun of(wrapperLookup: WrapperLookup, recipeId: Identifier): RegistryEntry<LockGroup>? = of(wrapperLookup[LockGroup], recipeId)
 
         fun of(player: PlayerEntity, stack: ItemStack) = of(player.registryManager[LockGroup], stack)
 
         @JvmStatic
         @Deprecated("Mixin convenience", ReplaceWith("of(player.world.registryManager, stack as ItemStack)", "archives.tater.rpgskills.data.LockGroup.Companion.of", "net.minecraft.item.ItemStack"))
         fun of(player: PlayerEntity, stack: Any) = of(player, stack as ItemStack)
-
-        @JvmStatic
-        @Deprecated("Convenience", ReplaceWith("of(registryOf(player, LockGroup), recipeId)", "archives.tater.rpgskills.data.LockGroup.Manager.of", "archives.tater.rpgskills.util.registryOf"))
-        fun of(player: PlayerEntity, recipeId: Identifier): RegistryEntry<LockGroup>? =
-            of(player.registryManager[LockGroup], recipeId)
 
         @JvmStatic
         fun isLocked(player: PlayerEntity, stack: ItemStack): Boolean {
