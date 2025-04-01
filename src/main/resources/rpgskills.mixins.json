@@ -3,9 +3,6 @@
   "package": "archives.tater.rpgskills.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "data.IngredientAccessor",
-    "data.StackEntryAccessor",
-    "data.TagEntryAccessor",
     "locking.CraftingScreenHandlerMixin",
     "locking.ItemStackMixin",
     "locking.LivingEntityMixin",

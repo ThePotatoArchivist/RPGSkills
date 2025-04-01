@@ -2,8 +2,12 @@
   "item_message": "You don't know if this potato is safe to eat",
   "item_name": "Unknown Potato",
   "items": [
-    "minecraft:potato",
-    "minecraft:poisonous_potato"
+    {
+      "item": "minecraft:potato"
+    },
+    {
+      "item": "minecraft:poisonous_potato"
+    }
   ],
   "recipe_message": "You don't know how to cook this potato",
   "recipes": [

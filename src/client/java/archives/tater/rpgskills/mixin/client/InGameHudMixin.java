@@ -31,7 +31,7 @@ public class InGameHudMixin {
 
 	@SuppressWarnings("DataFlowIssue") // client.player is definitely not null here
     @ModifyVariable(
-			method = "renderExperienceBar",
+			method = "renderExperienceLevel",
 			at = @At("STORE")
 	)
 	private String modifyXpDisplay(String original) {

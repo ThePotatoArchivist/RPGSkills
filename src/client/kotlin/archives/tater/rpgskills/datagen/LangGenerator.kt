@@ -8,9 +8,13 @@ import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
+import net.minecraft.registry.RegistryWrapper
+import java.util.concurrent.CompletableFuture
 
-class LangGenerator(dataOutput: FabricDataOutput) : FabricLanguageProvider(dataOutput) {
-    override fun generateTranslations(translationBuilder: TranslationBuilder) {
+class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>) :
+    FabricLanguageProvider(dataOutput, registryLookup) {
+
+    override fun generateTranslations(registryLookup: RegistryWrapper.WrapperLookup, translationBuilder: TranslationBuilder) {
         val s = "\$s"
         translationBuilder.add(RPGSkillsCommands.LIST_NONE, "There are no skills")
         translationBuilder.add(RPGSkillsCommands.LIST, "There are %s skills: %s")

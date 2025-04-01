@@ -37,7 +37,7 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        this.renderBackground(context)
+        this.renderBackground(context, mouseX, mouseY, delta)
         // Background
         context.drawTexture(TEXTURE, x, y, 0, 0, WIDTH, HEIGHT)
         // Title
@@ -71,9 +71,9 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
 
     // based on MerchantScreen
 
-    override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean {
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalAmount: Double, verticalAmount: Double): Boolean {
         if (canScroll)
-            indexOffset = clamp((indexOffset.toDouble() - amount).toInt(), 0, skillWidgets.size - MAX_VISIBLE)
+            indexOffset = clamp((indexOffset.toDouble() - verticalAmount).toInt(), 0, skillWidgets.size - MAX_VISIBLE)
 
         return true
     }

@@ -8,16 +8,21 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.registry.Registerable
+import net.minecraft.registry.RegistryWrapper
 import net.minecraft.util.Identifier
+import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
-class DefaultSkillGenerator(dataOutput: FabricDataOutput) : SkillProvider(dataOutput) {
-    override fun configure(provider: BiConsumer<Identifier, Skill>) {
+class DefaultSkillGenerator(
+    dataOutput: FabricDataOutput,
+    registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
+) : SkillProvider(dataOutput, registriesFuture) {
+    override fun configure(provider: BiConsumer<Identifier, Skill>, lookup: RegistryWrapper.WrapperLookup) {
 		provider.accept(POTATO_SKILL)
         provider.accept(COW_SKILL)
         provider.accept(GRASS_SKILL)
         repeat(5) {
-            provider.accept(BuildEntry(Identifier("rpg_test", "test$it"), Skill(
+            provider.accept(BuildEntry(Identifier.of("rpg_test", "test$it"), Skill(
                 icon = ItemStack(Items.IRON_INGOT),
                 levels = List(5) { level -> Skill.Level(level + 2)},
                 name = "Test $it",
@@ -29,7 +34,7 @@ class DefaultSkillGenerator(dataOutput: FabricDataOutput) : SkillProvider(dataOu
     companion object : BuildsRegistry<Skill> {
         override val registry = Skill.key
 
-        val POTATO_SKILL = BuildEntry(Identifier("rpg_test", "potato"), Skill(
+        val POTATO_SKILL = BuildEntry(Identifier.of("rpg_test", "potato"), Skill(
             icon = ItemStack(Items.POTATO),
             levels = listOf(
                 Skill.Level(1),
@@ -41,7 +46,7 @@ class DefaultSkillGenerator(dataOutput: FabricDataOutput) : SkillProvider(dataOu
         ))
 
         val COW_SKILL = BuildEntry(
-            Identifier("rpg_test", "cow"), Skill(
+            Identifier.of("rpg_test", "cow"), Skill(
                 icon = ItemStack(Items.COW_SPAWN_EGG),
                 levels = listOf(1, 2, 3).map(Skill::Level),
                 name = "Cow Skill",
@@ -50,7 +55,7 @@ class DefaultSkillGenerator(dataOutput: FabricDataOutput) : SkillProvider(dataOu
         )
 
         val GRASS_SKILL = DefaultSkillGenerator.BuildEntry(
-            Identifier("rpg_test", "grass"), Skill(
+            Identifier.of("rpg_test", "grass"), Skill(
                 icon = ItemStack(Items.GRASS_BLOCK),
                 levels = listOf(1, 2).map(Skill::Level),
                 name = "Grass Skill",

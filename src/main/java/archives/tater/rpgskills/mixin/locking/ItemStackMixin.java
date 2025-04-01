@@ -6,11 +6,11 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -20,10 +20,11 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @SuppressWarnings({"deprecation"})
 @Mixin(ItemStack.class)
@@ -57,7 +58,7 @@ public abstract class ItemStackMixin {
             method = "getTooltip",
             at = @At("TAIL")
     )
-    private void addTooltip(@Nullable PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> cir, @Local List<Text> tooltip) {
+    private void addTooltip(Item.TooltipContext context, @Nullable PlayerEntity player, TooltipType type, CallbackInfoReturnable<List<Text>> cir, @Local List<Text> tooltip) {
         ItemLockTooltip.appendTooltip((ItemStack) (Object) this, player, tooltip, context);
     }
 
@@ -69,14 +70,12 @@ public abstract class ItemStackMixin {
         return player != null && LockGroup.isLocked(player, this) ? LockGroup.nameOf(player, this, original) : original;
     }
 
-    @ModifyExpressionValue(
-            method = "getTooltip",
-            slice = @Slice(
-                    from = @At(value = "FIELD", target = "Lnet/minecraft/item/ItemStack$TooltipSection;MODIFIERS:Lnet/minecraft/item/ItemStack$TooltipSection;")
-            ),
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isSectionVisible(ILnet/minecraft/item/ItemStack$TooltipSection;)Z", ordinal = 0)
-    )
-    private boolean hideModifiers(boolean original, @Local(argsOnly = true) @Nullable PlayerEntity player) {
-        return original && (player == null || !LockGroup.isLocked(player, this));
+    @Inject(
+            method = "appendAttributeModifiersTooltip",
+            at = @At("HEAD"),
+            cancellable = true)
+    private void hideModifiers(Consumer<Text> textConsumer, @Nullable PlayerEntity player, CallbackInfo ci) {
+        if (player != null && LockGroup.isLocked(player, this))
+            ci.cancel();
     }
 }

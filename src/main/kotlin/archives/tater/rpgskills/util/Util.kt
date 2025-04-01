@@ -3,8 +3,6 @@ package archives.tater.rpgskills.util
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import dev.onyxstudios.cca.api.v3.component.Component
-import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
@@ -15,12 +13,15 @@ import net.minecraft.item.ItemStack
 import net.minecraft.registry.DynamicRegistryManager
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceReloader
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
+import org.ladysnake.cca.api.v3.component.Component
+import org.ladysnake.cca.api.v3.component.ComponentKey
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 import com.mojang.datafixers.util.Pair as DFPair
@@ -64,10 +65,11 @@ interface RegistryKeyHolder<T> {
     val key: RegistryKey<T>
 }
 
-operator fun <E> DynamicRegistryManager.get(holder: RegistryKeyHolder<out Registry<out E>?>): Registry<E> =
-    this[holder.key]
+operator fun <E> RegistryWrapper.WrapperLookup.get(holder: RegistryKeyHolder<out Registry<out E>?>): RegistryWrapper<E> =
+    this.getWrapperOrThrow(holder.key)
 
-fun registriesOf(provider: Entity): DynamicRegistryManager = provider.world.registryManager
+// TODO inline
+fun registriesOf(provider: Entity): DynamicRegistryManager = provider.registryManager
 
 fun <T> registryOf(provider: Entity, key: RegistryKey<Registry<T>>): Registry<T> = registriesOf(provider)[key]
 fun <T> registryOf(provider: Entity, holder: RegistryKeyHolder<Registry<T>>): Registry<T> = registryOf(provider, holder.key)

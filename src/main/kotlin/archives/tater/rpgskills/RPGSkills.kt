@@ -3,13 +3,15 @@ package archives.tater.rpgskills
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
-import archives.tater.rpgskills.networking.SkillUpgradePacket
+import archives.tater.rpgskills.networking.RecipeBlockedPayload
+import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.SimpleSynchronousResourceReloadListener
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.registryOf
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType
@@ -24,7 +26,7 @@ object RPGSkills : ModInitializer {
 	const val MOD_ID = "rpgskills"
 
 	@JvmStatic
-	fun id(path: String) = Identifier(MOD_ID, path)
+	fun id(path: String): Identifier = Identifier.of(MOD_ID, path)
 
     val logger: Logger = LoggerFactory.getLogger(MOD_ID)
 
@@ -47,9 +49,13 @@ object RPGSkills : ModInitializer {
 			LockGroup.clearLocked()
 		})
 
-		ServerPlayNetworking.registerGlobalReceiver(SkillUpgradePacket.TYPE) { packet, player, respond ->
+		PayloadTypeRegistry.playS2C().register(RecipeBlockedPayload.ID, RecipeBlockedPayload.CODEC)
+		PayloadTypeRegistry.playC2S().register(SkillUpgradePayload.ID, SkillUpgradePayload.CODEC)
+
+		ServerPlayNetworking.registerGlobalReceiver(SkillUpgradePayload.ID) { payload, context ->
+			val player = context.player()
 			val skillsComponent = player[SkillsComponent]
-			val skill = registryOf(player, Skill).entryOf(packet.skill)
+			val skill = registryOf(player, Skill).entryOf(payload.skill)
 			if (skillsComponent.canUpgrade(skill)) {
 				skillsComponent.remainingLevelPoints -= skillsComponent.getUpgradeCost(skill)!!
 				skillsComponent[skill]++

@@ -1,9 +1,9 @@
 package archives.tater.rpgskills.mixin.locking;
 
 import archives.tater.rpgskills.data.LockGroup;
-import archives.tater.rpgskills.networking.RecipeBlockedPacket;
+import archives.tater.rpgskills.networking.RecipeBlockedPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
@@ -19,15 +19,15 @@ public interface RecipeUnlockerMixin {
             method = "shouldCraftRecipe",
             at = @At("HEAD"),
             cancellable = true)
-    private void alsoCheckSkills(World world, ServerPlayerEntity player, Recipe<?> recipe, CallbackInfoReturnable<Boolean> cir) {
-        if (LockGroup.isLocked(player, recipe.getId())) {
+    private void alsoCheckSkills(World world, ServerPlayerEntity player, RecipeEntry<?> recipe, CallbackInfoReturnable<Boolean> cir) {
+        if (LockGroup.isLocked(player, recipe.id())) {
             cir.setReturnValue(false);
-            var lockGroup = LockGroup.of(player, recipe.getId());
+            var lockGroup = LockGroup.of(player, recipe.id());
             if (lockGroup != null && lockGroup.getKey().isPresent()) {
-                ServerPlayNetworking.send(player, new RecipeBlockedPacket(lockGroup.getKey().get()));
+                ServerPlayNetworking.send(player, new RecipeBlockedPayload(lockGroup.getKey().get()));
                 return;
             }
         }
-        ServerPlayNetworking.send(player, RecipeBlockedPacket.EMPTY);
+        ServerPlayNetworking.send(player, RecipeBlockedPayload.EMPTY);
     }
 }

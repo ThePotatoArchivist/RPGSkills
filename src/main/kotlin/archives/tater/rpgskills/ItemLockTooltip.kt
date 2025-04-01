@@ -4,8 +4,8 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.value
-import net.minecraft.client.item.TooltipContext
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
@@ -16,7 +16,7 @@ object ItemLockTooltip {
     val REQUIREMENT = Translation.arg("rpgskills.tooltip.stack.requirement") { formatted(Formatting.DARK_GRAY) }
 
     @JvmStatic
-    fun appendTooltip(stack: ItemStack, player: PlayerEntity?, tooltip: MutableList<Text>, context: TooltipContext) {
+    fun appendTooltip(stack: ItemStack, player: PlayerEntity?, tooltip: MutableList<Text>, context: Item.TooltipContext) {
         if (player == null) return
         if (!LockGroup.isLocked(player, stack)) return
         val lockGroup = LockGroup.of(player, stack) ?: return

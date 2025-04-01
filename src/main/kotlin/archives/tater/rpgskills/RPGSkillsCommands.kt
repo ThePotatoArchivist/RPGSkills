@@ -12,8 +12,8 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.command.argument.EntityArgumentType.getPlayer
 import net.minecraft.command.argument.EntityArgumentType.player
-import net.minecraft.command.argument.RegistryEntryArgumentType.getRegistryEntry
-import net.minecraft.command.argument.RegistryEntryArgumentType.registryEntry
+import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.getRegistryEntry
+import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.registryEntry
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
@@ -35,19 +35,20 @@ object RPGSkillsCommands : CommandRegistrationCallback {
         dispatcher.apply {
             command("skills") {
                 subExec("list") { command ->
-                    val skills = command.source.server.registryManager[Skill].indexedEntries
+                    // TODO remove .server.
+                    val skills = command.source.server.registryManager[Skill].streamEntries().toList()
 
-                    if (skills.size() == 0)
+                    if (skills.size == 0)
                         command.source.sendFeedback(LIST_NONE.text, false)
                     else
-                        command.source.sendFeedback(LIST.text(skills.size(), Text.empty().apply {
+                        command.source.sendFeedback(LIST.text(skills.size, Text.empty().apply {
                             skills.forEachIndexed { index, entry ->
                                 if (index > 0) append(Text.literal(", "))
                                 append(entry.name)
                             }
                         }), false)
 
-                    skills.size()
+                    skills.size
                 }
                 sub("level") {
                     argument("player", player()) {
@@ -57,7 +58,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                                 val skill = getRegistryEntry(command, "skill", Skill.key)
                                 val level = player[SkillsComponent][skill]
 
-                                command.source.sendFeedback(GET_LEVEL.text(player.displayName, skill.name, level), false)
+                                command.source.sendFeedback(GET_LEVEL.text(player.displayName!!, skill.name, level), false)
                                 level
                             }
                             sub("add") {
@@ -68,7 +69,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
 
                                     player[SkillsComponent][skill] += amount
 
-                                    command.source.sendFeedback(ADD_LEVEL.text(player.displayName, skill.name, amount), true)
+                                    command.source.sendFeedback(ADD_LEVEL.text(player.displayName!!, skill.name, amount), true)
                                     amount
                                 }
                             }
@@ -80,7 +81,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
 
                                     player[SkillsComponent][skill] = amount
 
-                                    command.source.sendFeedback(SET_LEVEL.text(player.displayName, skill.name, amount), true)
+                                    command.source.sendFeedback(SET_LEVEL.text(player.displayName!!, skill.name, amount), true)
                                     amount
                                 }
                             }
@@ -96,7 +97,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
 
                                 player[SkillsComponent].remainingLevelPoints = amount
 
-                                command.source.sendFeedback(SET_POINTS.text(player.displayName, amount), true)
+                                command.source.sendFeedback(SET_POINTS.text(player.displayName!!, amount), true)
                                 amount
                             }
                         }
@@ -107,7 +108,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
 
                                 player[SkillsComponent].remainingLevelPoints += amount
 
-                                command.source.sendFeedback(ADD_POINTS.text(player.displayName, amount), true)
+                                command.source.sendFeedback(ADD_POINTS.text(player.displayName!!, amount), true)
                                 amount
                             }
                         }

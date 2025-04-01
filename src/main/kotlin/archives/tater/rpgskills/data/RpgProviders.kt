@@ -10,14 +10,14 @@ import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
 abstract class SkillProvider(
-    dataOutput: FabricDataOutput,
-) : FabricCodecDataProvider<Skill>(dataOutput, DataOutput.OutputType.DATA_PACK, "rpgskills/skills", Skill.CODEC) {
+    dataOutput: FabricDataOutput, registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>,
+) : FabricCodecDataProvider<Skill>(dataOutput, registriesFuture, DataOutput.OutputType.DATA_PACK, "rpgskills/skills", Skill.CODEC) {
 	override fun getName(): String = "Skills"
 }
 
 abstract class LockGroupProvider(
     dataOutput: FabricDataOutput, registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>,
-) : DynamicCodecDataProvider<LockGroup>(dataOutput, DataOutput.OutputType.DATA_PACK, "rpgskills/lockgroup", LockGroup.CODEC, registriesFuture) {
+) : FabricCodecDataProvider<LockGroup>(dataOutput, registriesFuture, DataOutput.OutputType.DATA_PACK, "rpgskills/lockgroup", LockGroup.CODEC) {
     override fun getName(): String = "Lock Group"
 }
 

@@ -2,25 +2,27 @@ package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.ComponentKeyHolder
+import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.registryOf
 import archives.tater.rpgskills.util.value
-import dev.onyxstudios.cca.api.v3.component.ComponentKey
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
-import dev.onyxstudios.cca.api.v3.entity.PlayerComponent
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.recipe.Ingredient
 import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.util.Identifier
+import org.ladysnake.cca.api.v3.component.ComponentKey
+import org.ladysnake.cca.api.v3.component.ComponentRegistry
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
+import org.ladysnake.cca.api.v3.entity.RespawnableComponent
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 
 @Suppress("UnstableApiUsage")
-class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<SkillsComponent>, AutoSyncedComponent {
+class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
     private var _levels = mutableMapOf<RegistryEntry<Skill>, Int>()
     val levels: Map<RegistryEntry<Skill>, Int> get() = _levels
 
@@ -68,23 +70,23 @@ class SkillsComponent(private val player: PlayerEntity) : PlayerComponent<Skills
     override fun shouldCopyForRespawn(lossless: Boolean, keepInventory: Boolean, sameCharacter: Boolean): Boolean =
         sameCharacter
 
-    override fun copyFrom(other: SkillsComponent) {
+    override fun copyFrom(other: SkillsComponent, registryLookup: RegistryWrapper.WrapperLookup) {
         _levels = other._levels
         _spent = other._spent
         updateAllowed()
     }
 
-    override fun readFromNbt(tag: NbtCompound) {
-        val registry = registryOf(player, Skill)
+    override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
+        val registry = registryLookup[Skill]
         _levels = tag.getCompound("Levels").run {
             // TODO catch errors here
-            keys.associate { registry.entryOf(RegistryKey.of(Skill.key, Identifier.tryParse(it))) to getInt(it) }
+            keys.associate { registry.getOrThrow(RegistryKey.of(Skill.key, Identifier.tryParse(it))) to getInt(it) }
         }.toMutableMap()
         _spent = tag.getInt("Spent")
         updateAllowed()
     }
 
-    override fun writeToNbt(tag: NbtCompound) {
+    override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         tag.put("Levels", NbtCompound().apply {
             for ((skill, level) in _levels) {
                 putInt(skill.key.get().value.toString(), level)

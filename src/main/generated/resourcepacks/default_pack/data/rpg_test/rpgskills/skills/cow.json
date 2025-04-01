@@ -1,7 +1,7 @@
 {
   "description": "Unlocks cows I guess",
   "icon": {
-    "Count": 1,
+    "count": 1,
     "id": "minecraft:cow_spawn_egg"
   },
   "levels": [

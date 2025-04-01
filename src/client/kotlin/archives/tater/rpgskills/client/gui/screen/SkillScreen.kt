@@ -29,7 +29,7 @@ class SkillScreen(
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        renderBackground(context)
+        renderBackground(context, mouseX, mouseY, delta)
         context.drawItem(skill.value.icon, x + 8, y + 8)
         context.drawText(textRenderer, title, x + 26, y + 8, 0x404040, false)
         super.render(context, mouseX, mouseY, delta)

@@ -4,7 +4,7 @@ import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
-import archives.tater.rpgskills.networking.SkillUpgradePacket
+import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import net.fabricmc.api.EnvType
@@ -32,10 +32,10 @@ class SkillUpgradeButton(
 
     override fun onClick(mouseX: Double, mouseY: Double) {
         if (canUpgrade)
-            ClientPlayNetworking.send(SkillUpgradePacket(skill))
+            ClientPlayNetworking.send(SkillUpgradePayload(skill))
     }
 
-    override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         val canUpgrade = canUpgrade // Performance
         val cost = cost
 

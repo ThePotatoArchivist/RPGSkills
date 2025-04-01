@@ -1,9 +1,9 @@
 {
   "item_message": "You don't know what kind of button this is",
   "item_name": "Unknown Button",
-  "items": [
-    "#minecraft:buttons"
-  ],
+  "items": {
+    "tag": "minecraft:buttons"
+  },
   "recipe_message": "You don't know how to assemble this button",
   "recipes": [
     "minecraft:acacia_button",

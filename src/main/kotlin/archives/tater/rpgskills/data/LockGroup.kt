@@ -10,8 +10,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.recipe.Ingredient
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.entry.RegistryElementCodec
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
@@ -44,10 +44,10 @@ class LockGroup(
     companion object Manager : RegistryKeyHolder<Registry<LockGroup>> {
         val CODEC: Codec<LockGroup> = RecordCodecBuilder.create {
             it.group(
-                field("items", LockGroup::items, Ingredient.EMPTY, INGREDIENT_CODEC),
+                field("items", LockGroup::items, Ingredient.EMPTY, Ingredient.DISALLOW_EMPTY_CODEC),
                 field("recipes", LockGroup::recipes, listOf(), Identifier.CODEC.listOf()),
                 field("requirements", LockGroup::requirements, listOf(), Codec.unboundedMap(
-                    RegistryElementCodec.of(Skill.key, Skill.CODEC, false),
+                    RegistryFixedCodec.of(Skill.key),
                     Codec.INT
                 ).singleOrList()),
                 field("item_name", LockGroup::itemName, null, Codec.STRING),

@@ -11,11 +11,14 @@ import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
-class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput, registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>) : LockGroupProvider(dataOutput, registriesFuture) {
+class DefaultSkillsLockGenerator(
+    dataOutput: FabricDataOutput,
+    registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
+) : LockGroupProvider(dataOutput, registriesFuture) {
     override fun configure(provider: BiConsumer<Identifier, LockGroup>, registries: RegistryWrapper.WrapperLookup) {
-        provider.accept(Identifier("rpg_test", "potato1"), LockGroup(
+        provider.accept(Identifier.of("rpg_test", "potato1"), LockGroup(
             items = Ingredient.ofItems(Items.POTATO, Items.POISONOUS_POTATO),
-            recipes = listOf(Identifier("baked_potato"), Identifier("baked_potato_from_smoking"), Identifier("baked_potato_from_campfire_cooking")),
+            recipes = listOf(Identifier.of("baked_potato"), Identifier.of("baked_potato_from_smoking"), Identifier.of("baked_potato_from_campfire_cooking")),
             requirements = mapOf(
                 DefaultSkillGenerator.POTATO_SKILL.entry to 1
             ),
@@ -23,9 +26,9 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput, registriesFuture:
             itemMessage = "You don't know if this potato is safe to eat",
             recipeMessage = "You don't know how to cook this potato",
         ))
-        provider.accept(Identifier("rpg_test", "potato2"), LockGroup(
+        provider.accept(Identifier.of("rpg_test", "potato2"), LockGroup(
             items = Ingredient.ofItems(Items.TRIDENT),
-            recipes = listOf(Identifier("prismarine_bricks")),
+            recipes = listOf(Identifier.of("prismarine_bricks")),
             requirements = mapOf(
                 DefaultSkillGenerator.POTATO_SKILL.entry to 2,
                 DefaultSkillGenerator.COW_SKILL.entry to 2,
@@ -34,9 +37,9 @@ class DefaultSkillsLockGenerator(dataOutput: FabricDataOutput, registriesFuture:
             itemMessage = "You don't know how to eat with this fork",
             recipeMessage = "You don't know how to assemble this prismarine",
         ))
-        provider.accept(Identifier("rpg_test", "potato3"), LockGroup(
+        provider.accept(Identifier.of("rpg_test", "potato3"), LockGroup(
             items = Ingredient.fromTag(ItemTags.BUTTONS),
-            recipes = listOf("acacia", "bamboo", "birch", "cherry", "crimson", "jungle", "mangrove", "oak", "spruce", "stone", "warped", "dark_oak", "polished_blackstone").map { Identifier("${it}_button") },
+            recipes = listOf("acacia", "bamboo", "birch", "cherry", "crimson", "jungle", "mangrove", "oak", "spruce", "stone", "warped", "dark_oak", "polished_blackstone").map { Identifier.of("${it}_button") },
             requirements = listOf(
                 mapOf(
                     DefaultSkillGenerator.POTATO_SKILL.entry to 3

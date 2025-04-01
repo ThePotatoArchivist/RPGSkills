@@ -31,7 +31,7 @@ class SkillWidget(
     private val level get() = skillsComponent[skill]
     private val maxLevel = skill.value.levels.size
 
-    override fun renderButton(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         context.drawTexture(TEXTURE, x, y, 9, if (isHovered) 147 + HEIGHT else 147, WIDTH, HEIGHT)
         context.drawItem(skill.value.icon, x + 3, y + 3)
         context.drawText(textRenderer, name, x + 21, y + 4, 0xffffff, true)
@@ -54,10 +54,6 @@ class SkillWidget(
                 BAR_HEIGHT
             )
         }
-    }
-
-    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        super.render(context, mouseX, mouseY, delta)
         if (hovered)
             context.drawTooltip(textRenderer, description, mouseX, mouseY)
     }
