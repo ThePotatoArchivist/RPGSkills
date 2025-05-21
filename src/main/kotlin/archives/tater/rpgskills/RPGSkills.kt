@@ -5,7 +5,6 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
-import archives.tater.rpgskills.util.SimpleSynchronousResourceReloadListener
 import archives.tater.rpgskills.util.get
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
@@ -15,7 +14,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.resource.ResourceType
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Identifier
 import org.slf4j.Logger
@@ -43,10 +41,6 @@ object RPGSkills : ModInitializer {
 			FabricLoader.getInstance().getModContainer(MOD_ID).get(),
 			if (FabricLoader.getInstance().isDevelopmentEnvironment) ResourcePackActivationType.DEFAULT_ENABLED else ResourcePackActivationType.NORMAL
 		)
-
-		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(SimpleSynchronousResourceReloadListener(id("clear_locked_items")) {
-			LockGroup.clearLocked()
-		})
 
 		PayloadTypeRegistry.playS2C().register(RecipeBlockedPayload.ID, RecipeBlockedPayload.CODEC)
 		PayloadTypeRegistry.playC2S().register(SkillUpgradePayload.ID, SkillUpgradePayload.CODEC)

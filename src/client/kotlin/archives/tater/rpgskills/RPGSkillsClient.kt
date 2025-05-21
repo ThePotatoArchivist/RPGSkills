@@ -3,7 +3,6 @@ package archives.tater.rpgskills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.util.wasPressed
-import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents

@@ -35,10 +35,10 @@ public abstract class ItemStackMixin {
     )
     private ActionResult checkLock(Item instance, ItemUsageContext context, Operation<ActionResult> original) {
         var player = context.getPlayer();
-        if (player == null || !LockGroup.isLocked(player, this)) {
-            return original.call(instance, context);
-        }
-        player.sendMessage(LockGroup.messageOf(player, this), true);
+        if (player == null) return original.call(instance, context);
+        var lockGroup = LockGroup.findLocked(player, (ItemStack) (Object) this);
+        if (lockGroup == null) return original.call(instance, context);
+        player.sendMessage(lockGroup.value().itemMessage(), true);
         return ActionResult.CONSUME;
     }
 
@@ -47,11 +47,10 @@ public abstract class ItemStackMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;use(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;)Lnet/minecraft/util/TypedActionResult;")
     )
     private TypedActionResult<ItemStack> checkLock(Item instance, World world, PlayerEntity user, Hand hand, Operation<TypedActionResult<ItemStack>> original) {
-        if (!LockGroup.isLocked(user, this)) {
-            return original.call(instance, world, user, hand);
-        }
-        user.sendMessage(LockGroup.messageOf(user, this), true);
-        return TypedActionResult.pass(user.getStackInHand(hand));
+        var lockGroup = LockGroup.findLocked(user, (ItemStack) (Object) this);
+        if (lockGroup == null) return original.call(instance, world, user, hand);
+        user.sendMessage(lockGroup.value().itemMessage(), true);
+        return TypedActionResult.pass(user.getStackInHand(hand)); // shouldn't this be a fail?
     }
 
     @Inject(
@@ -59,7 +58,7 @@ public abstract class ItemStackMixin {
             at = @At("TAIL")
     )
     private void addTooltip(Item.TooltipContext context, @Nullable PlayerEntity player, TooltipType type, CallbackInfoReturnable<List<Text>> cir, @Local List<Text> tooltip) {
-        ItemLockTooltip.appendTooltip((ItemStack) (Object) this, player, tooltip, context);
+        ItemLockTooltip.appendTooltip((ItemStack) (Object) this, player, tooltip);
     }
 
     @ModifyExpressionValue(

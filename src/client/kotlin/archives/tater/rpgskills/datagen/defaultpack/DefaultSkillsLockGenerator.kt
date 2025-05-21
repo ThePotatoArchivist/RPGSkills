@@ -1,6 +1,5 @@
 package archives.tater.rpgskills.datagen.defaultpack
 
-import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.LockGroupProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.item.Items

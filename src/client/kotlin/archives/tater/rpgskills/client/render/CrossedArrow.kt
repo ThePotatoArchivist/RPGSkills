@@ -2,7 +2,6 @@ package archives.tater.rpgskills.client.render
 
 import archives.tater.rpgskills.RPGSkills.id
 import archives.tater.rpgskills.RPGSkillsClient
-import archives.tater.rpgskills.data.LockGroup.Manager.recipeMessage
 import archives.tater.rpgskills.mixin.client.HandledScreenAccessor
 import archives.tater.rpgskills.mixin.client.ScreenAccessor
 import net.fabricmc.api.EnvType

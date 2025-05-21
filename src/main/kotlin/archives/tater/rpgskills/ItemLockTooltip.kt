@@ -5,7 +5,6 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.value
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
@@ -16,10 +15,8 @@ object ItemLockTooltip {
     val REQUIREMENT = Translation.arg("rpgskills.tooltip.stack.requirement") { formatted(Formatting.DARK_GRAY) }
 
     @JvmStatic
-    fun appendTooltip(stack: ItemStack, player: PlayerEntity?, tooltip: MutableList<Text>, context: Item.TooltipContext) {
-        if (player == null || context.registryLookup == null) return
-        if (!LockGroup.isLocked(player, stack)) return
-        val lockGroup = LockGroup.of(context.registryLookup!!, stack) ?: return
+    fun appendTooltip(stack: ItemStack, player: PlayerEntity?, tooltip: MutableList<Text>) {
+        val lockGroup = LockGroup.findLocked(player ?: return, stack) ?: return
 
         tooltip.add(if (lockGroup.value.requirements.size == 1) REQUIRES.text else { REQUIRES_ANY.text })
 

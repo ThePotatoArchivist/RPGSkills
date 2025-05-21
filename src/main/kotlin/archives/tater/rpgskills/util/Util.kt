@@ -20,8 +20,11 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
+import kotlin.Pair
+import kotlin.jvm.optionals.getOrNull
 import com.mojang.datafixers.util.Pair as DFPair
 
 internal fun <T, C> field(name: String, getter: (C) -> T, codec: Codec<T>): RecordCodecBuilder<C, T> =
@@ -32,6 +35,12 @@ internal fun <T, C> field(name: String, getter: (C) -> T, codec: MapCodec<T>): R
 
 internal fun <T, C> field(name: String, getter: (C) -> T, default: T, codec: Codec<T>): RecordCodecBuilder<C, T> =
     codec.optionalFieldOf(name, default).forGetter(getter)
+
+internal fun <T: Any, C> fieldNullable(name: String, getter: (C) -> T?, codec: Codec<T>): RecordCodecBuilder<C, T?> =
+    codec.nullableFieldOf(name).forGetter(getter)
+
+internal fun <T: Any> Codec<T>.nullableFieldOf(name: String): MapCodec<T?> =
+    optionalFieldOf(name).xmap({ it.getOrNull() }, { Optional.ofNullable(it) })
 
 inline val <T> RegistryEntry<T>.value: T get() = value()
 

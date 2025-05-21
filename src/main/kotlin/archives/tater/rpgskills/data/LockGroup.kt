@@ -1,145 +1,109 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.util.RegistryKeyHolder
-import archives.tater.rpgskills.util.field
-import archives.tater.rpgskills.util.get
-import archives.tater.rpgskills.util.value
+import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients
+import net.minecraft.block.Block
+import net.minecraft.block.BlockState
+import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityType
+import net.minecraft.entity.attribute.EntityAttribute
+import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.recipe.Ingredient
-import net.minecraft.registry.Registry
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryWrapper
+import net.minecraft.recipe.RecipeEntry
+import net.minecraft.registry.*
 import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.entry.RegistryFixedCodec
-import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.jvm.optionals.getOrNull
 
-class LockGroup(
-    val items: Ingredient = Ingredient.EMPTY,
-    val recipes: List<Identifier> = listOf(),
-    val requirements: List<Map<RegistryEntry<Skill>, Int>> = listOf(),
-    val itemName: String? = null,
-    val itemMessage: String? = null,
-    val recipeMessage: String? = null,
+@JvmRecord
+data class LockGroup(
+    val requirements: List<Map<RegistryEntry<Skill>, Int>>,
+    val attributes: Map<RegistryEntry<EntityAttribute>, EntityAttributeModifier> = mapOf(),
+    val itemName: String?,
+    val items: LockList<Ingredient> = LockList(Ingredient.EMPTY),
+    val blocks: LockList<RegistryEntryList<Block>> = LockList.empty(),
+    val entities: LockList<RegistryEntryList<EntityType<*>>> = LockList.empty(),
+    val recipes: LockList<List<Identifier>> = LockList(listOf()),
 ) {
-    constructor(
-        items: Ingredient = Ingredient.EMPTY,
-        recipes: List<Identifier> = listOf(),
-        requirements: Map<RegistryEntry<Skill>, Int>,
-        itemName: String? = null,
-        itemMessage: String? = null,
-        recipeMessage: String? = null,
-    ) : this(items, recipes, listOf(requirements), itemName, itemMessage, recipeMessage)
 
     fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.any {
         it.all { (skill, level) ->
-            (levels[skill] ?: 0) >= level
+            levels.getOrDefault(skill, 0) >= level
         }
     }
 
     fun isSatisfiedBy(player: PlayerEntity): Boolean = isSatisfiedBy(player[SkillsComponent].levels)
 
-    companion object Manager : RegistryKeyHolder<Registry<LockGroup>> {
-        val CODEC: Codec<LockGroup> = RecordCodecBuilder.create {
-            it.group(
-                field("items", LockGroup::items, Ingredient.EMPTY, Ingredient.ALLOW_EMPTY_CODEC),
-                field("recipes", LockGroup::recipes, listOf(), Identifier.CODEC.listOf()),
-                field("requirements", LockGroup::requirements, listOf(), Codec.unboundedMap(
-                    RegistryFixedCodec.of(Skill.key),
-                    Codec.INT
-                ).singleOrList()),
-                field("item_name", LockGroup::itemName, null, Codec.STRING),
-                field("item_message", LockGroup::itemMessage, null, Codec.STRING),
-                field("recipe_message", LockGroup::recipeMessage, null, Codec.STRING),
-            ).apply(it, ::LockGroup)
+    fun itemNameText() = itemName.let(Text::literal) ?: DEFAULT_ITEM_NAME.text()
+    fun itemMessage() = items.message?.let(Text::literal) ?: DEFAULT_ITEM_MESSAGE.text()
+    fun blockMessage() = blocks.message?.let(Text::literal) ?: DEFAULT_BLOCK_MESSAGE.text()
+    fun entityMessage() = entities.message?.let(Text::literal) ?: DEFAULT_ENTITY_MESSAGE.text()
+    fun recipeMessage() = recipes.message?.let(Text::literal) ?: DEFAULT_RECIPE_MESSAGE.text()
+
+    @JvmRecord
+    data class LockList<T>(
+        val entries: T,
+        val message: String? = null,
+    ) {
+        companion object {
+            fun <T> createCodec(containerCodec: Codec<T>): Codec<LockList<T>> = RecordCodecBuilder.create { instance -> instance.group(
+                field("entries", LockList<T>::entries, containerCodec),
+                fieldNullable("message", LockList<T>::message, Codec.STRING),
+            ).apply(instance, ::LockList) }
+
+            fun <T> createCodec(registryRef: RegistryKey<Registry<T>>): Codec<LockList<RegistryEntryList<T>>> = createCodec(RegistryCodecs.entryList(registryRef))
+
+            fun <T> empty() = LockList<RegistryEntryList<T>>(RegistryEntryList.empty())
         }
+    }
+
+    companion object Manager : RegistryKeyHolder<Registry<LockGroup>> {
+        val DEFAULT_ITEM_MESSAGE = Translation.unit("rpgskills.lockgroup.item.message.default")
+        val DEFAULT_ITEM_NAME = Translation.unit("rpgskills.lockgroup.item.name.default")
+        val DEFAULT_BLOCK_MESSAGE = Translation.unit("rpgskills.lockgroup.block.message.default")
+        val DEFAULT_ENTITY_MESSAGE = Translation.unit("rpgskills.lockgroup.entity.message.default")
+        val DEFAULT_RECIPE_MESSAGE = Translation.unit("rpgskills.lockgroup.recipe.message.default")
+
+
+        val CODEC = RecordCodecBuilder.create { it.group(
+            field("requirements", LockGroup::requirements, Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList()),
+            field("attributes", LockGroup::attributes, mapOf(), Codec.simpleMap(Registries.ATTRIBUTE.entryCodec, EntityAttributeModifier.CODEC, Registries.ATTRIBUTE).codec()),
+            fieldNullable("item_name", LockGroup::itemName, Codec.STRING),
+            field("items", LockGroup::items, LockList(Ingredient.EMPTY), LockList.createCodec(Ingredient.DISALLOW_EMPTY_CODEC)),
+            field("blocks", LockGroup::blocks, LockList.empty(), LockList.createCodec(RegistryKeys.BLOCK)),
+            field("entities", LockGroup::entities, LockList.empty(), LockList.createCodec(RegistryKeys.ENTITY_TYPE)),
+            field("recipes", LockGroup::recipes, LockList(listOf()), LockList.createCodec(Identifier.CODEC.listOf())),
+        ).apply(it, ::LockGroup) }
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))
 
-        private var allLockedItems: Ingredient? = null
-        private var allLockedRecipes: List<Identifier>? = null
+        inline fun find(registries: WrapperLookup, crossinline condition: (LockGroup) -> Boolean) =
+            registries[LockGroup].streamEntries().filter { condition(it.value) }.findFirst().getOrNull()
 
-        private fun findLocked(registry: RegistryWrapper<LockGroup>) {
-            allLockedItems = registry.streamEntries().map { it.value.items }.toList().let {
-                if (it.isEmpty()) Ingredient.EMPTY else DefaultCustomIngredients.any(*it.toTypedArray())
-            }
-            allLockedRecipes = registry.streamEntries().flatMap { it.value.recipes.stream() }.toList()
-        }
+        @JvmStatic fun find(registries: WrapperLookup, stack: ItemStack) = find(registries) { it.items.entries.test(stack) }
+        @JvmStatic fun find(registries: WrapperLookup, state: BlockState) = find(registries) { state.isIn(it.blocks.entries) }
+        @JvmStatic fun find(registries: WrapperLookup, entity: Entity) = find(registries) { entity.type.isIn(it.entities.entries) }
+        @JvmStatic fun find(registries: WrapperLookup, recipe: RecipeEntry<*>) = find(registries) { recipe.id in it.recipes.entries }
 
-        fun clearLocked() {
-            allLockedItems = null
-            allLockedRecipes = null
-        }
+        private fun RegistryEntry<LockGroup>.check(player: PlayerEntity) = takeIf { value.isSatisfiedBy(player) }
 
-        fun of(registry: RegistryWrapper<LockGroup>, stack: ItemStack): RegistryEntry<LockGroup>? =
-            registry.streamEntries().filter { it.value.items.test(stack) }.findFirst().getOrNull()
+        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = find(player.registryManager) { it.items.entries.test(stack) }?.check(player)
+        @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = find(player.registryManager) { state.isIn(it.blocks.entries) }?.check(player)
+        @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = find(player.registryManager) { entity.type.isIn(it.entities.entries) }?.check(player)
+        @JvmStatic fun findLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = find(player.registryManager) { recipe.id in it.recipes.entries }?.check(player)
 
-        @JvmStatic
-        fun of(wrapperLookup: WrapperLookup, stack: ItemStack): RegistryEntry<LockGroup>? = of(wrapperLookup[LockGroup], stack)
-
-        fun of(registry: RegistryWrapper<LockGroup>, recipeId: Identifier): RegistryEntry<LockGroup>? =
-            registry.streamEntries().filter { recipeId in it.value.recipes }.findFirst().getOrNull()
-
-        @JvmStatic
-        fun of(wrapperLookup: WrapperLookup, recipeId: Identifier): RegistryEntry<LockGroup>? = of(wrapperLookup[LockGroup], recipeId)
-
-        fun of(player: PlayerEntity, stack: ItemStack) = of(player.registryManager[LockGroup], stack)
-
-        @JvmStatic
-        @Deprecated("Mixin convenience", ReplaceWith("of(player.world.registryManager, stack as ItemStack)", "archives.tater.rpgskills.data.LockGroup.Companion.of", "net.minecraft.item.ItemStack"))
-        fun of(player: PlayerEntity, stack: Any) = of(player, stack as ItemStack)
-
-        @JvmStatic
-        fun isLocked(player: PlayerEntity, stack: ItemStack): Boolean {
-            if (allLockedItems == null)
-                findLocked(player.registryManager[LockGroup])
-            return allLockedItems!!.test(stack) && !player[SkillsComponent].allowedItems.test(stack)
-        }
-
-        @JvmStatic
-        fun isLocked(player: PlayerEntity, recipeId: Identifier): Boolean {
-            if (allLockedRecipes == null)
-                findLocked(player.registryManager[LockGroup])
-            return recipeId in allLockedRecipes!! && recipeId !in player[SkillsComponent].allowedRecipes
-        }
-
-        @JvmStatic
-        @Deprecated("Mixin convenience", ReplaceWith("isLocked(player, stack as ItemStack)", "archives.tater.rpgskills.data.LockGroup.Companion.isLocked", "net.minecraft.item.ItemStack"))
-        fun isLocked(player: PlayerEntity, stack: Any) = isLocked(player, stack as ItemStack)
-
-        @JvmStatic
-        @get:JvmName("itemName")
-        val RegistryEntry<LockGroup>.itemName: MutableText get() = value.itemName?.let(Text::literal) ?: Text.translatable(key.get().value.toTranslationKey("lockgroup", "name"))
-        @JvmStatic
-        @get:JvmName("itemMessage")
-        val RegistryEntry<LockGroup>.itemMessage: MutableText get() = value.itemMessage?.let(Text::literal) ?: Text.translatable(key.get().value.toTranslationKey("lockgroup", "item_message"))
-        @JvmStatic
-        @get:JvmName("recipeMessage")
-        val RegistryEntry<LockGroup>.recipeMessage: MutableText get() = value.recipeMessage?.let(Text::literal) ?: Text.translatable(key.get().value.toTranslationKey("lockgroup", "recipe_message"))
-
-        @JvmStatic
-        fun nameOf(player: PlayerEntity, stack: ItemStack) = of(player.registryManager[LockGroup], stack)?.itemName
-        @JvmStatic
-        @Deprecated("Mixin convenience", ReplaceWith("nameOf(player, stack as ItemStack) ?: original", "archives.tater.rpgskills.data.LockGroup.Companion.nameOf", "net.minecraft.item.ItemStack"))
-        fun nameOf(player: PlayerEntity?, stack: Any, original: Text) = player?.let { nameOf(player, stack as ItemStack) } ?: original
-
-        @JvmStatic
-        fun messageOf(player: PlayerEntity, stack: ItemStack) = of(player.registryManager[LockGroup], stack)?.itemMessage
-        @JvmStatic
-        @Deprecated("Mixin convenience", ReplaceWith("Companion.messageOf(player, stack as ItemStack) ?: original", "archives.tater.rpgskills.data.LockGroup.Companion", "net.minecraft.item.ItemStack"))
-        fun messageOf(player: PlayerEntity, stack: Any): MutableText = messageOf(player, stack as ItemStack) ?: Text.literal("")
-
-        @JvmStatic
-        fun messageOf(player: PlayerEntity, recipeId: Identifier) = of(player.registryManager[LockGroup], recipeId)?.recipeMessage
+        @JvmStatic fun isLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, stack) != null
+        @JvmStatic fun isLocked(player: PlayerEntity, state: BlockState) = findLocked(player, state) != null
+        @JvmStatic fun isLocked(player: PlayerEntity, entity: Entity) = findLocked(player, entity) != null
+        @JvmStatic fun isLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = findLocked(player, recipe) != null
     }
+
 }
