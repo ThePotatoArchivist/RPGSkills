@@ -5,6 +5,9 @@ import archives.tater.rpgskills.util.ComponentKeyHolder
 import archives.tater.rpgskills.util.associateNotNull
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
+import com.google.common.collect.HashMultimap
+import net.minecraft.entity.attribute.EntityAttribute
+import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.RegistryKey
@@ -20,6 +23,8 @@ import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.jvm.optionals.getOrNull
 
+typealias ModifierMap = HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier>
+
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
     private var _levels = mutableMapOf<RegistryEntry<Skill>, Int>()
@@ -33,9 +38,12 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             key.sync(player)
         }
 
+    private var modifiers: ModifierMap = HashMultimap.create()
+
     operator fun get(skill: RegistryEntry<Skill>) = _levels.getOrDefault(skill, 0)
     operator fun set(skill: RegistryEntry<Skill>, level: Int) {
         _levels[skill] = level.coerceIn(0, skill.value.levels.size)
+        updateAttributes()
         key.sync(player)
     }
 
@@ -45,12 +53,30 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = getUpgradeCost(skill)
         ?.let { remainingLevelPoints >= it } ?: false
 
+    private fun getAttributeModifiers() =
+        HashMultimap.create<RegistryEntry<EntityAttribute>, EntityAttributeModifier>().apply {
+            for ((skill, playerLevel) in _levels)
+                for (level in skill.value.levels) {
+                    if (playerLevel < level.cost) continue
+                    for ((attribute, modifier) in level.attributes)
+                        put(attribute, modifier)
+                }
+        }
+
+    private fun updateAttributes() {
+        player.attributes.removeModifiers(modifiers)
+        modifiers = getAttributeModifiers().also {
+            player.attributes.addTemporaryModifiers(it)
+        }
+    }
+
     override fun shouldCopyForRespawn(lossless: Boolean, keepInventory: Boolean, sameCharacter: Boolean): Boolean =
         sameCharacter
 
     override fun copyFrom(other: SkillsComponent, registryLookup: RegistryWrapper.WrapperLookup) {
         _levels = other._levels
         _spent = other._spent
+        updateAttributes()
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
@@ -59,9 +85,11 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             keys.associateNotNull { key ->
                 Identifier.tryParse(key)
                     ?.let { registry.getOptional(RegistryKey.of(Skill.key, it)).getOrNull() }
-                    ?.let { it to getInt(key) } }
+                    ?.let { it to getInt(key) }
+            }
         }.toMutableMap()
         _spent = tag.getInt("Spent")
+        updateAttributes()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
@@ -74,7 +102,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     }
 
     companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity> {
-        override val key: ComponentKey<SkillsComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
+        override val key: ComponentKey<SkillsComponent> =
+            ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
 
         @JvmField
         val KEY = key

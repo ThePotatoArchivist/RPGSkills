@@ -7,6 +7,7 @@ import archives.tater.rpgskills.util.value
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.entity.attribute.EntityAttribute
+import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
@@ -39,13 +40,13 @@ class Skill(
 
     class Level(
         val cost: Int,
-        val attributes: Map<EntityAttribute, Float> = mapOf(),
+        val attributes: Map<RegistryEntry<EntityAttribute>, EntityAttributeModifier> = mapOf(),
     ) {
         companion object {
             val CODEC: Codec<Level> = RecordCodecBuilder.create {
                 it.group(
                     field("cost", Level::cost, Codec.INT),
-                    field("attributes", Level::attributes, mapOf(), Codec.unboundedMap(Registries.ATTRIBUTE.codec, Codec.FLOAT)),
+                    field("attributes", Level::attributes, mapOf(), Codec.unboundedMap(Registries.ATTRIBUTE.entryCodec, EntityAttributeModifier.CODEC)),
                 ).apply(it, ::Level)
             }
 

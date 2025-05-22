@@ -1,5 +1,6 @@
 package archives.tater.rpgskills.util
 
+import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -107,3 +108,9 @@ infix fun ItemStack.isOf(item: Item) = this.isOf(item)
 infix fun ItemStack.isIn(tag: TagKey<Item>) = this.isIn(tag)
 
 fun <T, K, V> Iterable<T>.associateNotNull(transform: (T) -> Pair<K, V>?) = mapNotNull(transform).toMap()
+
+fun <K, V> hashMultiMapOf(vararg pairs: Pair<K, V>): HashMultimap<K, V> = HashMultimap.create<K, V>().apply {
+    pairs.forEach { (key, value) ->
+        put(key, value)
+    }
+}

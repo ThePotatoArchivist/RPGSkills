@@ -5,7 +5,16 @@
     "id": "minecraft:potato"
   },
   "levels": [
-    1,
+    {
+      "attributes": {
+        "minecraft:generic.movement_speed": {
+          "amount": 2.0,
+          "id": "rpg_test:potato",
+          "operation": "add_value"
+        }
+      },
+      "cost": 1
+    },
     2,
     3
   ],
