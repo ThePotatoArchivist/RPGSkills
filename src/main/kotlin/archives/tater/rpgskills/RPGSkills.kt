@@ -104,7 +104,7 @@ object RPGSkills : ModInitializer {
 			}
 		}
 
-		AttackBlockCallback.EVENT.register { player, world, hand, _, _ ->
+		AttackBlockCallback.EVENT.register { player, _, hand, _, _ ->
 			val lockGroup = LockGroup.findLocked(player, player.getStackInHand(hand))
 			if (lockGroup == null)
 				ActionResult.PASS

@@ -1,4 +1,8 @@
 {
+  "blocks": {
+    "entries": "#minecraft:buttons",
+    "message": "How to press?"
+  },
   "item_name": "Unknown Button",
   "items": {
     "entries": {

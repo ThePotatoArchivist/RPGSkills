@@ -2,11 +2,10 @@ package archives.tater.rpgskills.datagen.defaultpack
 
 import archives.tater.rpgskills.data.BuildsRegistry
 import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.Skill.AnonymousAttributeModifier
 import archives.tater.rpgskills.data.SkillProvider
 import archives.tater.rpgskills.data.accept
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributeModifier.Operation
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
@@ -41,9 +40,11 @@ class DefaultSkillGenerator(
             icon = ItemStack(Items.POTATO),
             levels = listOf(
                 Skill.Level(1, mapOf(
-                    EntityAttributes.GENERIC_MOVEMENT_SPEED to EntityAttributeModifier(Identifier.of("rpg_test", "potato"), 2.0, Operation.ADD_VALUE) // TODO figure out how this can be more concise
+                    EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(2.0),
                 )),
-                Skill.Level(2),
+                Skill.Level(2, mapOf(
+                    EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.5),
+                )),
                 Skill.Level(3),
             ),
             name = "Potato Skill",

@@ -59,11 +59,12 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                 for (level in skill.value.levels) {
                     if (playerLevel < level.cost) continue
                     for ((attribute, modifier) in level.attributes)
-                        put(attribute, modifier)
+                        put(attribute, modifier.build(skill.key.orElseThrow().value))
                 }
         }
 
     private fun updateAttributes() {
+        if (player.world.isClient) return
         player.attributes.removeModifiers(modifiers)
         modifiers = getAttributeModifiers().also {
             player.attributes.addTemporaryModifiers(it)

@@ -60,7 +60,7 @@ data class LockGroup(
     @JvmRecord
     data class LockList<T>(
         val entries: T,
-        val message: String? = null,
+        val message: String? = null, // TODO this should be nullable in codecs
     ) {
         companion object {
             fun <T> createCodec(containerCodec: Codec<T>): Codec<LockList<T>> = RecordCodecBuilder.create { instance -> instance.group(

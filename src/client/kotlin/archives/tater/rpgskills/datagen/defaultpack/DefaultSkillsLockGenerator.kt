@@ -7,8 +7,10 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.entity.EntityType
 import net.minecraft.item.Items
 import net.minecraft.recipe.Ingredient
+import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntryList
+import net.minecraft.registry.tag.BlockTags
 import net.minecraft.registry.tag.ItemTags
 import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
@@ -65,6 +67,10 @@ class DefaultSkillsLockGenerator(
             items = LockList(
                 Ingredient.fromTag(ItemTags.BUTTONS),
                 "You don't know what kind of button this is",
+            ),
+            blocks = LockList(
+                RegistryEntryList.of(Registries.BLOCK.entryOwner, BlockTags.BUTTONS),
+                "How to press?"
             ),
             recipes = LockList(
                 listOf("acacia", "bamboo", "birch", "cherry", "crimson", "jungle", "mangrove", "oak", "spruce", "stone", "warped", "dark_oak", "polished_blackstone").map { Identifier.of("${it}_button") },

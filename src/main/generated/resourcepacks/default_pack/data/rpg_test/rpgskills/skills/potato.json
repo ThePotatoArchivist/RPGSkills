@@ -7,15 +7,16 @@
   "levels": [
     {
       "attributes": {
-        "minecraft:generic.movement_speed": {
-          "amount": 2.0,
-          "id": "rpg_test:potato",
-          "operation": "add_value"
-        }
+        "minecraft:generic.movement_speed": 2.0
       },
       "cost": 1
     },
-    2,
+    {
+      "attributes": {
+        "minecraft:generic.movement_speed": 0.5
+      },
+      "cost": 2
+    },
     3
   ],
   "name": "Potato Skill"
