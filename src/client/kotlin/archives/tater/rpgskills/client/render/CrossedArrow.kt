@@ -43,7 +43,7 @@ object CrossedArrow {
         )
             context.drawTooltip(
                 (screen as ScreenAccessor).textRenderer,
-                RPGSkillsClient.blockedRecipeGroup!!.recipeMessage,
+                RPGSkillsClient.blockedRecipeGroup!!.recipeMessage(),
                 mouseX,
                 mouseY
             )

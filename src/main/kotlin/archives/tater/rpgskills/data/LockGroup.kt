@@ -33,6 +33,15 @@ data class LockGroup(
     val entities: LockList<RegistryEntryList<EntityType<*>>> = LockList.empty(),
     val recipes: LockList<List<Identifier>> = LockList(listOf()),
 ) {
+    constructor(
+        requirements: Map<RegistryEntry<Skill>, Int>,
+        attributes: Map<RegistryEntry<EntityAttribute>, EntityAttributeModifier> = mapOf(),
+        itemName: String?,
+        items: LockList<Ingredient> = LockList(Ingredient.EMPTY),
+        blocks: LockList<RegistryEntryList<Block>> = LockList.empty(),
+        entities: LockList<RegistryEntryList<EntityType<*>>> = LockList.empty(),
+        recipes: LockList<List<Identifier>> = LockList(listOf()),
+    ) : this(listOf(requirements), attributes, itemName, items, blocks, entities, recipes)
 
     fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.any {
         it.all { (skill, level) ->
@@ -85,15 +94,15 @@ data class LockGroup(
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))
 
-        inline fun find(registries: WrapperLookup, crossinline condition: (LockGroup) -> Boolean) =
-            registries[LockGroup].streamEntries().filter { condition(it.value) }.findFirst().getOrNull()
+        inline fun find(registries: WrapperLookup, crossinline condition: (LockGroup) -> Boolean): LockGroup? =
+            registries[LockGroup].streamEntries().filter { condition(it.value) }.findFirst().getOrNull()?.value
 
         @JvmStatic fun find(registries: WrapperLookup, stack: ItemStack) = find(registries) { it.items.entries.test(stack) }
         @JvmStatic fun find(registries: WrapperLookup, state: BlockState) = find(registries) { state.isIn(it.blocks.entries) }
         @JvmStatic fun find(registries: WrapperLookup, entity: Entity) = find(registries) { entity.type.isIn(it.entities.entries) }
         @JvmStatic fun find(registries: WrapperLookup, recipe: RecipeEntry<*>) = find(registries) { recipe.id in it.recipes.entries }
 
-        private fun RegistryEntry<LockGroup>.check(player: PlayerEntity) = takeIf { value.isSatisfiedBy(player) }
+        private fun LockGroup.check(player: PlayerEntity) = takeIf { !isSatisfiedBy(player) }
 
         @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = find(player.registryManager) { it.items.entries.test(stack) }?.check(player)
         @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = find(player.registryManager) { state.isIn(it.blocks.entries) }?.check(player)

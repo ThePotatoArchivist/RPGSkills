@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@SuppressWarnings("deprecation")
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
 	@Shadow @Final private MinecraftClient client;
@@ -25,8 +24,8 @@ public class InGameHudMixin {
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
 	)
 	private Text init(ItemStack instance, Operation<Text> original) {
-		var originalName = original.call(instance);
-		return LockGroup.isLocked(client.player, instance) ? LockGroup.nameOf(client.player, instance, originalName) : originalName;
+        var lockGroup = LockGroup.findLocked(client.player, instance);
+		return lockGroup == null ? original.call(instance) : lockGroup.itemNameText();
 	}
 
 	@SuppressWarnings("DataFlowIssue") // client.player is definitely not null here

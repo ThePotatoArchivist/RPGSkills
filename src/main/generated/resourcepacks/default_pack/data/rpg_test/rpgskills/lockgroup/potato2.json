@@ -1,13 +1,17 @@
 {
-  "item_message": "You don't know how to eat with this fork",
   "item_name": "Unknown Fork",
   "items": {
-    "item": "minecraft:trident"
+    "entries": {
+      "item": "minecraft:trident"
+    },
+    "message": "You don't know how to eat with this fork"
   },
-  "recipe_message": "You don't know how to assemble this prismarine",
-  "recipes": [
-    "minecraft:prismarine_bricks"
-  ],
+  "recipes": {
+    "entries": [
+      "minecraft:prismarine_bricks"
+    ],
+    "message": "You don't know how to assemble this prismarine"
+  },
   "requirements": {
     "rpg_test:cow": 2,
     "rpg_test:potato": 2

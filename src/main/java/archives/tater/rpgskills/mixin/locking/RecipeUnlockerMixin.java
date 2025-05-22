@@ -19,14 +19,12 @@ public interface RecipeUnlockerMixin {
             at = @At("HEAD"),
             cancellable = true)
     private void alsoCheckSkills(World world, ServerPlayerEntity player, RecipeEntry<?> recipe, CallbackInfoReturnable<Boolean> cir) {
-        if (LockGroup.isLocked(player, recipe.id())) {
-            cir.setReturnValue(false);
-            var lockGroup = LockGroup.of(world.getRegistryManager(), recipe.id());
-            if (lockGroup != null) {
-                ServerPlayNetworking.send(player, new RecipeBlockedPayload(lockGroup));
-                return;
-            }
+        var lockGroup = LockGroup.findLocked(player, recipe);
+        if (lockGroup == null) {
+            ServerPlayNetworking.send(player, RecipeBlockedPayload.EMPTY);
+            return;
         }
-        ServerPlayNetworking.send(player, RecipeBlockedPayload.EMPTY);
+        cir.setReturnValue(false);
+        ServerPlayNetworking.send(player, new RecipeBlockedPayload(lockGroup));
     }
 }

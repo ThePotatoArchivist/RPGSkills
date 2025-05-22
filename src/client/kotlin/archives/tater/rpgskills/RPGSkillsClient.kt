@@ -3,6 +3,7 @@ package archives.tater.rpgskills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.util.wasPressed
+import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -11,13 +12,12 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
-import net.minecraft.registry.entry.RegistryEntry
 import org.lwjgl.glfw.GLFW
 import kotlin.jvm.optionals.getOrNull
 
 object RPGSkillsClient : ClientModInitializer {
 	@JvmField
-	var blockedRecipeGroup: RegistryEntry<LockGroup>? = null
+	var blockedRecipeGroup: LockGroup? = null
 
 	const val RPG_SKILLS_CATEGORY = "category.$MOD_ID.$MOD_ID"
 	const val SKILLS_KEY_TRANSLATION = "key.$MOD_ID.screen.skills"

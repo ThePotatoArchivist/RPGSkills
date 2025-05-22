@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 import java.util.function.Consumer;
 
-@SuppressWarnings({"deprecation"})
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
     @WrapOperation(
@@ -38,7 +37,7 @@ public abstract class ItemStackMixin {
         if (player == null) return original.call(instance, context);
         var lockGroup = LockGroup.findLocked(player, (ItemStack) (Object) this);
         if (lockGroup == null) return original.call(instance, context);
-        player.sendMessage(lockGroup.value().itemMessage(), true);
+        player.sendMessage(lockGroup.itemMessage(), true);
         return ActionResult.CONSUME;
     }
 
@@ -49,7 +48,7 @@ public abstract class ItemStackMixin {
     private TypedActionResult<ItemStack> checkLock(Item instance, World world, PlayerEntity user, Hand hand, Operation<TypedActionResult<ItemStack>> original) {
         var lockGroup = LockGroup.findLocked(user, (ItemStack) (Object) this);
         if (lockGroup == null) return original.call(instance, world, user, hand);
-        user.sendMessage(lockGroup.value().itemMessage(), true);
+        user.sendMessage(lockGroup.itemMessage(), true);
         return TypedActionResult.pass(user.getStackInHand(hand)); // shouldn't this be a fail?
     }
 
@@ -66,15 +65,19 @@ public abstract class ItemStackMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
     )
     private Text modifyName(Text original, @Local(argsOnly = true) @Nullable PlayerEntity player) {
-        return player != null && LockGroup.isLocked(player, this) ? LockGroup.nameOf(player, this, original) : original;
+        if (player == null) return original;
+        var lockGroup = LockGroup.findLocked(player, (ItemStack) (Object) this);
+        if (lockGroup == null) return original;
+        return lockGroup.itemNameText();
     }
 
+    @SuppressWarnings("ConstantValue")
     @Inject(
             method = "appendAttributeModifiersTooltip",
             at = @At("HEAD"),
             cancellable = true)
     private void hideModifiers(Consumer<Text> textConsumer, @Nullable PlayerEntity player, CallbackInfo ci) {
-        if (player != null && LockGroup.isLocked(player, this))
+        if (player != null && LockGroup.isLocked(player, (ItemStack) (Object) this))
             ci.cancel();
     }
 }

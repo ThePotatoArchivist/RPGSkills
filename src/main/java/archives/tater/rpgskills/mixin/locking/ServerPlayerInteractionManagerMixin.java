@@ -20,8 +20,9 @@ public class ServerPlayerInteractionManagerMixin {
             at = @At("HEAD"),
             cancellable = true)
     private void checkLock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (!LockGroup.isLocked(player, player.getMainHandStack())) return;
+        var lockGroup = LockGroup.findLocked(player, player.getMainHandStack());
+        if (lockGroup == null) return;
         cir.setReturnValue(false);
-        player.sendMessage(LockGroup.messageOf(player, player.getMainHandStack()), true);
+        player.sendMessage(lockGroup.itemMessage(), true);
     }
 }

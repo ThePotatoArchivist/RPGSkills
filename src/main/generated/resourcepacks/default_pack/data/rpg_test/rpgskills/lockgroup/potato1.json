@@ -1,20 +1,24 @@
 {
-  "item_message": "You don't know if this potato is safe to eat",
   "item_name": "Unknown Potato",
-  "items": [
-    {
-      "item": "minecraft:potato"
-    },
-    {
-      "item": "minecraft:poisonous_potato"
-    }
-  ],
-  "recipe_message": "You don't know how to cook this potato",
-  "recipes": [
-    "minecraft:baked_potato",
-    "minecraft:baked_potato_from_smoking",
-    "minecraft:baked_potato_from_campfire_cooking"
-  ],
+  "items": {
+    "entries": [
+      {
+        "item": "minecraft:potato"
+      },
+      {
+        "item": "minecraft:poisonous_potato"
+      }
+    ],
+    "message": "You don't know if this potato is safe to eat"
+  },
+  "recipes": {
+    "entries": [
+      "minecraft:baked_potato",
+      "minecraft:baked_potato_from_smoking",
+      "minecraft:baked_potato_from_campfire_cooking"
+    ],
+    "message": "You don't know how to cook this potato"
+  },
   "requirements": {
     "rpg_test:potato": 1
   }
