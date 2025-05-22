@@ -14,9 +14,7 @@ object ItemLockTooltip {
     val REQUIREMENT = Translation.arg("rpgskills.tooltip.stack.requirement") { formatted(Formatting.DARK_GRAY) }
 
     @JvmStatic
-    fun appendTooltip(stack: ItemStack, player: PlayerEntity?, tooltip: MutableList<Text>) {
-        val lockGroup = LockGroup.findLocked(player ?: return, stack) ?: return
-
+    fun appendRequirements(lockGroup: LockGroup, tooltip: MutableList<Text>) {
         tooltip.add(if (lockGroup.requirements.size == 1) REQUIRES.text else { REQUIRES_ANY.text })
 
         for (requirement in lockGroup.requirements) {
@@ -29,5 +27,12 @@ object ItemLockTooltip {
                 }
             }))
         }
+    }
+
+    @JvmStatic
+    fun appendTooltip(stack: ItemStack, player: PlayerEntity?, tooltip: MutableList<Text>) {
+        val lockGroup = LockGroup.findLocked(player ?: return, stack) ?: return
+
+        appendRequirements(lockGroup, tooltip)
     }
 }

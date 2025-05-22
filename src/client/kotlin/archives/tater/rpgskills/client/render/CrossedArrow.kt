@@ -1,5 +1,6 @@
 package archives.tater.rpgskills.client.render
 
+import archives.tater.rpgskills.ItemLockTooltip
 import archives.tater.rpgskills.RPGSkills.id
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.mixin.client.HandledScreenAccessor
@@ -8,6 +9,7 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
+import net.minecraft.text.Text
 
 @Environment(EnvType.CLIENT)
 object CrossedArrow {
@@ -43,7 +45,11 @@ object CrossedArrow {
         )
             context.drawTooltip(
                 (screen as ScreenAccessor).textRenderer,
-                RPGSkillsClient.blockedRecipeGroup!!.recipeMessage(),
+                mutableListOf<Text>(
+                    RPGSkillsClient.blockedRecipeGroup!!.recipeMessage()
+                ).also {
+                    ItemLockTooltip.appendRequirements(RPGSkillsClient.blockedRecipeGroup!!, it)
+                },
                 mouseX,
                 mouseY
             )

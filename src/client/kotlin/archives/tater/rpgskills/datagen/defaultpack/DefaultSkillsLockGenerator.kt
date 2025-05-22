@@ -4,9 +4,11 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.LockGroup.LockList
 import archives.tater.rpgskills.data.LockGroupProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
+import net.minecraft.entity.EntityType
 import net.minecraft.item.Items
 import net.minecraft.recipe.Ingredient
 import net.minecraft.registry.RegistryWrapper
+import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.tag.ItemTags
 import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
@@ -38,8 +40,12 @@ class DefaultSkillsLockGenerator(
             ),
             itemName = "Unknown Fork",
             items = LockList(
-                Ingredient.ofItems(Items.TRIDENT),
+                Ingredient.ofItems(Items.TRIDENT, Items.DIAMOND_HELMET),
                 "You don't know how to eat with this fork",
+            ),
+            entities = LockList(
+                RegistryEntryList.of(EntityType.VILLAGER.registryEntry),
+                "AAA"
             ),
             recipes = LockList(
                 listOf(Identifier.of("prismarine_bricks")),
