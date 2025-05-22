@@ -68,6 +68,8 @@ object RPGSkills : ModInitializer {
 			}
 		}
 
+		// TODO spectator checks
+
 		UseItemCallback.EVENT.register { player, _, hand ->
 			val stack = player.getStackInHand(hand)
 			val lockGroup = LockGroup.findLocked(player, stack)
