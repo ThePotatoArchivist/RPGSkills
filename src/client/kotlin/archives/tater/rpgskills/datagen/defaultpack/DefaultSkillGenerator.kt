@@ -40,10 +40,10 @@ class DefaultSkillGenerator(
             icon = ItemStack(Items.POTATO),
             levels = listOf(
                 Skill.Level(1, mapOf(
-                    EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(2.0),
+                    EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1),
                 )),
                 Skill.Level(2, mapOf(
-                    EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.5),
+                    EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1),
                 )),
                 Skill.Level(3),
             ),

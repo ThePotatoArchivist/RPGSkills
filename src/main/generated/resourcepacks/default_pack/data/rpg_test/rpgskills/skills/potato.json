@@ -7,13 +7,13 @@
   "levels": [
     {
       "attributes": {
-        "minecraft:generic.movement_speed": 2.0
+        "minecraft:generic.movement_speed": 0.1
       },
       "cost": 1
     },
     {
       "attributes": {
-        "minecraft:generic.movement_speed": 0.5
+        "minecraft:generic.movement_speed": 0.1
       },
       "cost": 2
     },

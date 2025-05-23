@@ -1,11 +1,14 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.ComponentKeyHolder
 import archives.tater.rpgskills.util.associateNotNull
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
 import com.google.common.collect.HashMultimap
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayPayloadHandler
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
@@ -13,6 +16,7 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Identifier
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
@@ -56,11 +60,12 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     private fun getAttributeModifiers() =
         HashMultimap.create<RegistryEntry<EntityAttribute>, EntityAttributeModifier>().apply {
             for ((skill, playerLevel) in _levels)
-                for (level in skill.value.levels) {
-                    if (playerLevel < level.cost) continue
-                    for ((attribute, modifier) in level.attributes)
-                        put(attribute, modifier.build(skill.key.orElseThrow().value))
-                }
+                skill.value.levels
+                    .filter { playerLevel >= it.cost }
+                    .forEachIndexed { levelIndex, level ->
+                        for ((attribute, modifier) in level.attributes)
+                            put(attribute, modifier.build(skill.key.orElseThrow().value.withPath { "skill/$it/$levelIndex" }))
+                    }
         }
 
     private fun updateAttributes() {
@@ -102,11 +107,26 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         tag.putInt("Spent", _spent)
     }
 
-    companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity> {
+    companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>, PlayPayloadHandler<SkillUpgradePayload> {
         override val key: ComponentKey<SkillsComponent> =
             ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
 
         @JvmField
         val KEY = key
+
+        override fun receive(payload: SkillUpgradePayload, context: ServerPlayNetworking.Context) {
+            val player = context.player()
+            val skillsComponent = player[SkillsComponent]
+            val skill = payload.skill
+            if (skillsComponent.canUpgrade(skill)) {
+                skillsComponent.remainingLevelPoints -= skillsComponent.getUpgradeCost(skill)!!
+                skillsComponent[skill]++
+                player.world.playSoundFromEntity(null, player, SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
+            }
+        }
+
+        fun registerNetworking() {
+            ServerPlayNetworking.registerGlobalReceiver(SkillUpgradePayload.ID, this)
+        }
     }
 }
