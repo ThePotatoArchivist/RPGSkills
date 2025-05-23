@@ -5,6 +5,7 @@ import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
+import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
@@ -24,6 +25,11 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
         translationBuilder.add(RPGSkillsCommands.ADD_POINTS, "Gave %2$s level points to %s")
         translationBuilder.add(RPGSkillsCommands.SET_POINTS, "Set %2$s level points on %s")
         translationBuilder.add(SkillsScreen.TITLE, "Skills")
+        translationBuilder.add(LockGroup.DEFAULT_ITEM_NAME, "Unknown Item")
+        translationBuilder.add(LockGroup.DEFAULT_ITEM_MESSAGE, "You don't know how to use this item")
+        translationBuilder.add(LockGroup.DEFAULT_BLOCK_MESSAGE, "You don't know how to use this block")
+        translationBuilder.add(LockGroup.DEFAULT_ENTITY_MESSAGE, "You don't know how to interact with this mob")
+        translationBuilder.add(LockGroup.DEFAULT_RECIPE_MESSAGE, "You don't know how to craft this recipe")
         translationBuilder.add(ItemLockTooltip.REQUIRES, "Requires:")
         translationBuilder.add(ItemLockTooltip.REQUIRES_ANY, "Requires either:")
         translationBuilder.add(ItemLockTooltip.REQUIREMENT, "- %s")

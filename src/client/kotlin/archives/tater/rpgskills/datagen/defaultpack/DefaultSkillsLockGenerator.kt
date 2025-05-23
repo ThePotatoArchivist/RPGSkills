@@ -4,6 +4,7 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.LockGroup.LockList
 import archives.tater.rpgskills.data.LockGroupProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
+import net.minecraft.block.Blocks
 import net.minecraft.entity.EntityType
 import net.minecraft.item.Items
 import net.minecraft.recipe.Ingredient
@@ -29,6 +30,9 @@ class DefaultSkillsLockGenerator(
             items = LockList(
                 Ingredient.ofItems(Items.POTATO, Items.POISONOUS_POTATO),
                 "You don't know if this potato is safe to eat",
+            ),
+            blocks = LockList(
+                RegistryEntryList.of(Blocks.CRAFTING_TABLE.registryEntry),
             ),
             recipes = LockList(
                 listOf(Identifier.of("baked_potato"), Identifier.of("baked_potato_from_smoking"), Identifier.of("baked_potato_from_campfire_cooking")),

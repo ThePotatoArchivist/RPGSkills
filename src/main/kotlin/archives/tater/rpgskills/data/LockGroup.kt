@@ -21,6 +21,7 @@ import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 @JvmRecord
@@ -43,6 +44,16 @@ data class LockGroup(
         recipes: LockList<List<Identifier>> = LockList(listOf()),
     ) : this(listOf(requirements), attributes, itemName, items, blocks, entities, recipes)
 
+    constructor(
+        requirements: List<Map<RegistryEntry<Skill>, Int>>,
+        attributes: Map<RegistryEntry<EntityAttribute>, EntityAttributeModifier> = mapOf(),
+        itemName: Optional<String>,
+        items: LockList<Ingredient> = LockList(Ingredient.EMPTY),
+        blocks: LockList<RegistryEntryList<Block>> = LockList.empty(),
+        entities: LockList<RegistryEntryList<EntityType<*>>> = LockList.empty(),
+        recipes: LockList<List<Identifier>> = LockList(listOf()),
+    ) : this(requirements, attributes, itemName.getOrNull(), items, blocks, entities, recipes)
+
     fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.any {
         it.all { (skill, level) ->
             levels.getOrDefault(skill, 0) >= level
@@ -62,10 +73,12 @@ data class LockGroup(
         val entries: T,
         val message: String? = null, // TODO this should be nullable in codecs
     ) {
+        constructor(entries: T, message: Optional<String>) : this(entries, message.getOrNull())
+
         companion object {
             fun <T> createCodec(containerCodec: Codec<T>): Codec<LockList<T>> = RecordCodecBuilder.create { instance -> instance.group(
                 field("entries", LockList<T>::entries, containerCodec),
-                fieldNullable("message", LockList<T>::message, Codec.STRING),
+                optionalField("message", LockList<T>::message, Codec.STRING),
             ).apply(instance, ::LockList) }
 
             fun <T> createCodec(registryRef: RegistryKey<Registry<T>>): Codec<LockList<RegistryEntryList<T>>> = createCodec(RegistryCodecs.entryList(registryRef))
@@ -85,7 +98,7 @@ data class LockGroup(
         val CODEC = RecordCodecBuilder.create { it.group(
             field("requirements", LockGroup::requirements, Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList()),
             field("attributes", LockGroup::attributes, mapOf(), Codec.simpleMap(Registries.ATTRIBUTE.entryCodec, EntityAttributeModifier.CODEC, Registries.ATTRIBUTE).codec()),
-            fieldNullable("item_name", LockGroup::itemName, Codec.STRING),
+            optionalField("item_name", LockGroup::itemName, Codec.STRING),
             field("items", LockGroup::items, LockList(Ingredient.EMPTY), LockList.createCodec(Ingredient.DISALLOW_EMPTY_CODEC)),
             field("blocks", LockGroup::blocks, LockList.empty(), LockList.createCodec(RegistryKeys.BLOCK)),
             field("entities", LockGroup::entities, LockList.empty(), LockList.createCodec(RegistryKeys.ENTITY_TYPE)),

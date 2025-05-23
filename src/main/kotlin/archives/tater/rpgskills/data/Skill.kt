@@ -3,6 +3,7 @@ package archives.tater.rpgskills.data
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.RegistryKeyHolder
 import archives.tater.rpgskills.util.field
+import archives.tater.rpgskills.util.optionalField
 import archives.tater.rpgskills.util.value
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -17,28 +18,37 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @JvmRecord
 data class Skill(
     val icon: ItemStack,
     val levels: List<Level>,
-    val name: String? = null,
+    val name: String,
     val description: String? = null,
 ) {
+    constructor(
+        icon: ItemStack,
+        levels: List<Level>,
+        name: String,
+        description: Optional<String>,
+    ) : this(icon, levels, name, description.getOrNull())
+
     companion object : RegistryKeyHolder<Registry<Skill>> {
         val CODEC: Codec<Skill> = RecordCodecBuilder.create {
             it.group(
                 field("icon", Skill::icon, ItemStack.CODEC),
                 field("levels", Skill::levels, Level.SHORT_CODEC.listOf()),
-                field("name", Skill::name, null, Codec.STRING),
-                field("description", Skill::description, null, Codec.STRING)
+                field("name", Skill::name, Codec.STRING),
+                optionalField("description", Skill::description, Codec.STRING)
             ).apply(it, ::Skill)
         }
 
         override val key: RegistryKey<Registry<Skill>> = RegistryKey.ofRegistry(RPGSkills.id("skills"))
 
-        val RegistryEntry<Skill>.name: MutableText get() = value.name?.let(Text::literal) ?: Text.translatable(key.get().value.toTranslationKey("skill", "name"))
-        val RegistryEntry<Skill>.description: MutableText get() = value.description?.let(Text::literal) ?: Text.translatable(key.get().value.toTranslationKey("skill", "name"))
+        val RegistryEntry<Skill>.name: MutableText get() = Text.literal(value.name)
+        val RegistryEntry<Skill>.description: MutableText get() = Text.literal(value.description ?: "")
     }
 
     @JvmRecord
