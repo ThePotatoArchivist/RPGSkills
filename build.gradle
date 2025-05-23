@@ -32,6 +32,12 @@ repositories {
 			includeGroup "maven.modrinth"
 		}
 	}
+	maven { url "https://maven.shedaniel.me/" }
+	maven { url "https://maven.terraformersmc.com/releases/" }
+	maven {
+		name "KosmX's maven"
+		url 'https://maven.kosmx.dev/'
+	}
 }
 
 loom {
@@ -67,6 +73,15 @@ dependencies {
 	modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
 	modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-world:${project.cca_version}"
 	modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-chunk:${project.cca_version}"
+
+	modLocalRuntime modCompileOnly("maven.modrinth:better-combat:${project.better_combat_version}-fabric")
+	modLocalRuntime("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
+	modCompileOnly("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
+	modLocalRuntime modCompileOnly("dev.kosmx.player-anim:player-animation-lib-fabric:${project.player_anim_version}")
 
 	modClientRuntimeOnly "maven.modrinth:skip-backup-screen:${project.sbs_version}"
 }

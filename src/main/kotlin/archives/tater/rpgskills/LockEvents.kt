@@ -1,7 +1,10 @@
 package archives.tater.rpgskills
 
 import archives.tater.rpgskills.data.LockGroup
-import net.fabricmc.fabric.api.event.player.*
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback
+import net.fabricmc.fabric.api.event.player.UseBlockCallback
+import net.fabricmc.fabric.api.event.player.UseEntityCallback
+import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
@@ -40,10 +43,8 @@ internal fun registerLockEvents() {
             LockGroup.findLocked(player, player.getStackInHand(hand))
         }
     }
-
-    AttackEntityCallback.EVENT.register { player, _, hand, _, _ ->
-        failIfLocked(player, LockGroup::itemMessage) {
-            LockGroup.findLocked(player, player.getStackInHand(hand))
-        }
-    }
 }
+
+fun checkAttackLocked(player: PlayerEntity) = failIfLocked(player, LockGroup::itemMessage) {
+    LockGroup.findLocked(player, player.mainHandStack)
+} != ActionResult.PASS

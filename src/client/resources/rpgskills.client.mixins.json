@@ -7,11 +7,12 @@
     "HandledScreenAccessor",
     "InGameHudMixin",
     "InventoryScreenMixin",
-    "ScreenAccessor"
+    "MinecraftClientMixin",
+    "ScreenAccessor",
+    "compat.bettercombat.WeaponAttributeTooltipMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
-  "mixins": [
-  ]
+  "plugin": "archives.tater.rpgskills.client.RPGSkillsMixinConfigPlugin"
 }

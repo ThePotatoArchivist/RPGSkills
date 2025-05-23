@@ -7,9 +7,11 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
 import org.lwjgl.glfw.GLFW
@@ -44,6 +46,10 @@ object RPGSkillsClient : ClientModInitializer {
 
 		ScreenEvents.BEFORE_INIT.register { _, _, _, _ ->
 			blockedRecipeGroup = null
+		}
+
+		ItemTooltipCallback.EVENT.register { stack, _, _, tooltip ->
+			ItemLockTooltip.appendTooltip(stack, MinecraftClient.getInstance().player, tooltip)
 		}
 	}
 }
