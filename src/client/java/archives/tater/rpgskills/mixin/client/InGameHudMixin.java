@@ -34,6 +34,6 @@ public class InGameHudMixin {
 			at = @At("STORE")
 	)
 	private String modifyXpDisplay(String original) {
-        return (SkillsComponent.KEY.get(client.player).getRemainingLevelPoints()) + "/" + original;
+        return (SkillsComponent.KEY.get(client.player).getSkillLevels()) + "/" + original;
 	}
 }

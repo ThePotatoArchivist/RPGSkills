@@ -60,7 +60,7 @@ data class LockGroup(
         }
     }
 
-    fun isSatisfiedBy(player: PlayerEntity): Boolean = isSatisfiedBy(player[SkillsComponent].levels)
+    fun isSatisfiedBy(player: PlayerEntity): Boolean = isSatisfiedBy(player[SkillsComponent].skills)
 
     fun itemNameText() = itemName.let(Text::literal) ?: DEFAULT_ITEM_NAME.text()
     fun itemMessage() = items.message?.let(Text::literal) ?: DEFAULT_ITEM_MESSAGE.text()

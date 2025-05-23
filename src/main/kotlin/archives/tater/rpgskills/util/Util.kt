@@ -25,6 +25,9 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 import kotlin.Pair
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KProperty
 import com.mojang.datafixers.util.Pair as DFPair
 
 internal fun <T, C> field(name: String, getter: (C) -> T, codec: Codec<T>): RecordCodecBuilder<C, T> =
@@ -108,5 +111,14 @@ fun <T, K, V> Iterable<T>.associateNotNull(transform: (T) -> Pair<K, V>?) = mapN
 fun <K, V> hashMultiMapOf(vararg pairs: Pair<K, V>): HashMultimap<K, V> = HashMultimap.create<K, V>().apply {
     pairs.forEach { (key, value) ->
         put(key, value)
+    }
+}
+
+fun <T> KMutableProperty0<T>.synced(key: ComponentKey<*>, provider: Any) = object : ReadWriteProperty<Component, T> {
+    override fun getValue(thisRef: Component, property: KProperty<*>): T = this@synced.get()
+
+    override fun setValue(thisRef: Component, property: KProperty<*>, value: T) {
+        this@synced.set(value)
+        key.sync(provider)
     }
 }

@@ -2,10 +2,7 @@ package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.networking.SkillUpgradePayload
-import archives.tater.rpgskills.util.ComponentKeyHolder
-import archives.tater.rpgskills.util.associateNotNull
-import archives.tater.rpgskills.util.get
-import archives.tater.rpgskills.util.value
+import archives.tater.rpgskills.util.*
 import com.google.common.collect.HashMultimap
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayPayloadHandler
@@ -31,22 +28,20 @@ typealias ModifierMap = HashMultimap<RegistryEntry<EntityAttribute>, EntityAttri
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
-    private var _levels = mutableMapOf<RegistryEntry<Skill>, Int>()
-    val levels: Map<RegistryEntry<Skill>, Int> get() = _levels
+    private var _skills = mutableMapOf<RegistryEntry<Skill>, Int>()
+    val skills: Map<RegistryEntry<Skill>, Int> get() = _skills
 
-    private var _spent = 0
-    var remainingLevelPoints
-        get() = player.experienceLevel - _spent
-        set(value) {
-            _spent = player.experienceLevel - value
-            key.sync(player)
-        }
+    private var _skillLevels = 0
+    var skillLevels by ::_skillLevels.synced(key, player)
+
+    private var _skillPoints = 0
+    var skillPoints by ::_skillPoints.synced(key, player)
 
     private var modifiers: ModifierMap = HashMultimap.create()
 
-    operator fun get(skill: RegistryEntry<Skill>) = _levels.getOrDefault(skill, 0)
+    operator fun get(skill: RegistryEntry<Skill>) = _skills.getOrDefault(skill, 0)
     operator fun set(skill: RegistryEntry<Skill>, level: Int) {
-        _levels[skill] = level.coerceIn(0, skill.value.levels.size)
+        _skills[skill] = level.coerceIn(0, skill.value.levels.size)
         updateAttributes()
         key.sync(player)
     }
@@ -55,11 +50,11 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         .getOrNull(this[skill])?.cost
 
     fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = getUpgradeCost(skill)
-        ?.let { remainingLevelPoints >= it } ?: false
+        ?.let { skillLevels >= it } ?: false
 
     private fun getAttributeModifiers() =
         HashMultimap.create<RegistryEntry<EntityAttribute>, EntityAttributeModifier>().apply {
-            for ((skill, playerLevel) in _levels)
+            for ((skill, playerLevel) in _skills)
                 skill.value.levels
                     .filter { playerLevel >= it.cost }
                     .forEachIndexed { levelIndex, level ->
@@ -80,31 +75,33 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         sameCharacter
 
     override fun copyFrom(other: SkillsComponent, registryLookup: RegistryWrapper.WrapperLookup) {
-        _levels = other._levels
-        _spent = other._spent
+        _skills = other._skills
+        _skillLevels = other._skillLevels
         updateAttributes()
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         val registry = registryLookup[Skill]
-        _levels = tag.getCompound("Levels").run {
+        _skills = tag.getCompound("skills").run {
             keys.associateNotNull { key ->
                 Identifier.tryParse(key)
                     ?.let { registry.getOptional(RegistryKey.of(Skill.key, it)).getOrNull() }
                     ?.let { it to getInt(key) }
             }
         }.toMutableMap()
-        _spent = tag.getInt("Spent")
+        _skillLevels = tag.getInt("levels")
+        _skillPoints = tag.getInt("points")
         updateAttributes()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        tag.put("Levels", NbtCompound().apply {
-            for ((skill, level) in _levels) {
+        tag.put("skills", NbtCompound().apply {
+            for ((skill, level) in _skills) {
                 putInt(skill.key.get().value.toString(), level)
             }
         })
-        tag.putInt("Spent", _spent)
+        tag.putInt("levels", _skillLevels)
+        tag.putInt("points", _skillPoints)
     }
 
     companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>, PlayPayloadHandler<SkillUpgradePayload> {
@@ -119,7 +116,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             val skillsComponent = player[SkillsComponent]
             val skill = payload.skill
             if (skillsComponent.canUpgrade(skill)) {
-                skillsComponent.remainingLevelPoints -= skillsComponent.getUpgradeCost(skill)!!
+                skillsComponent.skillLevels -= skillsComponent.getUpgradeCost(skill)!!
                 skillsComponent[skill]++
                 player.world.playSoundFromEntity(null, player, SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
             }
