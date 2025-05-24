@@ -2,17 +2,19 @@ package archives.tater.rpgskills.entity
 
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.mixin.xp.ExperienceOrbAccessor
-import archives.tater.rpgskills.mixin.xp.ExperienceOrbMixin
 import archives.tater.rpgskills.util.get
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
-import net.minecraft.entity.ExperienceOrbEntity
+import net.minecraft.entity.ExperienceOrbEntity.roundToOrbSize
+import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 
-class SkillPointOrbEntity(entityType: EntityType<out SkillPointOrbEntity>, world: World) : ExperienceOrbEntity(entityType, world), ExperienceOrbMixin {
+class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: World) : Entity(type, world) {
 
     @Suppress("CAST_NEVER_SUCCEEDS")
     private inline val thisAccess get() = this as ExperienceOrbAccessor
@@ -24,14 +26,24 @@ class SkillPointOrbEntity(entityType: EntityType<out SkillPointOrbEntity>, world
         thisAccess.setAmount(amount)
     }
 
-    override fun rpgskills_shouldRunExpensiveUpdate(instance: ExperienceOrbEntity?): Boolean = false
+    override fun initDataTracker(builder: DataTracker.Builder?) {
+        TODO("Not yet implemented")
+    }
 
     override fun onPlayerCollision(player: PlayerEntity?) {
         if (player !is ServerPlayerEntity) return
         player.experiencePickUpDelay = 2
         player.sendPickup(this, 1)
-        player[SkillsComponent].addSkillPoints(experienceAmount)
+        player[SkillsComponent].addSkillPoints(0 /*experienceAmount*/)
         this.discard()
+    }
+
+    override fun readCustomDataFromNbt(nbt: NbtCompound?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun writeCustomDataToNbt(nbt: NbtCompound?) {
+        TODO("Not yet implemented")
     }
 
     companion object {

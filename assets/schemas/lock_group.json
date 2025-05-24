@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+:[a-z0-9/._-]+$"
+    },
+    "Tag": {
+      "type": "string",
+      "pattern": "^#[a-z0-9_.-]+:[a-z0-9/._-]+$"
+    },
+    "LockList": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/Identifier"
+              },
+              {
+                "$ref": "#/definitions/Tag"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "entries"
+      ]
+    },
+    "Requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "blocks": {
+      "$ref": "#/definitions/LockList"
+    },
+    "entities": {
+      "$ref": "#/definitions/LockList"
+    },
+    "item_name": {
+      "type": "string"
+    },
+    "items": {
+      "$ref": "#/definitions/LockList"
+    },
+    "recipes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Identifier"
+          }
+        }
+      },
+      "required": [
+        "entries"
+      ]
+    },
+    "requirements": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Requirement"
+          }
+        },
+        {
+          "$ref": "#/definitions/Requirement"
+        }
+      ]
+    }
+  },
+  "required": [
+    "requirements"
+  ]
+}
+

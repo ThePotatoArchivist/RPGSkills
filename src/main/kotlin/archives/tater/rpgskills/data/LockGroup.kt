@@ -9,13 +9,12 @@ import net.minecraft.block.BlockState
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.recipe.Ingredient
 import net.minecraft.recipe.RecipeEntry
 import net.minecraft.registry.*
 import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.registry.entry.RegistryEntry
-import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
@@ -26,26 +25,26 @@ import kotlin.jvm.optionals.getOrNull
 data class LockGroup(
     val requirements: List<Map<RegistryEntry<Skill>, Int>>,
     val itemName: String?,
-    val items: LockList<Ingredient> = LockList(Ingredient.EMPTY),
-    val blocks: LockList<RegistryEntryList<Block>> = LockList.empty(),
-    val entities: LockList<RegistryEntryList<EntityType<*>>> = LockList.empty(),
+    val items: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
+    val blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
+    val entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
     val recipes: LockList<List<Identifier>> = LockList(listOf()),
 ) {
     constructor(
         requirements: Map<RegistryEntry<Skill>, Int>,
         itemName: String?,
-        items: LockList<Ingredient> = LockList(Ingredient.EMPTY),
-        blocks: LockList<RegistryEntryList<Block>> = LockList.empty(),
-        entities: LockList<RegistryEntryList<EntityType<*>>> = LockList.empty(),
+        items: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
+        blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
+        entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
         recipes: LockList<List<Identifier>> = LockList(listOf()),
     ) : this(listOf(requirements), itemName, items, blocks, entities, recipes)
 
     private constructor(
         requirements: List<Map<RegistryEntry<Skill>, Int>>,
         itemName: Optional<String>,
-        items: LockList<Ingredient> = LockList(Ingredient.EMPTY),
-        blocks: LockList<RegistryEntryList<Block>> = LockList.empty(),
-        entities: LockList<RegistryEntryList<EntityType<*>>> = LockList.empty(),
+        items: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
+        blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
+        entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
         recipes: LockList<List<Identifier>> = LockList(listOf()),
     ) : this(requirements, itemName.getOrNull(), items, blocks, entities, recipes)
 
@@ -76,9 +75,9 @@ data class LockGroup(
                 optionalField("message", LockList<T>::message, Codec.STRING),
             ).apply(instance, ::LockList) }
 
-            fun <T> createCodec(registryRef: RegistryKey<Registry<T>>): Codec<LockList<RegistryEntryList<T>>> = createCodec(RegistryCodecs.entryList(registryRef))
+            fun <T> createCodec(registry: Registry<T>): Codec<LockList<RegistryIngredient.Composite<T>>> = createCodec(RegistryIngredient.createCodec(registry))
 
-            fun <T> empty() = LockList<RegistryEntryList<T>>(RegistryEntryList.empty())
+            fun <T> empty() = LockList<RegistryIngredient.Composite<T>>(RegistryIngredient.empty())
         }
     }
 
@@ -93,9 +92,9 @@ data class LockGroup(
         val CODEC = RecordCodecBuilder.create { it.group(
             field("requirements", LockGroup::requirements, Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList()),
             optionalField("item_name", LockGroup::itemName, Codec.STRING),
-            field("items", LockGroup::items, LockList(Ingredient.EMPTY), LockList.createCodec(Ingredient.DISALLOW_EMPTY_CODEC)),
-            field("blocks", LockGroup::blocks, LockList.empty(), LockList.createCodec(RegistryKeys.BLOCK)),
-            field("entities", LockGroup::entities, LockList.empty(), LockList.createCodec(RegistryKeys.ENTITY_TYPE)),
+            field("items", LockGroup::items, LockList.empty(), LockList.createCodec(Registries.ITEM)),
+            field("blocks", LockGroup::blocks, LockList.empty(), LockList.createCodec(Registries.BLOCK)),
+            field("entities", LockGroup::entities, LockList.empty(), LockList.createCodec(Registries.ENTITY_TYPE)),
             field("recipes", LockGroup::recipes, LockList(listOf()), LockList.createCodec(Identifier.CODEC.listOf())),
         ).apply(it, ::LockGroup) }
 
@@ -104,16 +103,16 @@ data class LockGroup(
         inline fun find(registries: WrapperLookup, crossinline condition: (LockGroup) -> Boolean): LockGroup? =
             registries[LockGroup].streamEntries().filter { condition(it.value) }.findFirst().getOrNull()?.value
 
-        @JvmStatic fun find(registries: WrapperLookup, stack: ItemStack) = find(registries) { it.items.entries.test(stack) }
-        @JvmStatic fun find(registries: WrapperLookup, state: BlockState) = find(registries) { state.isIn(it.blocks.entries) }
-        @JvmStatic fun find(registries: WrapperLookup, entity: Entity) = find(registries) { entity.type.isIn(it.entities.entries) }
+        @JvmStatic fun find(registries: WrapperLookup, stack: ItemStack) = find(registries) { it.items.entries.test(stack.item) }
+        @JvmStatic fun find(registries: WrapperLookup, state: BlockState) = find(registries) { it.blocks.entries.test(state.block) }
+        @JvmStatic fun find(registries: WrapperLookup, entity: Entity) = find(registries) { it.entities.entries.test(entity.type) }
         @JvmStatic fun find(registries: WrapperLookup, recipe: RecipeEntry<*>) = find(registries) { recipe.id in it.recipes.entries }
 
         private fun LockGroup.check(player: PlayerEntity) = takeIf { !isSatisfiedBy(player) }
 
-        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = find(player.registryManager) { it.items.entries.test(stack) }?.check(player)
-        @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = find(player.registryManager) { state.isIn(it.blocks.entries) }?.check(player)
-        @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = find(player.registryManager) { entity.type.isIn(it.entities.entries) }?.check(player)
+        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = find(player.registryManager) { it.items.entries.test(stack.item) }?.check(player)
+        @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = find(player.registryManager) { it.blocks.entries.test(state.block) }?.check(player)
+        @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = find(player.registryManager) { it.entities.entries.test(entity.type) }?.check(player)
         @JvmStatic fun findLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = find(player.registryManager) { recipe.id in it.recipes.entries }?.check(player)
 
         @JvmStatic fun isLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, stack) != null

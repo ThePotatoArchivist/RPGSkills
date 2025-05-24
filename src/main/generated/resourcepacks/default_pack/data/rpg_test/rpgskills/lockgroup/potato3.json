@@ -1,13 +1,19 @@
 {
   "blocks": {
-    "entries": "#minecraft:buttons",
+    "entries": [
+      "#minecraft:buttons"
+    ],
     "message": "How to press?"
+  },
+  "entities": {
+    "entries": []
   },
   "item_name": "Unknown Button",
   "items": {
-    "entries": {
-      "tag": "minecraft:buttons"
-    },
+    "entries": [
+      "minecraft:red_concrete",
+      "#minecraft:buttons"
+    ],
     "message": "You don't know what kind of button this is"
   },
   "recipes": {

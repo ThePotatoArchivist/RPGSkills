@@ -1,17 +1,18 @@
 {
+  "blocks": {
+    "entries": []
+  },
   "entities": {
-    "entries": "minecraft:villager",
+    "entries": [
+      "minecraft:villager"
+    ],
     "message": "AAA"
   },
   "item_name": "Unknown Fork",
   "items": {
     "entries": [
-      {
-        "item": "minecraft:trident"
-      },
-      {
-        "item": "minecraft:diamond_helmet"
-      }
+      "minecraft:trident",
+      "minecraft:diamond_helmet"
     ],
     "message": "You don't know how to eat with this fork"
   },

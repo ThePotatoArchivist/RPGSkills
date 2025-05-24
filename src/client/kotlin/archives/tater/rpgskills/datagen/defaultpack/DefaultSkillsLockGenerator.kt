@@ -3,14 +3,12 @@ package archives.tater.rpgskills.datagen.defaultpack
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.LockGroup.LockList
 import archives.tater.rpgskills.data.LockGroupProvider
+import archives.tater.rpgskills.data.RegistryIngredient
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.block.Blocks
 import net.minecraft.entity.EntityType
 import net.minecraft.item.Items
-import net.minecraft.recipe.Ingredient
-import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryWrapper
-import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.registry.tag.ItemTags
 import net.minecraft.util.Identifier
@@ -28,11 +26,16 @@ class DefaultSkillsLockGenerator(
             ),
             itemName = "Unknown Potato",
             items = LockList(
-                Ingredient.ofItems(Items.POTATO, Items.POISONOUS_POTATO),
+                RegistryIngredient.ofItems {
+                    +Items.POTATO
+                    +Items.POISONOUS_POTATO
+                },
                 "You don't know if this potato is safe to eat",
             ),
             blocks = LockList(
-                RegistryEntryList.of(Blocks.CRAFTING_TABLE.registryEntry),
+                RegistryIngredient.ofBlocks {
+                    +Blocks.CRAFTING_TABLE
+                },
             ),
             recipes = LockList(
                 listOf(Identifier.of("baked_potato"), Identifier.of("baked_potato_from_smoking"), Identifier.of("baked_potato_from_campfire_cooking")),
@@ -46,11 +49,16 @@ class DefaultSkillsLockGenerator(
             ),
             itemName = "Unknown Fork",
             items = LockList(
-                Ingredient.ofItems(Items.TRIDENT, Items.DIAMOND_HELMET),
+                RegistryIngredient.ofItems {
+                    +Items.TRIDENT
+                    +Items.DIAMOND_HELMET
+                },
                 "You don't know how to eat with this fork",
             ),
             entities = LockList(
-                RegistryEntryList.of(EntityType.VILLAGER.registryEntry),
+                RegistryIngredient.ofEntities {
+                    +EntityType.VILLAGER
+                },
                 "AAA"
             ),
             recipes = LockList(
@@ -69,11 +77,16 @@ class DefaultSkillsLockGenerator(
             ),
             itemName = "Unknown Button",
             items = LockList(
-                Ingredient.fromTag(ItemTags.BUTTONS),
+                RegistryIngredient.ofItems {
+                    +ItemTags.BUTTONS
+                    +Items.RED_CONCRETE
+                },
                 "You don't know what kind of button this is",
             ),
             blocks = LockList(
-                RegistryEntryList.of(Registries.BLOCK.entryOwner, BlockTags.BUTTONS),
+                RegistryIngredient.ofBlocks {
+                    +BlockTags.BUTTONS
+                },
                 "How to press?"
             ),
             recipes = LockList(

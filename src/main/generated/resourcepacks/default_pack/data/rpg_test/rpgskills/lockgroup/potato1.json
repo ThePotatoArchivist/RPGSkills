@@ -1,16 +1,17 @@
 {
   "blocks": {
-    "entries": "minecraft:crafting_table"
+    "entries": [
+      "minecraft:crafting_table"
+    ]
+  },
+  "entities": {
+    "entries": []
   },
   "item_name": "Unknown Potato",
   "items": {
     "entries": [
-      {
-        "item": "minecraft:potato"
-      },
-      {
-        "item": "minecraft:poisonous_potato"
-      }
+      "minecraft:potato",
+      "minecraft:poisonous_potato"
     ],
     "message": "You don't know if this potato is safe to eat"
   },
