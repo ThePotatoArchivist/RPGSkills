@@ -190,7 +190,7 @@
       "type": "string"
     },
     "integer": {
-      "type": "number"
+      "type": "integer"
     }
   }
 }

@@ -98,7 +98,7 @@
       "type": "object"
     },
     "integer": {
-      "type": "number"
+      "type": "integer"
     }
   }
 }
