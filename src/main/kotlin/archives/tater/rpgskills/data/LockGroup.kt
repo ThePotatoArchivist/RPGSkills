@@ -40,15 +40,14 @@ data class LockGroup(
         recipes: LockList<List<Identifier>> = LockList(listOf()),
     ) : this(listOf(requirements), itemName, items, blocks, entities, recipes)
 
-    constructor(
+    private constructor(
         requirements: List<Map<RegistryEntry<Skill>, Int>>,
-        attributes: Map<RegistryEntry<EntityAttribute>, EntityAttributeModifier> = mapOf(),
         itemName: Optional<String>,
         items: LockList<Ingredient> = LockList(Ingredient.EMPTY),
         blocks: LockList<RegistryEntryList<Block>> = LockList.empty(),
         entities: LockList<RegistryEntryList<EntityType<*>>> = LockList.empty(),
         recipes: LockList<List<Identifier>> = LockList(listOf()),
-    ) : this(requirements, attributes, itemName.getOrNull(), items, blocks, entities, recipes)
+    ) : this(requirements, itemName.getOrNull(), items, blocks, entities, recipes)
 
     fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.any {
         it.all { (skill, level) ->
@@ -67,9 +66,9 @@ data class LockGroup(
     @JvmRecord
     data class LockList<T>(
         val entries: T,
-        val message: String? = null, // TODO this should be nullable in codecs
+        val message: String? = null,
     ) {
-        constructor(entries: T, message: Optional<String>) : this(entries, message.getOrNull())
+        private constructor(entries: T, message: Optional<String>) : this(entries, message.getOrNull())
 
         companion object {
             fun <T> createCodec(containerCodec: Codec<T>): Codec<LockList<T>> = RecordCodecBuilder.create { instance -> instance.group(

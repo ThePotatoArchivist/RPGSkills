@@ -28,7 +28,7 @@ data class Skill(
     val name: String,
     val description: String? = null,
 ) {
-    constructor(
+    private constructor(
         icon: ItemStack,
         levels: List<Level>,
         name: String,
