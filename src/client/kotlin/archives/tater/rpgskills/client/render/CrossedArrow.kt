@@ -11,7 +11,6 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.text.Text
 
-@Environment(EnvType.CLIENT)
 object CrossedArrow {
     private val TEXTURE = id("textures/gui/container/crossed_arrow.png")
     private const val LARGE_WIDTH = 28

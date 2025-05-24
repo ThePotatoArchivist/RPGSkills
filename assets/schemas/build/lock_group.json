@@ -1,0 +1,196 @@
+{
+  "$ref": "#/definitions/LockGroup",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Identifier": {
+      "pattern": "^[a-z0-9_.-]+:[a-z0-9/._-]+$",
+      "type": "string"
+    },
+    "LockGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "blocks": {
+          "$ref": "#/definitions/LockList"
+        },
+        "entities": {
+          "$ref": "#/definitions/LockList"
+        },
+        "item_name": {
+          "type": "string"
+        },
+        "items": {
+          "$ref": "#/definitions/LockList%3CSingleOrList%3C(structure-types.d.ts-919-939-types.d.ts-919-954-types.d.ts-906-955-types.d.ts-896-956-types.d.ts-884-957-types.d.ts-768-1045-types.d.ts-0-1046%7Cstructure-types.d.ts-941-954-types.d.ts-919-954-types.d.ts-906-955-types.d.ts-896-956-types.d.ts-884-957-types.d.ts-768-1045-types.d.ts-0-1046)%3E%3E"
+        },
+        "recipes": {
+          "$ref": "#/definitions/LockList%3Cdef-alias-types.d.ts-22-97-types.d.ts-0-1046450060324%5B%5D%3E"
+        },
+        "requirements": {
+          "$ref": "#/definitions/SingleOrList%3Cstructure-types.d.ts-830-858-types.d.ts-816-859-types.d.ts-798-860-types.d.ts-768-1045-types.d.ts-0-1046%3E"
+        }
+      },
+      "required": [
+        "requirements"
+      ],
+      "type": "object"
+    },
+    "LockList": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SingleOrList%3CIdentifier%3E"
+            },
+            {
+              "$ref": "#/definitions/Tag"
+            }
+          ]
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "entries"
+      ],
+      "type": "object"
+    },
+    "LockList<SingleOrList<(structure-types.d.ts-919-939-types.d.ts-919-954-types.d.ts-906-955-types.d.ts-896-956-types.d.ts-884-957-types.d.ts-768-1045-types.d.ts-0-1046|structure-types.d.ts-941-954-types.d.ts-919-954-types.d.ts-906-955-types.d.ts-896-956-types.d.ts-884-957-types.d.ts-768-1045-types.d.ts-0-1046)>>": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "$ref": "#/definitions/SingleOrList%3C(structure-types.d.ts-919-939-types.d.ts-919-954-types.d.ts-906-955-types.d.ts-896-956-types.d.ts-884-957-types.d.ts-768-1045-types.d.ts-0-1046%7Cstructure-types.d.ts-941-954-types.d.ts-919-954-types.d.ts-906-955-types.d.ts-896-956-types.d.ts-884-957-types.d.ts-768-1045-types.d.ts-0-1046)%3E"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "entries"
+      ],
+      "type": "object"
+    },
+    "LockList<def-alias-types.d.ts-22-97-types.d.ts-0-1046450060324[]>": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "#/definitions/Identifier"
+          },
+          "type": "array"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "entries"
+      ],
+      "type": "object"
+    },
+    "SingleOrList<(structure-types.d.ts-919-939-types.d.ts-919-954-types.d.ts-906-955-types.d.ts-896-956-types.d.ts-884-957-types.d.ts-768-1045-types.d.ts-0-1046|structure-types.d.ts-941-954-types.d.ts-919-954-types.d.ts-906-955-types.d.ts-896-956-types.d.ts-884-957-types.d.ts-768-1045-types.d.ts-0-1046)>": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "item": {
+              "$ref": "#/definitions/Identifier"
+            }
+          },
+          "required": [
+            "item"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "tag": {
+              "$ref": "#/definitions/Identifier"
+            }
+          },
+          "required": [
+            "tag"
+          ],
+          "type": "object"
+        },
+        {
+          "items": {
+            "anyOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "item": {
+                    "$ref": "#/definitions/Identifier"
+                  }
+                },
+                "required": [
+                  "item"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "tag": {
+                    "$ref": "#/definitions/Identifier"
+                  }
+                },
+                "required": [
+                  "tag"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "SingleOrList<Identifier>": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/Identifier"
+        },
+        {
+          "items": {
+            "$ref": "#/definitions/Identifier"
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "SingleOrList<structure-types.d.ts-830-858-types.d.ts-816-859-types.d.ts-798-860-types.d.ts-768-1045-types.d.ts-0-1046>": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {
+              "$ref": "#/definitions/integer"
+            }
+          },
+          "type": "object"
+        },
+        {
+          "items": {
+            "additionalProperties": false,
+            "patternProperties": {
+              "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {
+                "$ref": "#/definitions/integer"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        }
+      ]
+    },
+    "Tag": {
+      "pattern": "^#[a-z0-9_.-]+:[a-z0-9/._-]+$",
+      "type": "string"
+    },
+    "integer": {
+      "type": "number"
+    }
+  }
+}

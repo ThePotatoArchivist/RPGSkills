@@ -18,7 +18,6 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
 
-@Environment(EnvType.CLIENT)
 class SkillUpgradeButton(
     x: Int,
     y: Int,

@@ -12,7 +12,6 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 
-@Environment(EnvType.CLIENT)
 class SkillScreen(
     private val player: PlayerEntity,
     private val skill: RegistryEntry<Skill>,

@@ -8,8 +8,6 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.recipe.Ingredient
@@ -27,7 +25,6 @@ import kotlin.jvm.optionals.getOrNull
 @JvmRecord
 data class LockGroup(
     val requirements: List<Map<RegistryEntry<Skill>, Int>>,
-    val attributes: Map<RegistryEntry<EntityAttribute>, EntityAttributeModifier> = mapOf(),
     val itemName: String?,
     val items: LockList<Ingredient> = LockList(Ingredient.EMPTY),
     val blocks: LockList<RegistryEntryList<Block>> = LockList.empty(),
@@ -36,13 +33,12 @@ data class LockGroup(
 ) {
     constructor(
         requirements: Map<RegistryEntry<Skill>, Int>,
-        attributes: Map<RegistryEntry<EntityAttribute>, EntityAttributeModifier> = mapOf(),
         itemName: String?,
         items: LockList<Ingredient> = LockList(Ingredient.EMPTY),
         blocks: LockList<RegistryEntryList<Block>> = LockList.empty(),
         entities: LockList<RegistryEntryList<EntityType<*>>> = LockList.empty(),
         recipes: LockList<List<Identifier>> = LockList(listOf()),
-    ) : this(listOf(requirements), attributes, itemName, items, blocks, entities, recipes)
+    ) : this(listOf(requirements), itemName, items, blocks, entities, recipes)
 
     constructor(
         requirements: List<Map<RegistryEntry<Skill>, Int>>,
@@ -97,7 +93,6 @@ data class LockGroup(
 
         val CODEC = RecordCodecBuilder.create { it.group(
             field("requirements", LockGroup::requirements, Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList()),
-            field("attributes", LockGroup::attributes, mapOf(), Codec.simpleMap(Registries.ATTRIBUTE.entryCodec, EntityAttributeModifier.CODEC, Registries.ATTRIBUTE).codec()),
             optionalField("item_name", LockGroup::itemName, Codec.STRING),
             field("items", LockGroup::items, LockList(Ingredient.EMPTY), LockList.createCodec(Ingredient.DISALLOW_EMPTY_CODEC)),
             field("blocks", LockGroup::blocks, LockList.empty(), LockList.createCodec(RegistryKeys.BLOCK)),

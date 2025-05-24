@@ -16,7 +16,6 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.MathHelper.clamp
 
-@Environment(EnvType.CLIENT)
 class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
     private var x = 0
     private var y = 0

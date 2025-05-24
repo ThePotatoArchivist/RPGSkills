@@ -17,7 +17,6 @@ import net.minecraft.client.sound.SoundManager
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 
-@Environment(EnvType.CLIENT)
 class SkillWidget(
     x: Int,
     y: Int,
