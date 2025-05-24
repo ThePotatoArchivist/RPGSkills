@@ -32,25 +32,32 @@
           "additionalProperties": false,
           "patternProperties": {
             "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {
-              "additionalProperties": false,
-              "properties": {
-                "amount": {
+              "anyOf": [
+                {
                   "type": "number"
                 },
-                "operation": {
-                  "enum": [
-                    "add_value",
-                    "add_multiplied_base",
-                    "add_multiplied_total"
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "amount": {
+                      "type": "number"
+                    },
+                    "operation": {
+                      "enum": [
+                        "add_value",
+                        "add_multiplied_base",
+                        "add_multiplied_total"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "amount",
+                    "operation"
                   ],
-                  "type": "string"
+                  "type": "object"
                 }
-              },
-              "required": [
-                "amount",
-                "operation"
-              ],
-              "type": "object"
+              ]
             }
           },
           "type": "object"
