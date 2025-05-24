@@ -27,7 +27,7 @@
             <SchemaInfo>
               <option name="generatedName" value="New Schema" />
               <option name="name" value="Skill" />
-              <option name="relativePathToSchema" value="assets/build/skill.json" />
+              <option name="relativePathToSchema" value="assets/schemas/skill.json" />
               <option name="schemaVersion" value="JSON Schema 7" />
               <option name="patterns">
                 <list>

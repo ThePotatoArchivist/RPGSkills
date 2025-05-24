@@ -34,7 +34,7 @@ object RPGSkills : ModInitializer {
 		CommandRegistrationCallback.EVENT.register(RPGSkillsCommands)
 
 		ResourceManagerHelper.registerBuiltinResourcePack(
-			id("default_pack"),
+			id("test_pack"),
 			FabricLoader.getInstance().getModContainer(MOD_ID).get(),
 			if (FabricLoader.getInstance().isDevelopmentEnvironment) ResourcePackActivationType.DEFAULT_ENABLED else ResourcePackActivationType.NORMAL
 		)
