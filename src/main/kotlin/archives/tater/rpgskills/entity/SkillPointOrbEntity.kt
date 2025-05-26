@@ -157,10 +157,10 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
     override fun getSoundCategory(): SoundCategory = SoundCategory.AMBIENT
 
     override fun onPlayerCollision(player: PlayerEntity?) {
-        if (player !is ServerPlayerEntity || (owner != null && player != owner) || player.experiencePickUpDelay > 0) return
+        if (player !is ServerPlayerEntity || (ownerUuid != null && player != owner) || player.experiencePickUpDelay > 0) return
         player.experiencePickUpDelay = 2
         player.sendPickup(this, 1)
-        player[SkillsComponent].addSkillPoints(1)
+        player[SkillsComponent].points++
         discard()
     }
 

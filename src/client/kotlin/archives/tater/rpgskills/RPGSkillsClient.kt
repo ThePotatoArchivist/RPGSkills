@@ -2,6 +2,7 @@ package archives.tater.rpgskills
 
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
+import archives.tater.rpgskills.client.render.SkillBarRenderer
 import archives.tater.rpgskills.client.render.entity.SkillPointOrbEntityRenderer
 import archives.tater.rpgskills.client.util.wasPressed
 import archives.tater.rpgskills.data.LockGroup
@@ -37,6 +38,8 @@ object RPGSkillsClient : ClientModInitializer {
 	override fun onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 		EntityRendererRegistry.register(RPGSkillsEntities.SKILL_POINT_ORB, ::SkillPointOrbEntityRenderer)
+
+		SkillBarRenderer.register()
 
 		ClientPlayNetworking.registerGlobalReceiver(RecipeBlockedPayload.ID) { packet, _ ->
 			blockedRecipeGroup = packet.lockGroup.getOrNull()

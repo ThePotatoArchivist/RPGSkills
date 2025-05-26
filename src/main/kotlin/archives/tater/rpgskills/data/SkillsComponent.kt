@@ -1,15 +1,22 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.data.SkillsComponent.PointsChangedCallback
 import archives.tater.rpgskills.networking.SkillUpgradePayload
-import archives.tater.rpgskills.util.*
+import archives.tater.rpgskills.util.ComponentKeyHolder
+import archives.tater.rpgskills.util.associateNotNull
+import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.value
 import com.google.common.collect.HashMultimap
+import net.fabricmc.fabric.api.event.Event
+import net.fabricmc.fabric.api.event.EventFactory
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayPayloadHandler
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.network.RegistryByteBuf
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
@@ -31,11 +38,38 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     private var _skills = mutableMapOf<RegistryEntry<Skill>, Int>()
     val skills: Map<RegistryEntry<Skill>, Int> get() = _skills
 
-    private var _skillLevels = 0
-    var skillLevels by ::_skillLevels.synced(key, player)
+    private var _points = 0
+    var points
+        get() = _points
+        set(value) {
+            var newPoints = value
+            var newLevel = _level
+            while (newPoints < 0) {
+                newPoints += getPointsForLevel(newLevel)
+                newLevel--
+            }
+            while (newPoints > getPointsForLevel(newLevel + 1)) {
+                newPoints -= getPointsForLevel(newLevel + 1)
+                newLevel++
+            }
+            PointsChangedCallback.EVENT.invoker().onChange(player, this, points, newPoints, level, newLevel)
+            _points = newPoints
+            _level = newLevel
+            key.sync(player)
+        }
 
-    private var _skillPoints = 0
-    var skillPoints by ::_skillPoints.synced(key, player)
+    private var _level = 0
+    var level
+        get() = _level
+        set(value) {
+            val newPoints = _points * getPointsForLevel(value) / getPointsForLevel(_level + 1)
+            PointsChangedCallback.EVENT.invoker().onChange(player, this, points, newPoints, _level, value)
+            _points = newPoints
+            _level = value
+            key.sync(player)
+        }
+
+    val levelProgress get() = points / getPointsForLevel(level + 1).toFloat()
 
     private var modifiers: ModifierMap = HashMultimap.create()
 
@@ -46,16 +80,11 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         key.sync(player)
     }
 
-    fun addSkillPoints(points: Int) {
-        // TODO
-        skillLevels += points
-    }
-
     fun getUpgradeCost(skill: RegistryEntry<Skill>): Int? = skill.value.levels
         .getOrNull(this[skill])?.cost
 
     fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = getUpgradeCost(skill)
-        ?.let { skillLevels >= it } ?: false
+        ?.let { level >= it } ?: false
 
     private fun getAttributeModifiers() =
         HashMultimap.create<RegistryEntry<EntityAttribute>, EntityAttributeModifier>().apply {
@@ -81,7 +110,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     override fun copyFrom(other: SkillsComponent, registryLookup: RegistryWrapper.WrapperLookup) {
         _skills = other._skills
-        _skillLevels = other._skillLevels
+        _level = other._level
         updateAttributes()
     }
 
@@ -94,8 +123,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                     ?.let { it to getInt(key) }
             }
         }.toMutableMap()
-        _skillLevels = tag.getInt("levels")
-        _skillPoints = tag.getInt("points")
+        _level = tag.getInt("levels")
+        _points = tag.getInt("points")
         updateAttributes()
     }
 
@@ -105,8 +134,15 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                 putInt(skill.key.get().value.toString(), level)
             }
         })
-        tag.putInt("levels", _skillLevels)
-        tag.putInt("points", _skillPoints)
+        tag.putInt("levels", _level)
+        tag.putInt("points", _points)
+    }
+
+    override fun applySyncPacket(buf: RegistryByteBuf) {
+        val prevPoints = points
+        val prevLevel = level
+        super.applySyncPacket(buf)
+        PointsChangedCallback.EVENT.invoker().onChange(player, this, prevPoints, points, prevLevel, level)
     }
 
     companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>, PlayPayloadHandler<SkillUpgradePayload> {
@@ -116,12 +152,17 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         @JvmField
         val KEY = key
 
+        /**
+         * @return The number of points needed to get to `level` from `level - 1`
+         */
+        fun getPointsForLevel(level: Int) = 10 + (level - 1) // TODO
+
         override fun receive(payload: SkillUpgradePayload, context: ServerPlayNetworking.Context) {
             val player = context.player()
             val skillsComponent = player[SkillsComponent]
             val skill = payload.skill
             if (skillsComponent.canUpgrade(skill)) {
-                skillsComponent.skillLevels -= skillsComponent.getUpgradeCost(skill)!!
+                skillsComponent.level -= skillsComponent.getUpgradeCost(skill)!!
                 skillsComponent[skill]++
                 player.world.playSoundFromEntity(null, player, SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
             }
@@ -129,6 +170,22 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
         fun registerNetworking() {
             ServerPlayNetworking.registerGlobalReceiver(SkillUpgradePayload.ID, this)
+        }
+    }
+
+    /**
+     * Called whenever levels or points are changed. This is called before the actual fields are updated.
+     */
+    fun interface PointsChangedCallback {
+        fun onChange(player: PlayerEntity, skills: SkillsComponent, prevPoints: Int, newPoints: Int, prevLevel: Int, newLevel: Int)
+
+        companion object {
+            val EVENT: Event<PointsChangedCallback> = EventFactory.createArrayBacked(PointsChangedCallback::class.java) { callbacks ->
+                PointsChangedCallback { player, skills, prevPoints, newPoints, prevLevel, newLevel ->
+                    for (callback in callbacks)
+                        callback.onChange(player, skills, prevPoints, newPoints, prevLevel, newLevel)
+                }
+            }
         }
     }
 }
