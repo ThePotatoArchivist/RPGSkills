@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.mixin.client;
+package archives.tater.rpgskills.mixin.client.xp;
 
 import archives.tater.rpgskills.data.LockGroup;
 import archives.tater.rpgskills.data.SkillsComponent;

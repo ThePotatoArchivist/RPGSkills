@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.mixin.client;
+package archives.tater.rpgskills.mixin.client.locking;
 
 import archives.tater.rpgskills.LockEventsKt;
 import net.minecraft.client.MinecraftClient;

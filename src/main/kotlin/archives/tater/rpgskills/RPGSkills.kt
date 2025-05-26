@@ -3,15 +3,19 @@ package archives.tater.rpgskills
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
+import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -45,5 +49,11 @@ object RPGSkills : ModInitializer {
 		SkillsComponent.registerNetworking()
 
 		registerLockEvents()
+
+		ServerLivingEntityEvents.AFTER_DEATH.register { entity, source ->
+			(source.attacker as? PlayerEntity)?.let {
+				SkillPointOrbEntity.spawnOrbs(entity.world as ServerWorld, it, entity.pos, 5)
+			}
+		}
 	}
 }

@@ -47,7 +47,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     }
 
     fun addSkillPoints(points: Int) {
-        TODO()
+        // TODO
+        skillLevels += points
     }
 
     fun getUpgradeCost(skill: RegistryEntry<Skill>): Int? = skill.value.levels

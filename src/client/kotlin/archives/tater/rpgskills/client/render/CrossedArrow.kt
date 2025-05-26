@@ -3,10 +3,8 @@ package archives.tater.rpgskills.client.render
 import archives.tater.rpgskills.ItemLockTooltip
 import archives.tater.rpgskills.RPGSkills.id
 import archives.tater.rpgskills.RPGSkillsClient
-import archives.tater.rpgskills.mixin.client.HandledScreenAccessor
-import archives.tater.rpgskills.mixin.client.ScreenAccessor
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
+import archives.tater.rpgskills.mixin.client.locking.HandledScreenAccessor
+import archives.tater.rpgskills.mixin.client.locking.ScreenAccessor
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.text.Text

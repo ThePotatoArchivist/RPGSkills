@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.mixin.client;
+package archives.tater.rpgskills.mixin.client.locking;
 
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;

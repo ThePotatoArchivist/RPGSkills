@@ -3,12 +3,13 @@
   "package": "archives.tater.rpgskills.mixin.client",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "CraftingScreenMixin",
-    "HandledScreenAccessor",
-    "InGameHudMixin",
-    "InventoryScreenMixin",
-    "MinecraftClientMixin",
-    "ScreenAccessor",
+    "xp.ClientPlayNetworkHandlerMixin",
+    "locking.CraftingScreenMixin",
+    "locking.HandledScreenAccessor",
+    "xp.InGameHudMixin",
+    "locking.InventoryScreenMixin",
+    "locking.MinecraftClientMixin",
+    "locking.ScreenAccessor",
     "compat.bettercombat.WeaponAttributeTooltipMixin"
   ],
   "injectors": {

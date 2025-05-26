@@ -8,7 +8,7 @@
     "locking.LivingEntityMixin",
     "locking.RecipeUnlockerMixin",
     "locking.ServerPlayerInteractionManagerMixin",
-    "xp.ExperienceOrbAccessor",
+    "xp.LivingEntityMixin",
     "xp.PlayerEntityMixin",
     "xp.ServerPlayerEntityMixin"
   ],
