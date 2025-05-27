@@ -7,8 +7,6 @@ import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -46,7 +44,7 @@ class SkillUpgradeButton(
         }, 192, WIDTH, HEIGHT)
 
         if (cost == null) {
-            context.drawOutlinedText(textRenderer, MAX.text, x + (WIDTH - textRenderer.getWidth(MAX.text) - 2) / 2, y + (HEIGHT - 9) / 2)
+            context.drawOutlinedText(textRenderer, MAX.text, x + (WIDTH - textRenderer.getWidth(MAX.text) - 2) / 2, y + (HEIGHT - 9) / 2, 0x00FFFF)
             return
         }
 
@@ -55,7 +53,7 @@ class SkillUpgradeButton(
             cost.toString(),
             x + 12,
             y + 5,
-            if (canUpgrade) 0xC8FF8F else 0x8C605D,
+            if (canUpgrade) 0x00FFFF else 0x8C605D, // TODO better color
             if (canUpgrade) 0 else 0x47352F
         )
     }

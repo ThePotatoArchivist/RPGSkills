@@ -42,14 +42,14 @@ object SkillBarRenderer {
     @JvmStatic
     fun renderLevel(context: DrawContext, textRenderer: TextRenderer, clientPlayer: ClientPlayerEntity) {
         val skills = clientPlayer[SkillsComponent]
-        val levelString = skills.level.toString()
-        val x: Int = (context.scaledWindowWidth - textRenderer.getWidth(levelString)) / 2
+        val display = "${skills.spendableLevels}/${skills.level}"
+        val x: Int = (context.scaledWindowWidth - textRenderer.getWidth(display)) / 2
         val y = context.scaledWindowHeight - 31 - 4
-        context.drawText(textRenderer, levelString, x + 1, y, 0, false)
-        context.drawText(textRenderer, levelString, x - 1, y, 0, false)
-        context.drawText(textRenderer, levelString, x, y + 1, 0, false)
-        context.drawText(textRenderer, levelString, x, y - 1, 0, false)
-        context.drawText(textRenderer, levelString, x, y, 0x00ffff, false) // TODO better color
+        context.drawText(textRenderer, display, x + 1, y, 0, false)
+        context.drawText(textRenderer, display, x - 1, y, 0, false)
+        context.drawText(textRenderer, display, x, y + 1, 0, false)
+        context.drawText(textRenderer, display, x, y - 1, 0, false)
+        context.drawText(textRenderer, display, x, y, 0x00ffff, false) // TODO better color
     }
 
     fun register() {

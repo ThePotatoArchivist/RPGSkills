@@ -9,8 +9,6 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillsComponent
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.entity.player.PlayerEntity
@@ -43,11 +41,13 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
         // Title
         context.drawText(textRenderer, title, x + 8, y + 7, 0x404040, false)
         // Experience Number
-        "${player[SkillsComponent].level}/${player.experienceLevel}".let {
-            context.drawOutlinedText(textRenderer, it, x + 139 - it.length * 6, y + 6)
+        val skills = player[SkillsComponent]
+
+        "${skills.spendableLevels}/${skills.level}".let {
+            context.drawOutlinedText(textRenderer, it, x + 139 - it.length * 6, y + 6, 0x00FFFF)
         }
         // Experience Bar
-        context.drawTexture(TEXTURE, x + 143, y + 8, 143, 141, (player.experienceProgress * XP_BAR_WIDTH).toInt(), XP_BAR_HEIGHT)
+        context.drawTexture(TEXTURE, x + 143, y + 8, 143, 141, (skills.levelProgress * XP_BAR_WIDTH).toInt(), XP_BAR_HEIGHT)
         // List
         (if (skillWidgets.size > MAX_VISIBLE) skillWidgets.subList(indexOffset, indexOffset + MAX_VISIBLE) else skillWidgets)
             .forEachIndexed { index, (widget, button) ->

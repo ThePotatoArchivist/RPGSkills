@@ -94,7 +94,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                                 val player = getPlayer(command, "player")
                                 val amount = getInteger(command, "amount")
 
-                                player[SkillsComponent].level = amount
+                                player[SkillsComponent].spendableLevels = amount
 
                                 command.source.sendFeedback(SET_POINTS.text(player.displayName!!, amount), true)
                                 amount
@@ -105,7 +105,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                                 val player = getPlayer(command, "player")
                                 val amount = getInteger(command, "amount")
 
-                                player[SkillsComponent].level += amount
+                                player[SkillsComponent].spendableLevels += amount
 
                                 command.source.sendFeedback(ADD_POINTS.text(player.displayName!!, amount), true)
                                 amount
