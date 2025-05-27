@@ -52,7 +52,8 @@ object RPGSkills : ModInitializer {
 
 		ServerLivingEntityEvents.AFTER_DEATH.register { entity, source ->
 			(source.attacker as? PlayerEntity)?.let {
-				SkillPointOrbEntity.spawnOrbs(entity.world as ServerWorld, it, entity.pos, 5)
+				val world = entity.world as ServerWorld
+				SkillPointOrbEntity.spawnOrbs(world, it, entity.pos, entity.getXpToDrop(world, it))
 			}
 		}
 	}

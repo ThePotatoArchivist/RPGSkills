@@ -24,6 +24,8 @@ public abstract class InGameHudMixin {
 
 	@Shadow public abstract TextRenderer getTextRenderer();
 
+	@Shadow protected abstract boolean shouldRenderExperience();
+
 	@SuppressWarnings("DataFlowIssue") // client.player is definitely not null here
 	@WrapOperation(
 			method = "renderHeldItemTooltip",
@@ -53,7 +55,7 @@ public abstract class InGameHudMixin {
 			cancellable = true
 	)
 	private void modifyXpDisplay(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-		if (!SkillBarRenderer.shouldRender()) return;
+		if (!SkillBarRenderer.shouldRender() || !shouldRenderExperience()) return;
 		SkillBarRenderer.renderLevel(context, getTextRenderer(), client.player);
 		ci.cancel();
 	}

@@ -44,7 +44,7 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
         val skills = player[SkillsComponent]
 
         "${skills.spendableLevels}/${skills.level}".let {
-            context.drawOutlinedText(textRenderer, it, x + 139 - it.length * 6, y + 6, 0x00FFFF)
+            context.drawOutlinedText(textRenderer, it, x + 139 - it.length * 6, y + 6, 0x70DACD)
         }
         // Experience Bar
         context.drawTexture(TEXTURE, x + 143, y + 8, 143, 141, (skills.levelProgress * XP_BAR_WIDTH).toInt(), XP_BAR_HEIGHT)

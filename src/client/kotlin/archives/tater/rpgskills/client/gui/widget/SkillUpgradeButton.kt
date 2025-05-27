@@ -44,7 +44,7 @@ class SkillUpgradeButton(
         }, 192, WIDTH, HEIGHT)
 
         if (cost == null) {
-            context.drawOutlinedText(textRenderer, MAX.text, x + (WIDTH - textRenderer.getWidth(MAX.text) - 2) / 2, y + (HEIGHT - 9) / 2, 0x00FFFF)
+            context.drawOutlinedText(textRenderer, MAX.text, x + (WIDTH - textRenderer.getWidth(MAX.text) - 2) / 2, y + (HEIGHT - 9) / 2, 0x70DACD)
             return
         }
 
@@ -53,7 +53,7 @@ class SkillUpgradeButton(
             cost.toString(),
             x + 12,
             y + 5,
-            if (canUpgrade) 0x00FFFF else 0x8C605D, // TODO better color
+            if (canUpgrade) 0x70DACD else 0x8C605D, // TODO better color
             if (canUpgrade) 0 else 0x47352F
         )
     }

@@ -28,7 +28,6 @@ object SkillBarRenderer {
     @JvmStatic
     fun renderBar(context: DrawContext, x: Int, clientPlayer: ClientPlayerEntity) {
         val skills = clientPlayer[SkillsComponent]
-        if (skills.level <= 0) return
         val barWidth = (skills.levelProgress * (TEXTURE_WIDTH + 1)).toInt()
         val y = context.scaledWindowHeight - 32 + 3
         RenderSystem.enableBlend()
@@ -42,6 +41,7 @@ object SkillBarRenderer {
     @JvmStatic
     fun renderLevel(context: DrawContext, textRenderer: TextRenderer, clientPlayer: ClientPlayerEntity) {
         val skills = clientPlayer[SkillsComponent]
+        if (skills.level <= 0) return
         val display = "${skills.spendableLevels}/${skills.level}"
         val x: Int = (context.scaledWindowWidth - textRenderer.getWidth(display)) / 2
         val y = context.scaledWindowHeight - 31 - 4
@@ -49,7 +49,7 @@ object SkillBarRenderer {
         context.drawText(textRenderer, display, x - 1, y, 0, false)
         context.drawText(textRenderer, display, x, y + 1, 0, false)
         context.drawText(textRenderer, display, x, y - 1, 0, false)
-        context.drawText(textRenderer, display, x, y, 0x00ffff, false) // TODO better color
+        context.drawText(textRenderer, display, x, y, 0x70DACD, false)
     }
 
     fun register() {

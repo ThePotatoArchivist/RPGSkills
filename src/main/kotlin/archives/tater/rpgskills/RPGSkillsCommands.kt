@@ -49,7 +49,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
 
                     skills.size
                 }
-                sub("level") {
+                sub("skilllevel") {
                     argument("player", player()) {
                         argument("skill", registryEntry(registryAccess, Skill.key)) {
                             subExec("get") { command ->
@@ -87,7 +87,33 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                         }
                     }
                 }
-                sub("levelpoints") {
+                sub("points") {
+                    argument("player", player()) {
+                        sub("set") {
+                            argumentExec("amount", integer(0)) { command ->
+                                val player = getPlayer(command, "player")
+                                val amount = getInteger(command, "amount")
+
+                                player[SkillsComponent].points = amount
+
+                                command.source.sendFeedback(SET_POINTS.text(player.displayName!!, amount), true)
+                                amount
+                            }
+                        }
+                        sub("add") {
+                            argumentExec("amount", integer()) { command ->
+                                val player = getPlayer(command, "player")
+                                val amount = getInteger(command, "amount")
+
+                                player[SkillsComponent].points += amount
+
+                                command.source.sendFeedback(ADD_POINTS.text(player.displayName!!, amount), true)
+                                amount
+                            }
+                        }
+                    }
+                }
+                sub("spendablelevels") {
                     argument("player", player()) {
                         sub("set") {
                             argumentExec("amount", integer(0)) { command ->
