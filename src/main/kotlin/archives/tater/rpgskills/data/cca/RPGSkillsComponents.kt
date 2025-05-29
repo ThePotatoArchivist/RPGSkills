@@ -1,6 +1,5 @@
-package archives.tater.rpgskills
+package archives.tater.rpgskills.data.cca
 
-import archives.tater.rpgskills.data.SkillsComponent
 import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry
 import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer
 

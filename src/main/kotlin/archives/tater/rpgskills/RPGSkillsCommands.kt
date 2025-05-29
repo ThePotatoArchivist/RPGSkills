@@ -3,7 +3,7 @@ package archives.tater.rpgskills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
-import archives.tater.rpgskills.data.SkillsComponent
+import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.*
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType.getInteger

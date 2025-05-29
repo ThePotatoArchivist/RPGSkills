@@ -6,7 +6,7 @@ import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.client.gui.widget.SkillWidget
 import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.data.SkillsComponent
+import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import net.minecraft.client.gui.DrawContext

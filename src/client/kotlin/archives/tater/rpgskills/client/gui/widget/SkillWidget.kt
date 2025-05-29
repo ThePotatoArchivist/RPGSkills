@@ -4,11 +4,9 @@ import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.description
 import archives.tater.rpgskills.data.Skill.Companion.name
-import archives.tater.rpgskills.data.SkillsComponent
+import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder

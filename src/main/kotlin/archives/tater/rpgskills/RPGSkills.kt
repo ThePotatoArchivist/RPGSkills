@@ -2,7 +2,7 @@ package archives.tater.rpgskills
 
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.data.SkillsComponent
+import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload

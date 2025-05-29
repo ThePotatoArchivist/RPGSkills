@@ -3,7 +3,7 @@ package archives.tater.rpgskills.client.gui.widget
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.data.SkillsComponent
+import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get

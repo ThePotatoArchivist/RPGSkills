@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder

@@ -1,7 +1,7 @@
 package archives.tater.rpgskills.client.render
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.data.SkillsComponent
+import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.get
 import com.mojang.blaze3d.systems.RenderSystem
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents

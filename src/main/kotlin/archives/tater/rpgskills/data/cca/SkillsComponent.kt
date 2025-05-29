@@ -1,14 +1,14 @@
-package archives.tater.rpgskills.data
+package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.data.SkillsComponent.PointsChangedCallback
+import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.cca.SkillsComponent.PointsChangedCallback
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.*
 import com.google.common.collect.HashMultimap
 import net.fabricmc.fabric.api.event.Event
 import net.fabricmc.fabric.api.event.EventFactory
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayPayloadHandler
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
@@ -23,12 +23,7 @@ import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.jvm.optionals.getOrNull
-
-typealias ModifierMap = HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier>
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
@@ -51,7 +46,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     val levelProgress get() = getRemainingPoints(points) / getPointsForNextLevel(level + 1).toFloat()
 
-    private var modifiers: ModifierMap = HashMultimap.create()
+    private var modifiers: HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> =
+        HashMultimap.create()
 
     operator fun get(skill: RegistryEntry<Skill>) = _skills.getOrDefault(skill, 0)
     operator fun set(skill: RegistryEntry<Skill>, level: Int) {
@@ -73,7 +69,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                     .filter { playerLevel >= it.cost }
                     .forEachIndexed { levelIndex, level ->
                         for ((attribute, modifier) in level.attributes)
-                            put(attribute, modifier.build(skill.key.orElseThrow().value.withPath { "skill/$it/$levelIndex" }))
+                            put(
+                                attribute,
+                                modifier.build(skill.key.orElseThrow().value.withPath { "skill/$it/$levelIndex" })
+                            )
                     }
         }
 
@@ -126,7 +125,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         PointsChangedCallback.EVENT.invoker().onChange(player, this, prevPoints, points, prevLevel, level)
     }
 
-    companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>, PlayPayloadHandler<SkillUpgradePayload> {
+    companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>,
+        ServerPlayNetworking.PlayPayloadHandler<SkillUpgradePayload> {
         override val key: ComponentKey<SkillsComponent> =
             ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
 
@@ -142,9 +142,12 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
          */
         fun getPointsForNextLevel(nextLevel: Int) = 10 + (nextLevel - 1) // TODO
 
-        fun getLevelForPoints(points: Int): Int = LEVEL_REQUIREMENTS_REVERSED.firstNotNullOfOrNull { (level, required) -> level.takeIf { required < points } } ?: 0
+        fun getLevelForPoints(points: Int): Int =
+            LEVEL_REQUIREMENTS_REVERSED.firstNotNullOfOrNull { (level, required) -> level.takeIf { required < points } }
+                ?: 0
 
-        fun getRemainingPoints(points: Int) = points - (LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required < points }?.value ?: 0)
+        fun getRemainingPoints(points: Int) =
+            points - (LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required < points }?.value ?: 0)
 
         override fun receive(payload: SkillUpgradePayload, context: ServerPlayNetworking.Context) {
             val player = context.player()
@@ -153,7 +156,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             if (skillsComponent.canUpgrade(skill)) {
                 skillsComponent.spendableLevels -= skillsComponent.getUpgradeCost(skill)!!
                 skillsComponent[skill]++
-                player.world.playSoundFromEntity(null, player, SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
+                player.world.playSoundFromEntity(
+                    null, player,
+                    SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f
+                )
             }
         }
 
@@ -166,15 +172,24 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
      * Called whenever levels or points are changed. This is called before the actual fields are updated.
      */
     fun interface PointsChangedCallback {
-        fun onChange(player: PlayerEntity, skills: SkillsComponent, prevPoints: Int, newPoints: Int, prevLevel: Int, newLevel: Int)
+        fun onChange(
+            player: PlayerEntity,
+            skills: SkillsComponent,
+            prevPoints: Int,
+            newPoints: Int,
+            prevLevel: Int,
+            newLevel: Int
+        )
 
         companion object {
-            val EVENT: Event<PointsChangedCallback> = EventFactory.createArrayBacked(PointsChangedCallback::class.java) { callbacks ->
-                PointsChangedCallback { player, skills, prevPoints, newPoints, prevLevel, newLevel ->
-                    for (callback in callbacks)
-                        callback.onChange(player, skills, prevPoints, newPoints, prevLevel, newLevel)
+            val EVENT: Event<PointsChangedCallback> =
+                EventFactory.createArrayBacked(PointsChangedCallback::class.java) { callbacks ->
+                    PointsChangedCallback { player, skills, prevPoints, newPoints, prevLevel, newLevel ->
+                        for (callback in callbacks)
+                            callback.onChange(player, skills, prevPoints, newPoints, prevLevel, newLevel)
+                    }
                 }
-            }
         }
     }
 }
+
