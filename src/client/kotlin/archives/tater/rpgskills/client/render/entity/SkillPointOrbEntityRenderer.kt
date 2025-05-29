@@ -2,10 +2,8 @@ package archives.tater.rpgskills.client.render.entity
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumer
-import net.minecraft.client.render.VertexConsumerProvider
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.render.*
 import net.minecraft.client.render.entity.EntityRenderer
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
@@ -21,6 +19,14 @@ class SkillPointOrbEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRe
 
     override fun getBlockLight(entity: SkillPointOrbEntity, blockPos: BlockPos): Int = 15
         // MathHelper.clamp(super.getBlockLight(entity, blockPos) + 7, 0, 15)
+
+    override fun shouldRender(
+        entity: SkillPointOrbEntity,
+        frustum: Frustum?,
+        x: Double,
+        y: Double,
+        z: Double
+    ): Boolean = super.shouldRender(entity, frustum, x, y, z) && entity.owner == MinecraftClient.getInstance().player
 
     override fun render(
         entity: SkillPointOrbEntity,

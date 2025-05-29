@@ -42,7 +42,8 @@
 	},
 	"custom": {
 		"cardinal-components": [
-			"rpgskills:skills"
+			"rpgskills:skills",
+			"rpgskills:defeat_source"
 		]
 	},
 	"mixins": [
