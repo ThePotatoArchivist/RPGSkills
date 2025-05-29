@@ -6,7 +6,6 @@ import archives.tater.rpgskills.util.get
 import com.mojang.blaze3d.systems.RenderSystem
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.network.ClientPlayerEntity
@@ -52,12 +51,12 @@ object SkillBarRenderer {
         context.drawText(textRenderer, display, x, y, 0x70DACD, false)
     }
 
-    fun register() {
-        SkillsComponent.PointsChangedCallback.EVENT.register { player, _, prevPoints, newPoints, prevLevel, newLevel ->
-            if (player === MinecraftClient.getInstance().player && newPoints > prevPoints && newLevel >= prevLevel)
-                showTicks = MAX_SHOW_TICKS
-        }
+    @JvmStatic
+    fun onSkillOrbPickup() {
+        showTicks = MAX_SHOW_TICKS
+    }
 
+    fun register() {
         ClientTickEvents.END_WORLD_TICK.register { _ ->
             if (showTicks > 0)
                 showTicks--

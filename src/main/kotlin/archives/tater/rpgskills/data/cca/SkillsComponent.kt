@@ -2,18 +2,14 @@ package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.data.cca.SkillsComponent.PointsChangedCallback
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.*
 import com.google.common.collect.HashMultimap
-import net.fabricmc.fabric.api.event.Event
-import net.fabricmc.fabric.api.event.EventFactory
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.RegistryByteBuf
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
@@ -118,13 +114,6 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         tag.putInt("points", _points)
     }
 
-    override fun applySyncPacket(buf: RegistryByteBuf) {
-        val prevPoints = points
-        val prevLevel = level
-        super.applySyncPacket(buf)
-        PointsChangedCallback.EVENT.invoker().onChange(player, this, prevPoints, points, prevLevel, level)
-    }
-
     companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>,
         ServerPlayNetworking.PlayPayloadHandler<SkillUpgradePayload> {
         override val key: ComponentKey<SkillsComponent> =
@@ -165,30 +154,6 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
         fun registerNetworking() {
             ServerPlayNetworking.registerGlobalReceiver(SkillUpgradePayload.ID, this)
-        }
-    }
-
-    /**
-     * Called whenever levels or points are changed. This is called before the actual fields are updated.
-     */
-    fun interface PointsChangedCallback {
-        fun onChange(
-            player: PlayerEntity,
-            skills: SkillsComponent,
-            prevPoints: Int,
-            newPoints: Int,
-            prevLevel: Int,
-            newLevel: Int
-        )
-
-        companion object {
-            val EVENT: Event<PointsChangedCallback> =
-                EventFactory.createArrayBacked(PointsChangedCallback::class.java) { callbacks ->
-                    PointsChangedCallback { player, skills, prevPoints, newPoints, prevLevel, newLevel ->
-                        for (callback in callbacks)
-                            callback.onChange(player, skills, prevPoints, newPoints, prevLevel, newLevel)
-                    }
-                }
         }
     }
 }
