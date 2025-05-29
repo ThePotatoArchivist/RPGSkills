@@ -12,7 +12,7 @@ class RPGSkillsMixinConfigPlugin : IMixinConfigPlugin {
     override fun getRefMapperConfig(): String? = null
 
     override fun shouldApplyMixin(targetClassName: String?, mixinClassName: String): Boolean {
-        return !mixinClassName.startsWith("$MIXIN_COMPAT_PACKAGE.bettercombat") || FabricLoader.getInstance().isModLoaded("bettercombat")
+        return FabricLoader.getInstance().isModLoaded("bettercombat") || !mixinClassName.contains("bettercombat")
     }
 
     override fun acceptTargets(myTargets: MutableSet<String>?, otherTargets: MutableSet<String>?) {
