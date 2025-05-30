@@ -10,6 +10,8 @@ import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtList
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryWrapper
@@ -100,6 +102,9 @@ interface ComponentKeyHolder<C : Component, T> {
 
 operator fun <C : Component, T : Any> T.get(keyHolder: ComponentKeyHolder<C, T>): C = keyHolder.key.get(this)
 
+operator fun <C: Component> ComponentKey<C>.getValue(thisRef: Any, property: KProperty<*>): C = get(thisRef)
+operator fun <C: Component> ComponentKeyHolder<C, *>.provideDelegate(thisRef: Any, property: KProperty<*>) = key
+
 operator fun <T> DFPair<T, *>.component1(): T = first
 operator fun <T> DFPair<*, T>.component2(): T = second
 
@@ -121,4 +126,9 @@ fun <T> KMutableProperty0<T>.synced(key: ComponentKey<*>, provider: Any) = objec
         this@synced.set(value)
         key.sync(provider)
     }
+}
+
+fun <T> Iterable<T>.mapToNbt(transform: (T) -> NbtCompound) = NbtList().apply {
+    for (element in this@mapToNbt)
+        add(transform(element))
 }

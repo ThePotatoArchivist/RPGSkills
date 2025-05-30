@@ -8,7 +8,9 @@
     "locking.LivingEntityMixin",
     "locking.RecipeUnlockerMixin",
     "locking.ServerPlayerInteractionManagerMixin",
-    "xp.LivingEntityMixin"
+    "xp.LivingEntityMixin",
+    "xp.MobEntityMixin",
+    "xp.MobSpawnerLogicMixin"
   ],
   "injectors": {
     "defaultRequire": 1
