@@ -1,10 +1,9 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.util.RegistryKeyHolder
+import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.field
 import archives.tater.rpgskills.util.optionalField
-import archives.tater.rpgskills.util.value
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.entity.attribute.EntityAttribute
