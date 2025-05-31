@@ -65,6 +65,8 @@ sealed class SkillSource {
         }
     }
 
+    // TODO empty
+
     companion object {
         val CODEC: Codec<SkillSource> = KeyDispatchCodec(
             "type", Codec.STRING,

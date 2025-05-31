@@ -1,9 +1,13 @@
 package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.util.forAccess
 import archives.tater.rpgskills.util.getValue
+import archives.tater.rpgskills.util.recordMutationCodec
+import com.mojang.serialization.Codec
 import net.minecraft.block.entity.MobSpawnerBlockEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtOps
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.world.chunk.Chunk
 import org.ladysnake.cca.api.v3.component.Component
@@ -18,14 +22,20 @@ class SkillSourceComponent(initialPoints: Int, private val onUpdate: (() -> Unit
         }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        remainingSkillPoints = tag.getInt("remaining_points")
+        CODEC.update(NbtOps.INSTANCE, tag, this)
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        tag.putInt("remaining_points", remainingSkillPoints)
+        CODEC.encode(this, NbtOps.INSTANCE, tag)
     }
 
     companion object {
+        val CODEC = recordMutationCodec(
+            Codec.INT.fieldOf("remaining_points").forAccess(SkillSourceComponent::remainingSkillPoints)
+        )
+
+        fun createCodec(initialPoints: Int = 0) = CODEC.codec { SkillSourceComponent(initialPoints) }
+
         val KEY: ComponentKey<SkillSourceComponent> =
             ComponentRegistry.getOrCreate(RPGSkills.id("skill_source"), SkillSourceComponent::class.java)
     }

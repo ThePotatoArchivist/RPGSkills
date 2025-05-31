@@ -4,8 +4,7 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.data.SkillSource
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
-import archives.tater.rpgskills.util.ComponentKeyHolder
-import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import net.minecraft.entity.LivingEntity
@@ -27,7 +26,6 @@ import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import java.util.*
 import java.util.function.Consumer
-import kotlin.jvm.optionals.getOrNull
 
 class DefeatSourceComponent(val entity: MobEntity) : Component {
     private var _attackers = mutableMapOf<UUID, Float>()
@@ -41,24 +39,11 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        _attackers = ATTACKERS_CODEC.decode(NbtOps.INSTANCE, tag.getCompound(ATTACKERS_NBT))
-            .ifError(logReadError)
-            .result().getOrNull()?.first?.toMutableMap() ?: mutableMapOf()
-
-        skillSource = SkillSource.CODEC.decode(NbtOps.INSTANCE, tag.getCompound(SKILL_SOURCE_NBT))
-            .ifError(logReadError)
-            .result().getOrNull()?.first
+        CODEC.update(NbtOps.INSTANCE, tag, this)
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        ATTACKERS_CODEC.encodeStart(NbtOps.INSTANCE, _attackers).ifSuccess {
-            tag.put(ATTACKERS_NBT, it)
-        }.ifError(logWriteError)
-
-        if (skillSource != null)
-            SkillSource.CODEC.encodeStart(NbtOps.INSTANCE, skillSource).ifSuccess {
-                tag.put(SKILL_SOURCE_NBT, it)
-            }.ifError(logWriteError)
+        CODEC.encode(this, NbtOps.INSTANCE, tag)
     }
 
     val skillPointProportions get() = attackers.mapValues { (_, damage) ->
@@ -79,9 +64,10 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
     }
 
     companion object : ComponentKeyHolder<DefeatSourceComponent, MobEntity> {
-        val ATTACKERS_CODEC: Codec<Map<UUID, Float>> = Codec.unboundedMap(Uuids.STRING_CODEC, Codec.FLOAT)
-        const val ATTACKERS_NBT = "attackers"
-        const val SKILL_SOURCE_NBT = "skill_source"
+        val CODEC = recordMutationCodec(
+            Codec.unboundedMap(Uuids.STRING_CODEC, Codec.FLOAT).mutateMap().fieldFor("attackers", DefeatSourceComponent::_attackers),
+            SkillSource.CODEC.fieldOf("skill_source").forAccess(DefeatSourceComponent::skillSource),
+        )
 
         override val key: ComponentKey<DefeatSourceComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("defeat_source"), DefeatSourceComponent::class.java)
 

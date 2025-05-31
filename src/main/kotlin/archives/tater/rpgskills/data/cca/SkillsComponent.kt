@@ -5,21 +5,22 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.*
 import com.google.common.collect.HashMultimap
+import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.registry.RegistryKey
+import net.minecraft.nbt.NbtOps
+import net.minecraft.registry.RegistryOps
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Identifier
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
-import kotlin.jvm.optionals.getOrNull
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
@@ -91,31 +92,23 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        val registry = registryLookup[Skill]
-        _skills = tag.getCompound("skills").run {
-            keys.associateNotNull { key ->
-                Identifier.tryParse(key)
-                    ?.let { registry.getOptional(RegistryKey.of(Skill.key, it)).getOrNull() }
-                    ?.let { it to getInt(key) }
-            }
-        }.toMutableMap()
-        spentLevels = tag.getInt("spent")
-        _points = tag.getInt("points")
+        CODEC.update(RegistryOps.of(NbtOps.INSTANCE, registryLookup), tag, this)
         updateAttributes()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        tag.put("skills", NbtCompound().apply {
-            for ((skill, level) in _skills) {
-                putInt(skill.key.get().value.toString(), level)
-            }
-        })
-        tag.putInt("spent", spentLevels)
-        tag.putInt("points", _points)
+        CODEC.encode(this, RegistryOps.of(NbtOps.INSTANCE, registryLookup), tag)
     }
 
     companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>,
         ServerPlayNetworking.PlayPayloadHandler<SkillUpgradePayload> {
+
+        val CODEC = recordMutationCodec(
+            Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).mutateMap().fieldFor("skills", SkillsComponent::_skills),
+            Codec.INT.fieldOf("spent").forAccess(SkillsComponent::spentLevels),
+            Codec.INT.fieldOf("points").forAccess(SkillsComponent::_points)
+        )
+
         override val key: ComponentKey<SkillsComponent> =
             ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
 
