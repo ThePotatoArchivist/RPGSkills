@@ -27,6 +27,6 @@ object RPGSkillsComponents : EntityComponentInitializer, ChunkComponentInitializ
     }
 
     override fun registerBlockComponentFactories(registry: BlockComponentFactoryRegistry) {
-        registry.registerFor(MobSpawnerBlockEntity::class.java, SkillSourceComponent.KEY) { SkillSourceComponent(40) }
+        registry.registerFor(MobSpawnerBlockEntity::class.java, SkillSourceComponent.KEY) { SkillSourceComponent(40) { it.markDirty() } }
     }
 }

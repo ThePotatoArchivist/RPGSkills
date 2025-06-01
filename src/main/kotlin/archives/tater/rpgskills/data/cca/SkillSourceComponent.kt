@@ -1,9 +1,7 @@
 package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.util.forAccess
-import archives.tater.rpgskills.util.getValue
-import archives.tater.rpgskills.util.recordMutationCodec
+import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
 import net.minecraft.block.entity.MobSpawnerBlockEntity
 import net.minecraft.nbt.NbtCompound
@@ -21,12 +19,17 @@ class SkillSourceComponent(initialPoints: Int, private val onUpdate: (() -> Unit
             onUpdate?.invoke()
         }
 
+    fun removeSkillPoints(max: Int) =
+        remainingSkillPoints.coerceAtMost(max).also {
+            remainingSkillPoints -= it
+        }
+
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.update(NbtOps.INSTANCE, tag, this)
+        CODEC.update(NbtOps.INSTANCE, tag, this) { it.logIfError() }
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.encode(this, NbtOps.INSTANCE, tag)
+        CODEC.encode(this, tag) { it.logIfError() }
     }
 
     companion object {

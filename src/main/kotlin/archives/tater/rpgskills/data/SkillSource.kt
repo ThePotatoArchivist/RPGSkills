@@ -65,7 +65,11 @@ sealed class SkillSource {
         }
     }
 
-    // TODO empty
+    data object EmptySource : SkillSource() {
+        override fun getComponent(world: World): SkillSourceComponent? = null
+
+        val CODEC: MapCodec<EmptySource> = MapCodec.unit(this)
+    }
 
     companion object {
         val CODEC: Codec<SkillSource> = KeyDispatchCodec(
@@ -74,12 +78,14 @@ sealed class SkillSource {
                     is ChunkSource -> DataResult.success("chunk")
                     is SpawnerSource -> DataResult.success("spawner")
                     is StructureSource -> DataResult.success("structure")
+                    is EmptySource -> DataResult.success("empty")
                     else -> DataResult.error { "Unknown source ${it::class.simpleName}" }
             } },
             { when (it) {
                 "chunk" -> DataResult.success(ChunkSource.CODEC)
                 "spawner" -> DataResult.success(SpawnerSource.CODEC)
                 "structure" -> DataResult.success(StructureSource.CODEC)
+                "empty" -> DataResult.success(EmptySource.CODEC)
                 else -> DataResult.error { "Unknown type $it" }
             } },
         ).codec()

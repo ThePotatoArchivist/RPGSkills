@@ -1,7 +1,10 @@
 package archives.tater.rpgskills.util
 
+import archives.tater.rpgskills.RPGSkills
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
+import com.mojang.serialization.DynamicOps
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
@@ -11,10 +14,14 @@ import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtElement
 import net.minecraft.nbt.NbtList
+import net.minecraft.nbt.NbtOps
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryOps
 import net.minecraft.registry.RegistryWrapper
+import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.resource.ResourceManager
@@ -23,6 +30,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
+import org.slf4j.Logger
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
@@ -131,4 +139,30 @@ fun <T> KMutableProperty0<T>.synced(key: ComponentKey<*>, provider: Any) = objec
 fun <T> Iterable<T>.mapToNbt(transform: (T) -> NbtCompound) = NbtList().apply {
     for (element in this@mapToNbt)
         add(transform(element))
+}
+
+fun DataResult<*>.logIfError(logger: Logger = RPGSkills.logger) {
+    ifError {
+        try {
+            it.orThrow
+            logger.error(it.message())
+        } catch (e: Exception) {
+            logger.error(it.message(), e)
+        }
+    }
+}
+
+fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, ops: DynamicOps<NbtElement> = NbtOps.INSTANCE, onError: ((DataResult.Error<*>) -> Unit)? = null) {
+    encode(input, ops, tag).ifError(onError).ifSuccess {
+        val compound = it as? NbtCompound ?: run {
+            onError?.invoke(DataResult.error({ "$it was not an NbtCompound" }, it) as DataResult.Error)
+            return@ifSuccess
+        }
+        for (key in compound.keys)
+            tag.put(key, compound[key])
+    }
+}
+
+fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, wrapperLookup: WrapperLookup, onError: ((DataResult.Error<*>) -> Unit)? = null) {
+    encode(input, tag, RegistryOps.of(NbtOps.INSTANCE, wrapperLookup), onError)
 }

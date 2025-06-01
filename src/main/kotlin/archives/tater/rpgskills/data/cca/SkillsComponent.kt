@@ -92,19 +92,19 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.update(RegistryOps.of(NbtOps.INSTANCE, registryLookup), tag, this)
+        CODEC.update(RegistryOps.of(NbtOps.INSTANCE, registryLookup), tag, this) { it.logIfError() }
         updateAttributes()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.encode(this, RegistryOps.of(NbtOps.INSTANCE, registryLookup), tag)
+        CODEC.encode(this, tag, registryLookup) { it.logIfError() }
     }
 
     companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>,
         ServerPlayNetworking.PlayPayloadHandler<SkillUpgradePayload> {
 
         val CODEC = recordMutationCodec(
-            Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).mutateMap().fieldFor("skills", SkillsComponent::_skills),
+            Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).mutate().fieldFor("skills", SkillsComponent::_skills),
             Codec.INT.fieldOf("spent").forAccess(SkillsComponent::spentLevels),
             Codec.INT.fieldOf("points").forAccess(SkillsComponent::_points)
         )

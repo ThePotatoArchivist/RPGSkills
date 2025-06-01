@@ -1,10 +1,8 @@
 package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.util.ComponentKeyHolder
-import archives.tater.rpgskills.util.fieldFor
-import archives.tater.rpgskills.util.mutateCollection
-import archives.tater.rpgskills.util.recordMutationCodec
+import archives.tater.rpgskills.util.*
+import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtOps
@@ -23,16 +21,16 @@ class StructuresSkillSourceComponent(val world: World) : Component {
     val structures = mutableListOf<Entry>()
 
     fun getOrCreate(box: BlockBox, structure: RegistryKey<Structure>): SkillSourceComponent =
-        (structures.firstOrNull { it.box == box && it.structure.value == structure.value }
+        (structures.firstOrNull { it.box == box && it.structure == structure }
             ?: Entry(box, structure, SkillSourceComponent(getInitialPoints(structure))).also(structures::add)
         ).component
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.update(NbtOps.INSTANCE, tag, this)
+        CODEC.update(NbtOps.INSTANCE, tag, this) { it.logIfError() }
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.encode(this, NbtOps.INSTANCE, tag)
+        CODEC.encode(this, tag) { it.logIfError() }
     }
 
     companion object : ComponentKeyHolder<StructuresSkillSourceComponent, World> {
@@ -58,7 +56,7 @@ class StructuresSkillSourceComponent(val world: World) : Component {
         val component: SkillSourceComponent,
     ) {
         companion object {
-            val CODEC = RecordCodecBuilder.create { it.group(
+            val CODEC: Codec<Entry> = RecordCodecBuilder.create { it.group(
                 BlockBox.CODEC.fieldOf("box").forGetter(Entry::box),
                 RegistryKey.createCodec(RegistryKeys.STRUCTURE).fieldOf("structure").forGetter(Entry::structure),
                 SkillSourceComponent.createCodec().fieldOf("component").forGetter(Entry::component),

@@ -31,7 +31,7 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
     private var _attackers = mutableMapOf<UUID, Float>()
     val attackers: Map<UUID, Float> get() = _attackers
 
-    var skillSource: SkillSource? = null
+    var skillSource: SkillSource = SkillSource.EmptySource
 
     operator fun get(player: PlayerEntity) = attackers.getOrDefault(player.uuid, 0f)
     operator fun set(player: PlayerEntity, value: Float) {
@@ -39,11 +39,11 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.update(NbtOps.INSTANCE, tag, this)
+        CODEC.update(NbtOps.INSTANCE, tag, this) { it.logIfError() }
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.encode(this, NbtOps.INSTANCE, tag)
+        CODEC.encode(this, tag) { it.logIfError() }
     }
 
     val skillPointProportions get() = attackers.mapValues { (_, damage) ->
@@ -52,20 +52,15 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
     }
 
     fun getSkillPointAmounts(): Map<UUID, Int> {
-        val source = skillSource?.getComponent(entity.world)
+        val source = skillSource.getComponent(entity.world) ?: return mapOf()
         return skillPointProportions.mapValues { (_, proportion) ->
-            (proportion * getMaxSkillPoints(entity)).toInt().run {
-                if (source == null) this else
-                    coerceAtMost(source.remainingSkillPoints).also {
-                        source.remainingSkillPoints -= it
-                    }
-            }
+            source.removeSkillPoints((proportion * getMaxSkillPoints(entity)).toInt())
         }
     }
 
     companion object : ComponentKeyHolder<DefeatSourceComponent, MobEntity> {
         val CODEC = recordMutationCodec(
-            Codec.unboundedMap(Uuids.STRING_CODEC, Codec.FLOAT).mutateMap().fieldFor("attackers", DefeatSourceComponent::_attackers),
+            Codec.unboundedMap(Uuids.STRING_CODEC, Codec.FLOAT).mutate().fieldFor("attackers", DefeatSourceComponent::_attackers),
             SkillSource.CODEC.fieldOf("skill_source").forAccess(DefeatSourceComponent::skillSource),
         )
 
@@ -88,7 +83,7 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
         @JvmStatic
         fun onSpawn(entity: MobEntity) {
             val component = entity[DefeatSourceComponent]
-            if (component.skillSource != null) return
+            if (component.skillSource != SkillSource.EmptySource) return
 
             val structure = (entity.world as ServerWorld).structureAccessor.getStructureContaining(entity.blockPos, RPGSkillsTags.HAS_SKILL_POOL_STRUCTURE)
             component.skillSource =
