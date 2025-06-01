@@ -141,10 +141,11 @@ fun <T> Iterable<T>.mapToNbt(transform: (T) -> NbtCompound) = NbtList().apply {
         add(transform(element))
 }
 
-fun DataResult<*>.logIfError(logger: Logger = RPGSkills.logger) {
+fun <T: DataResult<*>> T.logIfError(logger: Logger = RPGSkills.logger): T {
     ifError {
         logger.error("Serialization Error: {}", it.message())
     }
+    return this
 }
 
 fun <A> MutationCodec<A>.update(input: A, tag: NbtCompound) = update(input, NbtOps.INSTANCE, tag)

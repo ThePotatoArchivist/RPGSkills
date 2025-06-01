@@ -14,13 +14,13 @@ import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import java.util.*
 
-class SkillSourceComponent(private val initialPoints: Int, private val onUpdate: (() -> Unit)? = null) : Component {
+class SkillSourceComponent(private val initialPoints: Int, private val markDirty: (() -> Unit)? = null) : Component {
     private val remainingSkillPoints = mutableMapOf<UUID, Int>()
 
     operator fun get(playerUuid: UUID) = remainingSkillPoints.getOrDefault(playerUuid, initialPoints)
     operator fun set(playerUuid: UUID, points: Int) {
         remainingSkillPoints[playerUuid] = points
-        onUpdate?.invoke()
+        markDirty?.invoke()
     }
 
     operator fun get(player: PlayerEntity) = this[player.uuid]
@@ -40,7 +40,9 @@ class SkillSourceComponent(private val initialPoints: Int, private val onUpdate:
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.encode(this, tag).logIfError()
+        CODEC.encode(this, tag).logIfError().ifError {
+            markDirty?.invoke() // So that it saves and doesn't throw an error next time
+        }
     }
 
     companion object {

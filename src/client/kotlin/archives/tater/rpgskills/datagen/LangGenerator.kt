@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.datagen
 
 import archives.tater.rpgskills.ItemLockTooltip
+import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
@@ -36,5 +37,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
         translationBuilder.add(SkillUpgradeButton.MAX, "MAX")
         translationBuilder.add(RPGSkillsClient.RPG_SKILLS_CATEGORY, "RPG Skills")
         translationBuilder.add(RPGSkillsClient.SKILLS_KEY_TRANSLATION, "Open Skills")
+        translationBuilder.add(RPGSkillsAttributes.BOW_DRAW_TIME, "Bow Draw Time")
+        translationBuilder.add(RPGSkillsAttributes.PROJECTILE_DIVERGENCE, "Projectile Divergence")
     }
 }

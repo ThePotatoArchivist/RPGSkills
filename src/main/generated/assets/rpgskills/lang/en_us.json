@@ -1,4 +1,6 @@
 {
+  "attribute.name.rpgskills.bow_draw_time": "Bow Draw Time",
+  "attribute.name.rpgskills.projectile_divergence": "Projectile Divergence",
   "category.rpgskills.rpgskills": "RPG Skills",
   "commands.rpgskills.skills.level.add": "Gave %3$s levels in skill %2$s to %1$s",
   "commands.rpgskills.skills.level.get": "%s has %3$s levels in skill %2$s",

@@ -28,7 +28,7 @@ object RPGSkillsAttributes {
     val BOW_DRAW_TIME = register("bow_draw_time", 20.0, 1.0, 100.0, Category.NEGATIVE, true) // prevent division by 0
 
     @JvmField
-    val PROJECTILE_DIVERGENCE = register("projectile_divergence", 1.0, 0.0, 4.0, Category.NEGATIVE)
+    val PROJECTILE_DIVERGENCE = register("projectile_divergence", 1.0, 0.0, 8.0, Category.NEGATIVE)
 
     fun register() {}
 }
