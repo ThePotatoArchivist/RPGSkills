@@ -4,7 +4,6 @@ import archives.tater.rpgskills.data.cca.DefeatSourceComponent;
 import archives.tater.rpgskills.entity.SkillPointOrbEntity;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -28,7 +27,7 @@ public class LivingEntityMixin {
             method = "damage",
             at = @At("TAIL")
     )
-    private void afterDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir, @Local(ordinal = 1) float dealt, @Local(ordinal = 0) boolean blocked) {
-        DefeatSourceComponent.afterDamage((LivingEntity) (Object) this, source, dealt, amount, blocked);
+    private void afterDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        DefeatSourceComponent.afterDamage((LivingEntity) (Object) this, source, amount);
     }
 }

@@ -2,6 +2,7 @@ package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
+import archives.tater.rpgskills.data.SkillPointConstants
 import archives.tater.rpgskills.data.SkillSource
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.util.*
@@ -52,7 +53,7 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
     fun getSkillPointAmounts(): Map<UUID, Int> {
         val source = skillSource.getComponent(entity.world) ?: return mapOf()
         return skillPointProportions.mapValues { (uuid, proportion) ->
-            source.removeSkillPoints(uuid, (proportion * getMaxSkillPoints(entity)).toInt())
+            source.removeSkillPoints(uuid, (proportion * SkillPointConstants.getEntityPoints(entity)).toInt())
         }
     }
 
@@ -66,9 +67,6 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
 
         @JvmField
         val KEY = key
-
-        fun getMaxSkillPoints(entity: MobEntity): Int =
-            entity.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH).toInt() / 5 // TODO decide skill points formula
 
         @JvmStatic
         fun onSpawn(entity: MobEntity) {
@@ -92,11 +90,9 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
         fun afterDamage(
             entity: LivingEntity,
             source: DamageSource,
-            baseDamageTaken: Float,
-            damageTaken: Float,
-            blocked: Boolean
+            damageTaken: Float
         ) {
-            if (entity !is MobEntity) return
+            if (damageTaken == 0f || entity !is MobEntity) return
             val player = source.attacker as? PlayerEntity ?: return
             entity[DefeatSourceComponent][player] += damageTaken
 
