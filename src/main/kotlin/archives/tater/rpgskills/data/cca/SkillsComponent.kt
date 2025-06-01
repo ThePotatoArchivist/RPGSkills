@@ -11,8 +11,6 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtOps
-import net.minecraft.registry.RegistryOps
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
@@ -92,12 +90,12 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.update(RegistryOps.of(NbtOps.INSTANCE, registryLookup), tag, this) { it.logIfError() }
+        CODEC.update(this, tag, registryLookup).logIfError()
         updateAttributes()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.encode(this, tag, registryLookup) { it.logIfError() }
+        CODEC.encode(this, tag, registryLookup).logIfError()
     }
 
     companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>,

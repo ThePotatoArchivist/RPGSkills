@@ -143,26 +143,22 @@ fun <T> Iterable<T>.mapToNbt(transform: (T) -> NbtCompound) = NbtList().apply {
 
 fun DataResult<*>.logIfError(logger: Logger = RPGSkills.logger) {
     ifError {
-        try {
-            it.orThrow
-            logger.error(it.message())
-        } catch (e: Exception) {
-            logger.error(it.message(), e)
-        }
+        logger.error("Serialization Error: {}", it.message())
     }
 }
 
-fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, ops: DynamicOps<NbtElement> = NbtOps.INSTANCE, onError: ((DataResult.Error<*>) -> Unit)? = null) {
-    encode(input, ops, tag).ifError(onError).ifSuccess {
-        val compound = it as? NbtCompound ?: run {
-            onError?.invoke(DataResult.error({ "$it was not an NbtCompound" }, it) as DataResult.Error)
-            return@ifSuccess
-        }
+fun <A> MutationCodec<A>.update(input: A, tag: NbtCompound) = update(input, NbtOps.INSTANCE, tag)
+
+fun <A> MutationCodec<A>.update(input: A, tag: NbtCompound, registryLookup: WrapperLookup) =
+    update(input, RegistryOps.of(NbtOps.INSTANCE, registryLookup), tag)
+
+fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, ops: DynamicOps<NbtElement> = NbtOps.INSTANCE): DataResult<*> =
+    encode(input, ops, tag).flatMap {
+        val compound = it as? NbtCompound ?: return@flatMap DataResult.error({ "$it was not an NbtCompound" }, it)
         for (key in compound.keys)
             tag.put(key, compound[key])
+        DataResult.success(it)
     }
-}
 
-fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, wrapperLookup: WrapperLookup, onError: ((DataResult.Error<*>) -> Unit)? = null) {
-    encode(input, tag, RegistryOps.of(NbtOps.INSTANCE, wrapperLookup), onError)
-}
+fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, registryLookup: WrapperLookup) =
+    encode(input, tag, RegistryOps.of(NbtOps.INSTANCE, registryLookup))

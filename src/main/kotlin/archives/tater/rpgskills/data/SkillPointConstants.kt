@@ -10,6 +10,9 @@ object SkillPointConstants {
     const val CHUNK_SKILL_POINTS = 20
     const val SPAWNER_SKILL_POINTS = 100
 
+    /**
+     * See [StructureTagGenerator.configure][archives.tater.rpgskills.datagen.StructureTagGenerator.configure] to configure which structures have their own skill pool
+     */
     fun getStructurePoints(structure: RegistryKey<Structure>) = when(structure) {
         StructureKeys.MANSION -> 100
         else -> 40

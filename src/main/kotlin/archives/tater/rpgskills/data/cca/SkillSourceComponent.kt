@@ -6,7 +6,6 @@ import com.mojang.serialization.Codec
 import net.minecraft.block.entity.MobSpawnerBlockEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtOps
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.util.Uuids
 import net.minecraft.world.chunk.Chunk
@@ -37,11 +36,11 @@ class SkillSourceComponent(private val initialPoints: Int, private val onUpdate:
         }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.update(NbtOps.INSTANCE, tag, this) { it.logIfError() }
+        CODEC.update(this, tag).logIfError()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.encode(this, tag) { it.logIfError() }
+        CODEC.encode(this, tag).logIfError()
     }
 
     companion object {

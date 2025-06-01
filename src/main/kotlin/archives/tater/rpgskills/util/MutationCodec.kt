@@ -5,9 +5,10 @@ import com.mojang.serialization.*
 import java.util.*
 import java.util.stream.Stream
 import kotlin.reflect.KMutableProperty1
+import com.mojang.datafixers.util.Unit as DFUnit
 
 interface MutationCodec<A> : Encoder<A> {
-    fun <T> update(ops: DynamicOps<T>, input: T, target: A, onError: ((DataResult.Error<*>) -> Unit)? = null)
+    fun <T> update(target: A, ops: DynamicOps<T>, input: T): DataResult<*>
 
     override fun <T> encode(input: A, ops: DynamicOps<T>, prefix: T): DataResult<T>
 
@@ -18,7 +19,7 @@ interface MutationCodec<A> : Encoder<A> {
         override fun <T : Any?> decode(ops: DynamicOps<T>, input: T): DataResult<Pair<A, T>> {
             return createDefault().apply {
                 var error: DataResult.Error<*>? = null
-                this@MutationCodec.update(ops, input, this) { error = it }
+                this@MutationCodec.update(this, ops, input).ifError { error = it }
                 error?.let { return DataResult.error(it.messageSupplier, Pair(this, input), it.lifecycle) }
             }.let {
                 DataResult.success(Pair(it, input))
@@ -30,12 +31,11 @@ interface MutationCodec<A> : Encoder<A> {
 fun <A, C: MutableCollection<A>> Codec<A>.mutateCollection() = object : MutationCodec<C> {
     private val listCodec = listOf()
 
-    override fun <T> update(ops: DynamicOps<T>, input: T, target: C, onError: ((DataResult.Error<*>) -> Unit)?) {
-        listCodec.decode(ops, input).ifError(onError).ifSuccess {
+    override fun <T> update(target: C, ops: DynamicOps<T>, input: T): DataResult<*> =
+        listCodec.decode(ops, input).ifSuccess {
             target.clear()
             target.addAll(it.first)
         }
-    }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any?> encode(input: C, ops: DynamicOps<T>, prefix: T): DataResult<T> =
@@ -43,30 +43,28 @@ fun <A, C: MutableCollection<A>> Codec<A>.mutateCollection() = object : Mutation
 }
 
 fun <K, V> Codec<Map<K, V>>.mutate() = object : MutationCodec<MutableMap<K, V>> {
-    override fun <T> update(ops: DynamicOps<T>, input: T, target: MutableMap<K, V>, onError: ((DataResult.Error<*>) -> Unit)?) {
-        this@mutate.decode(ops, input).ifError(onError).ifSuccess {
+    override fun <T> update(target: MutableMap<K, V>, ops: DynamicOps<T>, input: T): DataResult<*> =
+        this@mutate.decode(ops, input).ifSuccess {
             target.clear()
             target.putAll(it.first)
         }
-    }
 
     override fun <T : Any?> encode(input: MutableMap<K, V>, ops: DynamicOps<T>, prefix: T): DataResult<T> =
         this@mutate.encode(input, ops, prefix)
 }
 
 abstract class RecordMutationCodec<A> : CompressorHolder(), MapEncoder<A> {
-    abstract fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: A, onError: ((DataResult.Error<*>) -> Unit)? = {})
+    abstract fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: A): DataResult<*>
 
     abstract override fun <T> encode(input: A, ops: DynamicOps<T>, prefix: RecordBuilder<T>): RecordBuilder<T>
 
     abstract override fun <T> keys(ops: DynamicOps<T>): Stream<T>
 
     fun codec() = object : MutationCodec<A> {
-        override fun <T> update(ops: DynamicOps<T>, input: T, target: A, onError: ((DataResult.Error<*>) -> Unit)?) {
-            ops.getMap(input).setLifecycle(Lifecycle.stable()).ifError(onError).ifSuccess {
-                this@RecordMutationCodec.update(ops, it, target, onError)
+        override fun <T> update(target: A, ops: DynamicOps<T>, input: T): DataResult<*> =
+            ops.getMap(input).setLifecycle(Lifecycle.stable()).flatMap {
+                this@RecordMutationCodec.update(ops, it, target)
             }
-        }
 
         override fun <T> encode(input: A, ops: DynamicOps<T>, prefix: T): DataResult<T> {
             return this@RecordMutationCodec.encode(input, ops, this@RecordMutationCodec.compressedBuilder(ops)).build(prefix)
@@ -75,12 +73,9 @@ abstract class RecordMutationCodec<A> : CompressorHolder(), MapEncoder<A> {
 }
 
 fun <M, A> MutationCodec<A>.fieldFor(name: String, getValue: M.() -> A) = object : RecordMutationCodec<M>() {
-    override fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: M, onError: ((DataResult.Error<*>) -> Unit)?) {
-        val value = input[name] ?: run {
-            onError?.invoke(DataResult.error<Unit> { "No key $name in $input" } as DataResult.Error<*>)
-            return
-        }
-        this@fieldFor.update(ops, value, target.getValue(), onError)
+    override fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: M): DataResult<*> {
+        val value = input[name] ?: return DataResult.error<DFUnit> { "No key $name in $input" }
+        return this@fieldFor.update(target.getValue(), ops, value)
     }
 
     override fun <T> encode(input: M, ops: DynamicOps<T>, prefix: RecordBuilder<T>): RecordBuilder<T> =
@@ -91,11 +86,10 @@ fun <M, A> MutationCodec<A>.fieldFor(name: String, getValue: M.() -> A) = object
 }
 
 fun <M, A> MapCodec<A>.forAccess(getValue: M.() -> A, setValue: M.(A) -> Unit) = object : RecordMutationCodec<M>() {
-    override fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: M, onError: ((DataResult.Error<*>) -> Unit)?) {
-        this@forAccess.decode(ops, input).ifError(onError).ifSuccess {
+    override fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: M): DataResult<*> =
+        this@forAccess.decode(ops, input).ifSuccess {
             target.setValue(it)
         }
-    }
 
     override fun <T> encode(input: M, ops: DynamicOps<T>, prefix: RecordBuilder<T>): RecordBuilder<T> =
         this@forAccess.encode(input.getValue(), ops, prefix)
@@ -106,9 +100,13 @@ fun <M, A> MapCodec<A>.forAccess(getValue: M.() -> A, setValue: M.(A) -> Unit) =
 fun <M, A> MapCodec<A>.forAccess(property: KMutableProperty1<M, A>) = forAccess(property, property::set)
 
 fun <A> RecordMutationCodec(vararg codecs: RecordMutationCodec<A>) = object : RecordMutationCodec<A>() {
-    override fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: A, onError: ((DataResult.Error<*>) -> Unit)?) {
-        for (codec in codecs)
-            codec.update(ops, input, target, onError)
+    override fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: A): DataResult<*> {
+        val results = codecs.mapNotNull { codec ->
+            codec.update(ops, input, target).takeIf { it.isError }
+        }
+        return if (results.isEmpty()) DataResult.success(DFUnit.INSTANCE) else DataResult.error<DFUnit> {
+            "Some or all fields could not be read: ${results.filter { it.isError }.joinToString(", ") { (it as DataResult.Error).message() }}"
+        }
     }
 
     override fun <T> encode(input: A, ops: DynamicOps<T>, prefix: RecordBuilder<T>): RecordBuilder<T> {

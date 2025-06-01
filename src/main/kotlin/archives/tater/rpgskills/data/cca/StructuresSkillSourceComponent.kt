@@ -6,7 +6,6 @@ import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtOps
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
@@ -26,11 +25,11 @@ class StructuresSkillSourceComponent(val world: World) : Component {
         ).component
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.update(NbtOps.INSTANCE, tag, this) { it.logIfError() }
+        CODEC.update(this, tag).logIfError()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.encode(this, tag) { it.logIfError() }
+        CODEC.encode(this, tag).logIfError()
     }
 
     companion object : ComponentKeyHolder<StructuresSkillSourceComponent, World> {

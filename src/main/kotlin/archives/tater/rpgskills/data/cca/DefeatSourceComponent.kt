@@ -13,7 +13,6 @@ import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtOps
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.server.world.ServerWorld
@@ -38,11 +37,11 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.update(NbtOps.INSTANCE, tag, this) { it.logIfError() }
+        CODEC.update(this, tag).logIfError()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
-        CODEC.encode(this, tag) { it.logIfError() }
+        CODEC.encode(this, tag).logIfError()
     }
 
     val skillPointProportions get() = attackers.mapValues { (_, damage) ->
