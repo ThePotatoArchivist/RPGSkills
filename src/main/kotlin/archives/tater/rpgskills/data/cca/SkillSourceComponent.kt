@@ -4,24 +4,36 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
 import net.minecraft.block.entity.MobSpawnerBlockEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtOps
 import net.minecraft.registry.RegistryWrapper
+import net.minecraft.util.Uuids
 import net.minecraft.world.chunk.Chunk
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
+import java.util.*
 
-class SkillSourceComponent(initialPoints: Int, private val onUpdate: (() -> Unit)? = null) : Component {
-    var remainingSkillPoints = initialPoints
-        set(value) {
-            field = value
-            onUpdate?.invoke()
-        }
+class SkillSourceComponent(private val initialPoints: Int, private val onUpdate: (() -> Unit)? = null) : Component {
+    private val remainingSkillPoints = mutableMapOf<UUID, Int>()
 
-    fun removeSkillPoints(max: Int) =
-        remainingSkillPoints.coerceAtMost(max).also {
-            remainingSkillPoints -= it
+    operator fun get(playerUuid: UUID) = remainingSkillPoints.getOrDefault(playerUuid, initialPoints)
+    operator fun set(playerUuid: UUID, points: Int) {
+        remainingSkillPoints[playerUuid] = points
+        onUpdate?.invoke()
+    }
+
+    operator fun get(player: PlayerEntity) = this[player.uuid]
+    operator fun set(player: PlayerEntity, points: Int) {
+        this[player.uuid] = points
+    }
+
+    fun removeSkillPoints(player: PlayerEntity, max: Int) = removeSkillPoints(player.uuid, max)
+
+    fun removeSkillPoints(playerUuid: UUID, max: Int) =
+        get(playerUuid).coerceAtMost(max).also {
+            this[playerUuid] -= it
         }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
@@ -34,7 +46,7 @@ class SkillSourceComponent(initialPoints: Int, private val onUpdate: (() -> Unit
 
     companion object {
         val CODEC = recordMutationCodec(
-            Codec.INT.fieldOf("remaining_points").forAccess(SkillSourceComponent::remainingSkillPoints)
+            Codec.unboundedMap(Uuids.STRING_CODEC, Codec.INT).mutate().fieldFor("remaining_points", SkillSourceComponent::remainingSkillPoints)
         )
 
         fun createCodec(initialPoints: Int = 0) = CODEC.codec { SkillSourceComponent(initialPoints) }

@@ -18,7 +18,7 @@ import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 
 class StructuresSkillSourceComponent(val world: World) : Component {
-    val structures = mutableListOf<Entry>()
+    private val structures = mutableListOf<Entry>()
 
     fun getOrCreate(box: BlockBox, structure: RegistryKey<Structure>): SkillSourceComponent =
         (structures.firstOrNull { it.box == box && it.structure == structure }

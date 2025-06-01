@@ -6,7 +6,6 @@ import archives.tater.rpgskills.data.SkillSource
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
-import com.mojang.serialization.DataResult
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
@@ -25,7 +24,6 @@ import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import java.util.*
-import java.util.function.Consumer
 
 class DefeatSourceComponent(val entity: MobEntity) : Component {
     private var _attackers = mutableMapOf<UUID, Float>()
@@ -53,8 +51,8 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
 
     fun getSkillPointAmounts(): Map<UUID, Int> {
         val source = skillSource.getComponent(entity.world) ?: return mapOf()
-        return skillPointProportions.mapValues { (_, proportion) ->
-            source.removeSkillPoints((proportion * getMaxSkillPoints(entity)).toInt())
+        return skillPointProportions.mapValues { (uuid, proportion) ->
+            source.removeSkillPoints(uuid, (proportion * getMaxSkillPoints(entity)).toInt())
         }
     }
 
@@ -68,14 +66,6 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
 
         @JvmField
         val KEY = key
-
-        private val logWriteError = Consumer { error: DataResult.Error<*> ->
-            RPGSkills.logger.error("Could not serialize DefeatSource component: {}", error.message())
-        }
-
-        private val logReadError = Consumer { error: DataResult.Error<*> ->
-            RPGSkills.logger.error("Could not deserialize DefeatSource component: {}", error.message())
-        }
 
         fun getMaxSkillPoints(entity: MobEntity): Int =
             entity.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH).toInt() / 5 // TODO decide skill points formula
