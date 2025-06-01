@@ -5,7 +5,12 @@
     "id": "minecraft:grass_block"
   },
   "levels": [
-    1,
+    {
+      "attributes": {
+        "rpgskills:bow_draw_time": -10.0
+      },
+      "cost": 1
+    },
     2
   ],
   "name": "Grass Skill"

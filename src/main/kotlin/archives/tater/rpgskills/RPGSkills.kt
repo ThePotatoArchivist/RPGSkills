@@ -45,5 +45,7 @@ object RPGSkills : ModInitializer {
 		SkillsComponent.registerNetworking()
 
 		registerLockEvents()
+
+		RPGSkillsAttributes.register()
 	}
 }

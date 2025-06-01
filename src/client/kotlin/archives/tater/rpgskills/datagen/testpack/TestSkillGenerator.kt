@@ -1,11 +1,13 @@
 package archives.tater.rpgskills.datagen.defaultpack
 
+import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.data.BuildsRegistry
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.AnonymousAttributeModifier
 import archives.tater.rpgskills.data.SkillProvider
 import archives.tater.rpgskills.data.accept
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
+import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
@@ -63,7 +65,12 @@ class DefaultSkillGenerator(
         val GRASS_SKILL = DefaultSkillGenerator.BuildEntry(
             Identifier.of("rpg_test", "grass"), Skill(
                 icon = ItemStack(Items.GRASS_BLOCK),
-                levels = listOf(1, 2).map(Skill::Level),
+                levels = listOf(
+                    Skill.Level(1, mapOf(
+                        RPGSkillsAttributes.BOW_DRAW_TIME to AnonymousAttributeModifier(-10.0, EntityAttributeModifier.Operation.ADD_VALUE)
+                    )),
+                    Skill.Level(2),
+                ),
                 name = "Grass Skill",
                 description = "Unlocks cows I guess"
             )

@@ -3,6 +3,9 @@
   "package": "archives.tater.rpgskills.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "attribute.BowItemMixin",
+    "attribute.CrossbowItemMixin",
+    "attribute.LivingEntityMixin",
     "locking.CraftingScreenHandlerMixin",
     "locking.ItemStackMixin",
     "locking.LivingEntityMixin",
