@@ -28,7 +28,7 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
 
         skillWidgets = player.registryManager[Skill].streamEntries().toList().mapIndexed { index, skill ->
             Pair(
-                addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill)),
+                addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill, this)),
                 addDrawableChild(SkillUpgradeButton(x + 197, y + index * SkillWidget.HEIGHT + 19 + 2, player, skill))
             )
         }

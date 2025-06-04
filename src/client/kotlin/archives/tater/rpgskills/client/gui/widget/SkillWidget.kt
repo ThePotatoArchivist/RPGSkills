@@ -1,5 +1,6 @@
 package archives.tater.rpgskills.client.gui.widget
 
+import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.description
@@ -9,6 +10,7 @@ import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.client.sound.SoundManager
@@ -18,8 +20,9 @@ import net.minecraft.registry.entry.RegistryEntry
 class SkillWidget(
     x: Int,
     y: Int,
-    player: PlayerEntity,
+    private val player: PlayerEntity,
     private val skill: RegistryEntry<Skill>,
+    private val parent: Screen? = null,
 ) : ClickableWidget(x, y, WIDTH - SkillUpgradeButton.WIDTH - 5, HEIGHT, skill.name) {
     private val skillsComponent = player[SkillsComponent]
     private val name = skill.name
@@ -60,7 +63,8 @@ class SkillWidget(
     }
 
     override fun onClick(mouseX: Double, mouseY: Double) {
-
+        val client = MinecraftClient.getInstance()
+        client.setScreen(SkillScreen(player, skill, parent))
     }
 
     override fun playDownSound(soundManager: SoundManager?) {
