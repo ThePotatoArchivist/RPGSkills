@@ -14,6 +14,7 @@ import net.minecraft.client.gui.Drawable
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ScrollableWidget
+import net.minecraft.client.gui.widget.Widget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
@@ -33,6 +34,8 @@ class SkillScreen(
 
     private inline val selectedLevel get() = selectedTab + 1
 
+    private lateinit var contents : List<LockGroupWidget>
+
     override fun init() {
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
@@ -43,17 +46,14 @@ class SkillScreen(
 
         addDrawableChild(SkillUpgradeButton(x + WIDTH - SkillUpgradeButton.WIDTH - 8, y + 20, player, skill))
 
-        var currentY = 42
-        val contents = player.registryManager[LockGroup].streamEntries()
+        contents = player.registryManager[LockGroup].streamEntries()
             .filter { lockEntry -> lockEntry.value.requirements.any { it[skill] == selectedLevel } }
             .map {
-                LockGroupWidget(x + 11, y + currentY, 230, it.value, player.registryManager, player.world.recipeManager).also { widget ->
-                    currentY += widget.height
-                }
+                LockGroupWidget(x + 10, 0, 224, it.value, player.registryManager, player.world.recipeManager)
             }
             .toList()
 
-        addDrawableChild(Scrolling(x + 11, y + 42, 230, 120, currentY, contents))
+        addDrawableChild(Scrolling(x + 9, y + 40, 226, 143, contents))
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
@@ -75,28 +75,33 @@ class SkillScreen(
         val TEXTURE = RPGSkills.id("textures/gui/skill.png")
 
         const val WIDTH = 252
-        const val HEIGHT = 154
+        const val HEIGHT = 192
     }
 
-    class Scrolling(
+    class Scrolling<T>(
         x: Int,
         y: Int,
         width: Int,
         height: Int,
-        private val contentsHeight: Int,
-        private val contents: List<Drawable>
-    ) : ScrollableWidget(x, y, width, height, Text.empty()) {
+        private val contents: List<T>
+    ) : ScrollableWidget(x, y, width, height, Text.empty()) where T: Widget, T: Drawable {
+
+        private val contentsHeight = contents.fold(1) { currentY, widget ->
+            widget.y = y + currentY
+            currentY + widget.height
+        }
+
         override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {}
 
         override fun getContentsHeight(): Int = contentsHeight
 
         override fun getDeltaYPerScroll(): Double = 9.0
 
-        override fun renderContents(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-            for (drawable in contents) {
-                drawable.render(context, mouseX, mouseY, delta)
-            }
-        }
+        override fun drawBox(context: DrawContext?) {}
 
+        override fun renderContents(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+            for (drawable in contents)
+                drawable.render(context, mouseX, mouseY, delta)
+        }
     }
 }

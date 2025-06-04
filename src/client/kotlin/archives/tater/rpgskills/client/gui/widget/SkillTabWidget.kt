@@ -32,8 +32,8 @@ class SkillTabWidget(x: Int, y: Int, private val level: Int, private val parent:
     }
 
     companion object {
-        val TEXTURE_UNSELECTED = RPGSkills.id("textures/gui/sprites/hud/level_tab.png")
-        val TEXTURE_SELECTED = RPGSkills.id("textures/gui/sprites/hud/level_tab_selected.png")
+        val TEXTURE_UNSELECTED = RPGSkills.id("textures/gui/sprites/skill/level_tab.png")
+        val TEXTURE_SELECTED = RPGSkills.id("textures/gui/sprites/skill/level_tab_selected.png")
 
         val TOOLTIP = Translation.arg("screen.widget.rpgskills.skilltab.tooltip")
 
