@@ -10,10 +10,10 @@ import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.text.Text
 
 class SkillTabWidget(x: Int, y: Int, private val level: Int, private val parent: Tabbed?) :
-    ClickableWidget(x, y, WIDTH, HEIGHT, Text.of(level.toString())) {
+    ClickableWidget(x, y, WIDTH, HEIGHT, Text.empty()) {
 
     private val text = (level + 1).toString()
-    private val tooltip = TOOLTIP.text(level)
+    private val tooltip = TOOLTIP.text(level + 1)
 
     private val isSelectedTab get() = parent?.selectedTab == level
 

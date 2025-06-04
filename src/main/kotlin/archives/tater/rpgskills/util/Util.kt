@@ -163,3 +163,5 @@ fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, ops: DynamicOps<NbtE
 
 fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, registryLookup: WrapperLookup) =
     encode(input, tag, RegistryOps.of(NbtOps.INSTANCE, registryLookup))
+
+infix fun Int.ceilDiv(other: Int) = (this + other - 1) / other

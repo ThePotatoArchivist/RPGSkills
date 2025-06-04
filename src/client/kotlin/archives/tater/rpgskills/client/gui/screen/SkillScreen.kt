@@ -1,10 +1,13 @@
 package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.client.gui.widget.LockGroupWidget
 import archives.tater.rpgskills.client.gui.widget.SkillTabWidget
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
+import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
+import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
@@ -29,6 +32,9 @@ class SkillScreen(
         }
 
         addDrawableChild(SkillUpgradeButton(x + WIDTH - SkillUpgradeButton.WIDTH - 8, y + 20, player, skill))
+
+        // TODO WIP
+        addDrawableChild(LockGroupWidget(x + 11, y + 42, WIDTH, player.registryManager[LockGroup].streamEntries().toList()[1].value, player.registryManager, player.world.recipeManager))
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {

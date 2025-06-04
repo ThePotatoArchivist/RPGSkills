@@ -13,7 +13,6 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
-import net.minecraft.client.sound.SoundManager
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 
@@ -65,10 +64,6 @@ class SkillWidget(
     override fun onClick(mouseX: Double, mouseY: Double) {
         val client = MinecraftClient.getInstance()
         client.setScreen(SkillScreen(player, skill, parent))
-    }
-
-    override fun playDownSound(soundManager: SoundManager?) {
-
     }
 
     companion object {

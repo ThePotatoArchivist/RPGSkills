@@ -47,6 +47,9 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         val matchingEntries: List<RegistryEntry<T>> by lazy { findMatchingEntries(registry) }
         val matchingValues: List<T> by lazy { matchingEntries.stream().map { it.value() }.distinct().toList() }
 
+        val size get() = matchingEntries.size
+        val isEmpty get() = matchingEntries.isEmpty()
+
         override fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>> =
             Arrays.stream(entries).flatMap { it.findMatchingEntries(lookup).stream() }.distinct().toList()
 
