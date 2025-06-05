@@ -1,13 +1,11 @@
 package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.client.gui.widget.AttributesWidget
-import archives.tater.rpgskills.client.gui.widget.LockGroupWidget
-import archives.tater.rpgskills.client.gui.widget.SkillTabWidget
-import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
+import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
+import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
 import archives.tater.rpgskills.util.withFirst
@@ -64,6 +62,8 @@ class SkillScreen(
         super.render(context, mouseX, mouseY, delta)
         context.drawItem(skill.value.icon, x + 8, y + 21)
         context.drawText(textRenderer, title, x + 26, y + 25, 0x404040, false)
+        val max = skill.value.levels.size
+        SkillBar.draw(context, x + WIDTH - SkillUpgradeButton.WIDTH - 16 - max * 10, y + 27, max, player[SkillsComponent][skill])
     }
 
     override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {

@@ -1,7 +1,7 @@
 package archives.tater.rpgskills.client.gui.widget
 
+import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.client.gui.screen.SkillScreen
-import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.description
 import archives.tater.rpgskills.data.Skill.Companion.name
@@ -31,28 +31,12 @@ class SkillWidget(
     private val maxLevel = skill.value.levels.size
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        context.drawTexture(TEXTURE, x, y, 9, if (isHovered) 147 + HEIGHT else 147, WIDTH, HEIGHT)
+        context.drawGuiTexture(if (hovered) TEXTURE_HIGHLIGHTED else TEXTURE, x, y, WIDTH, HEIGHT)
         context.drawItem(skill.value.icon, x + 3, y + 3)
         context.drawText(textRenderer, name, x + 21, y + 4, 0xffffff, true)
 
-        val level = level
-        val maxLevel = maxLevel
-        repeat(maxLevel) { i ->
-            val first = i == 0
-            context.drawTexture(
-                TEXTURE,
-                x + 21 + i * BAR_NOTCH_WIDTH + if (first) 0 else 1,
-                y + 14,
-                when {
-                    first -> 29
-                    i + 1 == maxLevel -> 50
-                    else -> 40
-                },
-                if (i < level) 198 else 192,
-                if (first) BAR_NOTCH_WIDTH + 1 else BAR_NOTCH_WIDTH,
-                BAR_HEIGHT
-            )
-        }
+        SkillBar.draw(context, x + 21, y + 14, maxLevel, level)
+
         if (hovered)
             context.drawTooltip(textRenderer, description, mouseX, mouseY)
     }
@@ -67,10 +51,15 @@ class SkillWidget(
     }
 
     companion object {
-        val TEXTURE = SkillsScreen.TEXTURE
+        val TEXTURE = RPGSkills.id("skill/entry")
+        val TEXTURE_HIGHLIGHTED = RPGSkills.id("skill/entry_highlighted")
+        val BAR_TEXTURE = RPGSkills.id("skill/bar_empty")
+        val BAR_TEXTURE_FILL = RPGSkills.id("skill/bar_filled")
+
         const val WIDTH = 227
         const val HEIGHT = 22
 
+        const val BAR_TEXTURE_WIDTH = 31
         const val BAR_NOTCH_WIDTH = 10
         const val BAR_HEIGHT = 5
 
