@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.datagen.defaultpack
+package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.LockGroup.LockList
@@ -15,14 +15,14 @@ import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
-class DefaultSkillsLockGenerator(
+class TestSkillsLockGenerator(
     dataOutput: FabricDataOutput,
     registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
 ) : LockGroupProvider(dataOutput, registriesFuture) {
     override fun configure(provider: BiConsumer<Identifier, LockGroup>, registries: RegistryWrapper.WrapperLookup) {
         provider.accept(Identifier.of("rpg_test", "potato1"), LockGroup(
             requirements = mapOf(
-                DefaultSkillGenerator.POTATO_SKILL.entry to 1
+                TestSkillGenerator.POTATO_SKILL.entry to 1
             ),
             itemName = "Unknown Potato",
             items = LockList(
@@ -44,8 +44,8 @@ class DefaultSkillsLockGenerator(
         ))
         provider.accept(Identifier.of("rpg_test", "potato2"), LockGroup(
             requirements = mapOf(
-                DefaultSkillGenerator.POTATO_SKILL.entry to 2,
-                DefaultSkillGenerator.COW_SKILL.entry to 2,
+                TestSkillGenerator.POTATO_SKILL.entry to 2,
+                TestSkillGenerator.COW_SKILL.entry to 2,
             ),
             itemName = "Unknown Fork",
             items = LockList(
@@ -69,10 +69,10 @@ class DefaultSkillsLockGenerator(
         provider.accept(Identifier.of("rpg_test", "potato3"), LockGroup(
             requirements = listOf(
                 mapOf(
-                    DefaultSkillGenerator.POTATO_SKILL.entry to 3
+                    TestSkillGenerator.POTATO_SKILL.entry to 3
                 ),
                 mapOf(
-                    DefaultSkillGenerator.GRASS_SKILL.entry to 2
+                    TestSkillGenerator.GRASS_SKILL.entry to 2
                 ),
             ),
             itemName = "Unknown Button",

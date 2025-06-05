@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.datagen.defaultpack
+package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.data.BuildsRegistry
@@ -17,7 +17,7 @@ import net.minecraft.util.Identifier
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
-class DefaultSkillGenerator(
+class TestSkillGenerator(
     dataOutput: FabricDataOutput,
     registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
 ) : SkillProvider(dataOutput, registriesFuture) {
@@ -62,7 +62,7 @@ class DefaultSkillGenerator(
             )
         )
 
-        val GRASS_SKILL = DefaultSkillGenerator.BuildEntry(
+        val GRASS_SKILL = BuildEntry(
             Identifier.of("rpg_test", "grass"), Skill(
                 icon = ItemStack(Items.GRASS_BLOCK),
                 levels = listOf(
