@@ -5,6 +5,8 @@ import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
+import archives.tater.rpgskills.client.gui.widget.AttributesWidget
+import archives.tater.rpgskills.client.gui.widget.LockGroupWidget
 import archives.tater.rpgskills.client.gui.widget.SkillTabWidget
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.data.LockGroup
@@ -28,6 +30,11 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
         translationBuilder.add(RPGSkillsCommands.SET_POINTS, "Set %2$s level points on %s")
         translationBuilder.add(SkillsScreen.TITLE, "Skills")
         translationBuilder.add(SkillTabWidget.TOOLTIP, "Level %s")
+        translationBuilder.add(LockGroupWidget.Texts.ITEMS, "Items")
+        translationBuilder.add(LockGroupWidget.Texts.BLOCKS, "Blocks")
+        translationBuilder.add(LockGroupWidget.Texts.ENTITIES, "Entities")
+        translationBuilder.add(LockGroupWidget.Texts.RECIPES, "Recipes")
+        translationBuilder.add(AttributesWidget.TITLE, "Attributes")
         translationBuilder.add(LockGroup.DEFAULT_ITEM_NAME, "Unknown Item")
         translationBuilder.add(LockGroup.DEFAULT_ITEM_MESSAGE, "You don't know how to use this item")
         translationBuilder.add(LockGroup.DEFAULT_BLOCK_MESSAGE, "You don't know how to use this block")

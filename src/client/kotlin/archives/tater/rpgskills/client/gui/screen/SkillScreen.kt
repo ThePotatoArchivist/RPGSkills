@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.client.gui.widget.AttributesWidget
 import archives.tater.rpgskills.client.gui.widget.LockGroupWidget
 import archives.tater.rpgskills.client.gui.widget.SkillTabWidget
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
@@ -9,6 +10,7 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
+import archives.tater.rpgskills.util.withFirst
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.Drawable
 import net.minecraft.client.gui.screen.Screen
@@ -34,26 +36,28 @@ class SkillScreen(
 
     private inline val selectedLevel get() = selectedTab + 1
 
-    private lateinit var contents : List<LockGroupWidget>
-
     override fun init() {
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
 
-        repeat(skill.value().levels.size) {
+        repeat(skill.value.levels.size) {
             addDrawableChild(SkillTabWidget(x + it * 20 + 6, y, it, this))
         }
 
         addDrawableChild(SkillUpgradeButton(x + WIDTH - SkillUpgradeButton.WIDTH - 8, y + 20, player, skill))
 
-        contents = player.registryManager[LockGroup].streamEntries()
+        val attributesWidget = skill.value.levels[selectedTab].attributes.takeIf { it.isNotEmpty() }?.let {
+            AttributesWidget(x + 10, 0, 224, it)
+        }
+
+        val lockWidgets: List<LockGroupWidget> = player.registryManager[LockGroup].streamEntries()
             .filter { lockEntry -> lockEntry.value.requirements.any { it[skill] == selectedLevel } }
             .map {
                 LockGroupWidget(x + 10, 0, 224, it.value, player.registryManager, player.world.recipeManager)
             }
             .toList()
 
-        addDrawableChild(Scrolling(x + 9, y + 40, 226, 143, contents))
+        addDrawableChild(Scrolling(x + 9, y + 40, 226, 143, attributesWidget?.let(lockWidgets::withFirst) ?: lockWidgets))
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {

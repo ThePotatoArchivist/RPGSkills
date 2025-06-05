@@ -165,3 +165,10 @@ fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, registryLookup: Wrap
     encode(input, tag, RegistryOps.of(NbtOps.INSTANCE, registryLookup))
 
 infix fun Int.ceilDiv(other: Int) = (this + other - 1) / other
+
+fun <T> Collection<T>.withFirst(element: T): List<T> {
+    val result = ArrayList<T>(size + 1)
+    result.add(element)
+    result.addAll(this)
+    return result
+}

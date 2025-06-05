@@ -20,5 +20,10 @@
   "rpgskills.tooltip.stack.requires.any": "Requires either:",
   "screen.rpgskills.skills": "Skills",
   "screen.rpgskills.skills.max": "MAX",
+  "screen.widget.rpgskills.attributes.title": "Attributes",
+  "screen.widget.rpgskills.lockgroup.blocks": "Blocks",
+  "screen.widget.rpgskills.lockgroup.entities": "Entities",
+  "screen.widget.rpgskills.lockgroup.items": "Items",
+  "screen.widget.rpgskills.lockgroup.recipes": "Recipes",
   "screen.widget.rpgskills.skilltab.tooltip": "Level %s"
 }
