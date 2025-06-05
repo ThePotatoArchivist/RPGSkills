@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.mixin.client.locking;
 
-import archives.tater.rpgskills.client.render.CrossedArrow;
+import archives.tater.rpgskills.client.render.CrossedArrowRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -23,12 +23,12 @@ public abstract class InventoryScreenMixin extends AbstractInventoryScreen<Playe
             at = @At("TAIL")
     )
     private void renderCross(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        CrossedArrow.render(context,
+        CrossedArrowRenderer.render(context,
                 this,
                 x + 133,
                 y + 27,
                 mouseX,
                 mouseY,
-                false);
+                true);
     }
 }
