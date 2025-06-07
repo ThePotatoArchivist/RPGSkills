@@ -14,8 +14,8 @@ object SkillBarRenderer {
     private var showTicks = 0
 
     private const val MAX_SHOW_TICKS = 40 // TODO
-    private val BACKGROUND_TEXTURE = RPGSkills.id("textures/gui/sprites/hud/skill_bar_background.png")
-    private val PROGRESS_TEXTURE = RPGSkills.id("textures/gui/sprites/hud/skill_bar_progress.png")
+    private val BACKGROUND_TEXTURE = RPGSkills.id("hud/skill_bar_background")
+    private val PROGRESS_TEXTURE = RPGSkills.id("hud/skill_bar_progress")
     private const val TEXTURE_WIDTH = 182
     private const val TEXTURE_HEIGHT = 5
 
@@ -30,9 +30,9 @@ object SkillBarRenderer {
         val barWidth = (skills.levelProgress * (TEXTURE_WIDTH + 1)).toInt()
         val y = context.scaledWindowHeight - 32 + 3
         RenderSystem.enableBlend()
-        context.drawTexture(BACKGROUND_TEXTURE, x, y, 0f, 0f, TEXTURE_WIDTH, TEXTURE_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT)
+        context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, TEXTURE_WIDTH, TEXTURE_HEIGHT)
         if (barWidth > 0)
-            context.drawTexture(PROGRESS_TEXTURE, x, y, barWidth, TEXTURE_HEIGHT, 0f, 0f, barWidth, TEXTURE_HEIGHT, TEXTURE_WIDTH, TEXTURE_HEIGHT)
+            context.drawGuiTexture(PROGRESS_TEXTURE, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0, 0, x, y, barWidth, TEXTURE_HEIGHT)
 
         RenderSystem.disableBlend()
     }

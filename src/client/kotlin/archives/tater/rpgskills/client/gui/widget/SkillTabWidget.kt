@@ -18,7 +18,7 @@ class SkillTabWidget(x: Int, y: Int, private val level: Int, private val parent:
     private val isSelectedTab get() = parent?.selectedTab == level
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        context.drawTexture(if (isSelectedTab) TEXTURE_SELECTED else TEXTURE_UNSELECTED, x, y, 0f, 0f, WIDTH, HEIGHT, WIDTH, HEIGHT)
+        context.drawGuiTexture(if (isSelectedTab) TEXTURE_SELECTED else TEXTURE_UNSELECTED, x, y, WIDTH, HEIGHT)
         context.drawText(textRenderer, text, x + (WIDTH + 1) / 2 - textRenderer.getWidth(text) / 2, y + 7, 0x404040, false)
         if (hovered) context.drawTooltip(textRenderer, tooltip, mouseX, mouseY)
     }
@@ -32,8 +32,8 @@ class SkillTabWidget(x: Int, y: Int, private val level: Int, private val parent:
     }
 
     companion object {
-        val TEXTURE_UNSELECTED = RPGSkills.id("textures/gui/sprites/skill/level_tab.png")
-        val TEXTURE_SELECTED = RPGSkills.id("textures/gui/sprites/skill/level_tab_selected.png")
+        val TEXTURE_UNSELECTED = RPGSkills.id("skill/level_tab")
+        val TEXTURE_SELECTED = RPGSkills.id("skill/level_tab_selected")
 
         val TOOLTIP = Translation.arg("screen.widget.rpgskills.skilltab.tooltip")
 
