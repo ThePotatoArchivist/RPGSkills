@@ -1,0 +1,11 @@
+{
+  "description": "Makes stuff",
+  "icon": {
+    "id": "minecraft:iron_axe"
+  },
+  "name": "Blacksmith",
+  "starting_levels": {
+    "rpg_test:grass": 1,
+    "rpg_test:potato": 2
+  }
+}

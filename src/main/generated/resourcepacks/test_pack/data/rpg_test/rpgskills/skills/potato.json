@@ -1,7 +1,6 @@
 {
   "description": "Unlocks potatoes & other stuff",
   "icon": {
-    "count": 1,
     "id": "minecraft:potato"
   },
   "levels": [

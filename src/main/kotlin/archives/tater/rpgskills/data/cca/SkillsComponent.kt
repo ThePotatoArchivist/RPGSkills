@@ -2,6 +2,7 @@ package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.*
 import com.google.common.collect.HashMultimap
@@ -22,6 +23,9 @@ import org.ladysnake.cca.api.v3.entity.RespawnableComponent
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
+    private var _skillClass: RegistryEntry<SkillClass>? = null
+    var skillClass by ::_skillClass.synced(key, player)
+
     private var _skills = mutableMapOf<RegistryEntry<Skill>, Int>()
     val skills: Map<RegistryEntry<Skill>, Int> get() = _skills
 
@@ -57,7 +61,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = getUpgradeCost(skill)
         ?.let { spendableLevels >= it } ?: false
 
-    private fun getAttributeModifiers() =
+    private fun getAttributeModifiers(): HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> =
         HashMultimap.create<RegistryEntry<EntityAttribute>, EntityAttributeModifier>().apply {
             for ((skill, playerLevel) in _skills)
                 skill.value.levels
@@ -102,6 +106,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         ServerPlayNetworking.PlayPayloadHandler<SkillUpgradePayload> {
 
         val CODEC = recordMutationCodec(
+            RegistryFixedCodec.of(SkillClass.key).fieldOf("class").forAccess(SkillsComponent::_skillClass),
             Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).mutate().fieldFor("skills", SkillsComponent::_skills),
             Codec.INT.fieldOf("spent").forAccess(SkillsComponent::spentLevels),
             Codec.INT.fieldOf("points").forAccess(SkillsComponent::_points)
@@ -109,9 +114,6 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
         override val key: ComponentKey<SkillsComponent> =
             ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
-
-        @JvmField
-        val KEY = key
 
         private val LEVEL_REQUIREMENTS = (0..100)
             .runningFold(0) { acc, lvl -> acc + getPointsForNextLevel(lvl) }

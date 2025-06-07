@@ -39,9 +39,6 @@ class StructuresSkillSourceComponent(val world: World) : Component {
 
         override val key: ComponentKey<StructuresSkillSourceComponent> =
             ComponentRegistry.getOrCreate(RPGSkills.id("structures_skill_source"), StructuresSkillSourceComponent::class.java)
-
-        @JvmField
-        val KEY = key
     }
 
     class Entry(

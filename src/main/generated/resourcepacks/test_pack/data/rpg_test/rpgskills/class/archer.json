@@ -1,0 +1,11 @@
+{
+  "description": "Shoots arrows",
+  "icon": {
+    "id": "minecraft:bow"
+  },
+  "name": "Archer",
+  "starting_levels": {
+    "rpg_test:cow": 1,
+    "rpg_test:grass": 2
+  }
+}

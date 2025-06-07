@@ -2,6 +2,7 @@ package archives.tater.rpgskills
 
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
@@ -30,6 +31,7 @@ object RPGSkills : ModInitializer {
 		// Proceed with mild caution.
 		DynamicRegistries.registerSynced(Skill.key, Skill.CODEC)
 		DynamicRegistries.registerSynced(LockGroup.key, LockGroup.CODEC)
+		DynamicRegistries.registerSynced(SkillClass.key, SkillClass.CODEC)
 
 		CommandRegistrationCallback.EVENT.register(RPGSkillsCommands)
 

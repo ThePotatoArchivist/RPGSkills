@@ -2,8 +2,6 @@ package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.*
-import archives.tater.rpgskills.util.field
-import archives.tater.rpgskills.util.optionalField
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.entity.attribute.EntityAttribute
@@ -37,7 +35,7 @@ data class Skill(
     companion object : RegistryKeyHolder<Registry<Skill>> {
         val CODEC: Codec<Skill> = RecordCodecBuilder.create {
             it.group(
-                field("icon", Skill::icon, ItemStack.CODEC),
+                field("icon", Skill::icon, ItemStack.UNCOUNTED_CODEC),
                 field("levels", Skill::levels, Level.SHORT_CODEC.listOf()),
                 field("name", Skill::name, Codec.STRING),
                 optionalField("description", Skill::description, Codec.STRING)

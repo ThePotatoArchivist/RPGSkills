@@ -64,9 +64,6 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
 
         override val key: ComponentKey<DefeatSourceComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("defeat_source"), DefeatSourceComponent::class.java)
 
-        @JvmField
-        val KEY = key
-
         @JvmStatic
         fun onSpawn(entity: MobEntity) {
             val component = entity[DefeatSourceComponent]
