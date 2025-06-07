@@ -21,7 +21,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
 
     fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>>
 
-    class EntryEntry<T>(private val entry: RegistryEntry<T>) : RegistryIngredient<T> {
+    data class EntryEntry<T>(private val entry: RegistryEntry<T>) : RegistryIngredient<T> {
         override fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>> = listOf(entry)
 
         @Suppress("DEPRECATION")
@@ -32,7 +32,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         }
     }
 
-    class TagEntry<T>(private val tag: TagKey<T>) : RegistryIngredient<T> {
+    data class TagEntry<T>(private val tag: TagKey<T>) : RegistryIngredient<T> {
         override fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>> =
             lookup.streamEntries().filter { it.isIn(tag) }.toList()
 
@@ -43,7 +43,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         }
     }
 
-    class Composite<T>(val registry: RegistryWrapper<T>, private vararg val entries: RegistryIngredient<T>) : RegistryIngredient<T> {
+    class Composite<T>(private val registry: RegistryWrapper<T>, private val entries: List<RegistryIngredient<T>> = listOf()) : RegistryIngredient<T> {
         val matchingEntries: List<RegistryEntry<T>> by lazy { findMatchingEntries(registry) }
         val matchingValues: List<T> by lazy { matchingEntries.stream().map { it.value() }.distinct().toList() }
 
@@ -51,16 +51,26 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         val isEmpty get() = matchingEntries.isEmpty()
 
         override fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>> =
-            Arrays.stream(entries).flatMap { it.findMatchingEntries(lookup).stream() }.distinct().toList()
+            entries.stream().flatMap { it.findMatchingEntries(lookup).stream() }.distinct().toList()
 
         override fun test(value: RegistryEntry<T>): Boolean = value in matchingEntries
 
         @JvmName("testValue")
         fun test(value: T): Boolean = value in matchingValues
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+            return entries == (other as Composite<*>).entries
+        }
+
+        override fun hashCode(): Int {
+            return entries.hashCode()
+        }
+
         companion object {
             fun <T> createCodec(registry: Registry<T>): Codec<Composite<T>> = Codec.either(EntryEntry.createCodec(registry), TagEntry.createCodec(registry.key)).listOf().xmap(
-                { entries -> Composite(registry.readOnlyWrapper, *entries.map { either -> either.map({ it }, { it }) }.toTypedArray()) },
+                { entries -> Composite(registry.readOnlyWrapper, entries.map { either -> either.map({ it }, { it }) }) },
                 { composite -> composite.entries.map { when (it) {
                     is EntryEntry -> Either.left(it)
                     is TagEntry -> Either.right(it)
@@ -86,7 +96,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
             tags.add(tagKey)
         }
 
-        fun build() = Composite(registry.readOnlyWrapper, *(entries.map(::EntryEntry) + tags.map(::TagEntry)).toTypedArray())
+        fun build() = Composite(registry.readOnlyWrapper, entries.map(::EntryEntry) + tags.map(::TagEntry))
 
         operator fun RegistryEntry<T>.unaryPlus() = add(this)
         operator fun T.unaryPlus() = add(this)
@@ -94,7 +104,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
     }
 
     companion object {
-        fun <T> of(registry: RegistryWrapper<T>, vararg entries: RegistryIngredient<T>): RegistryIngredient<T> = Composite(registry, *entries)
+        fun <T> of(registry: RegistryWrapper<T>, vararg entries: RegistryIngredient<T>): RegistryIngredient<T> = Composite(registry, entries.toList())
         fun <T> of(registry: Registry<T>, init: Builder<T>.() -> Unit) = Builder(registry).apply(init).build()
 
         fun ofItems(init: Builder<Item>.() -> Unit) = of(Registries.ITEM, init)
