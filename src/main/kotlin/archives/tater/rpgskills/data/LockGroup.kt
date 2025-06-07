@@ -25,7 +25,7 @@ import kotlin.jvm.optionals.getOrNull
 @JvmRecord
 data class LockGroup(
     val requirements: List<Map<RegistryEntry<Skill>, Int>>,
-    val itemName: String?,
+    val itemName: String? = null,
     val items: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
     val blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
     val entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
@@ -33,7 +33,7 @@ data class LockGroup(
 ) {
     constructor(
         requirements: Map<RegistryEntry<Skill>, Int>,
-        itemName: String?,
+        itemName: String? = null,
         items: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
         blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
         entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),

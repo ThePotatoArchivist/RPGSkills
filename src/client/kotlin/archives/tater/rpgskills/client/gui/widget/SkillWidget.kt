@@ -53,15 +53,9 @@ class SkillWidget(
     companion object {
         val TEXTURE = RPGSkills.id("skill/entry")
         val TEXTURE_HIGHLIGHTED = RPGSkills.id("skill/entry_highlighted")
-        val BAR_TEXTURE = RPGSkills.id("skill/bar_empty")
-        val BAR_TEXTURE_FILL = RPGSkills.id("skill/bar_filled")
 
         const val WIDTH = 227
         const val HEIGHT = 22
-
-        const val BAR_TEXTURE_WIDTH = 31
-        const val BAR_NOTCH_WIDTH = 10
-        const val BAR_HEIGHT = 5
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
     }

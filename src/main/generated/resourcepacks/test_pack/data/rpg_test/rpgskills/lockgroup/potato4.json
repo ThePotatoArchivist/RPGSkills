@@ -1,0 +1,16 @@
+{
+  "blocks": {
+    "entries": []
+  },
+  "entities": {
+    "entries": []
+  },
+  "items": {
+    "entries": [
+      "minecraft:barrier"
+    ]
+  },
+  "requirements": {
+    "rpg_test:potato": 2
+  }
+}

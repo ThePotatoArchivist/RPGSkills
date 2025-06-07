@@ -11,13 +11,16 @@ import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.screen.ScreenTexts
 import net.minecraft.util.math.MathHelper.clamp
 
 class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
     private var x = 0
     private var y = 0
     private lateinit var skillWidgets: List<Pair<SkillWidget, SkillUpgradeButton>>
+    private lateinit var buttonWidget: ButtonWidget
     private var indexOffset = 0
     private val canScroll get() = skillWidgets.size > MAX_VISIBLE
     private var scrolling = false
@@ -32,10 +35,16 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
                 addDrawableChild(SkillUpgradeButton(x + 197, y + index * SkillWidget.HEIGHT + 19 + 2, player, skill))
             )
         }
+
+        buttonWidget = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE) { close() }.apply {
+            width(200)
+            position(client!!.window.scaledWidth / 2 - 100, client!!.window.scaledHeight - 25)
+        }.build())
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         this.renderBackground(context, mouseX, mouseY, delta)
+        buttonWidget.render(context, mouseX, mouseY, delta)
         // Background
         context.drawTexture(TEXTURE, x, y, 0, 0, WIDTH, HEIGHT)
         // Title

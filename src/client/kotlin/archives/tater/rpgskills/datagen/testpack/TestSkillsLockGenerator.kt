@@ -94,5 +94,15 @@ class TestSkillsLockGenerator(
                 "You don't know how to assemble this button",
             ),
         ))
+        provider.accept(Identifier.of("rpg_test", "potato4"), LockGroup(
+            requirements = mapOf(
+                TestSkillGenerator.POTATO_SKILL.entry to 2,
+            ),
+            items = LockList(
+                RegistryIngredient.ofItems {
+                    +Items.BARRIER
+                },
+            ),
+        ))
     }
 }

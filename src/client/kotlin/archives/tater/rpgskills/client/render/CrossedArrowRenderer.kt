@@ -16,7 +16,6 @@ object CrossedArrowRenderer {
     private const val LARGE_HEIGHT = 21
     private const val SMALL_WIDTH = 20
     private const val SMALL_HEIGHT = 18
-    private const val SMALL_Y = LARGE_HEIGHT
 
     @JvmStatic
     fun render(context: DrawContext, screen: HandledScreen<*>, x: Int, y: Int, mouseX: Int, mouseY: Int, small: Boolean = false) {

@@ -13,10 +13,12 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.Drawable
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
+import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.ScrollableWidget
 import net.minecraft.client.gui.widget.Widget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.screen.ScreenTexts
 import net.minecraft.text.Text
 
 class SkillScreen(
@@ -42,7 +44,7 @@ class SkillScreen(
             addDrawableChild(SkillTabWidget(x + it * 20 + 6, y, it, this))
         }
 
-        addDrawableChild(SkillUpgradeButton(x + WIDTH - SkillUpgradeButton.WIDTH - 8, y + 20, player, skill))
+        addDrawableChild(SkillUpgradeButton(x + WIDTH - SkillUpgradeButton.WIDTH - 8, y + 21, player, skill))
 
         val attributesWidget = skill.value.levels[selectedTab].attributes.takeIf { it.isNotEmpty() }?.let {
             AttributesWidget(x + 10, 0, 224, it)
@@ -55,15 +57,20 @@ class SkillScreen(
             }
             .toList()
 
-        addDrawableChild(Scrolling(x + 9, y + 40, 226, 143, attributesWidget?.let(lockWidgets::withFirst) ?: lockWidgets))
+        addDrawableChild(Scrolling(x + 9, y + 42, 226, 141, attributesWidget?.let(lockWidgets::withFirst) ?: lockWidgets))
+
+        addDrawableChild(ButtonWidget.builder(ScreenTexts.BACK) { close() }.apply {
+            width(200)
+            position(client!!.window.scaledWidth / 2 - 100, client!!.window.scaledHeight - 25)
+        }.build())
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(context, mouseX, mouseY, delta)
-        context.drawItem(skill.value.icon, x + 8, y + 21)
-        context.drawText(textRenderer, title, x + 26, y + 25, 0x404040, false)
+        context.drawItem(skill.value.icon, x + 8, y + 22)
+        context.drawText(textRenderer, title, x + 26, y + 23, 0x404040, false)
         val max = skill.value.levels.size
-        SkillBar.draw(context, x + WIDTH - SkillUpgradeButton.WIDTH - 16 - max * 10, y + 27, max, player[SkillsComponent][skill])
+        SkillBar.draw(context, x + 26, y + 32, max, player[SkillsComponent][skill])
     }
 
     override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
@@ -92,7 +99,7 @@ class SkillScreen(
 
         private val contentsHeight = contents.fold(1) { currentY, widget ->
             widget.y = y + currentY
-            currentY + widget.height
+            currentY + widget.height + GAP
         }
 
         override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {}
@@ -106,6 +113,10 @@ class SkillScreen(
         override fun renderContents(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
             for (drawable in contents)
                 drawable.render(context, mouseX, mouseY, delta)
+        }
+
+        companion object {
+            const val GAP = 2
         }
     }
 }
