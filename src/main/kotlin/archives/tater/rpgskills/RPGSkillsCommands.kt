@@ -3,6 +3,7 @@ package archives.tater.rpgskills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
+import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.*
 import com.mojang.brigadier.CommandDispatcher
@@ -26,6 +27,8 @@ object RPGSkillsCommands : CommandRegistrationCallback {
     val SET_LEVEL = Translation.arg("commands.$MOD_ID.skills.level.set")
     val SET_POINTS = Translation.arg("commands.$MOD_ID.skills.levelpoints.set")
     val ADD_POINTS = Translation.arg("commands.$MOD_ID.skills.levelpoints.add")
+    val RESET_CLASS = Translation.arg("commands.$MOD_ID.skills.class.reset")
+    val SET_CLASS = Translation.arg("commands.$MOD_ID.skills.class.set")
 
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
@@ -135,6 +138,27 @@ object RPGSkillsCommands : CommandRegistrationCallback {
 
                                 command.source.sendFeedback(ADD_POINTS.text(player.displayName!!, amount), true)
                                 amount
+                            }
+                        }
+                    }
+                }
+                sub("class") {
+                    sub("reset") {
+                        argumentExec("player", player()) { command ->
+                            val player = getPlayer(command, "player")
+                            player[SkillsComponent].skillClass = null
+                            command.source.sendFeedback(RESET_CLASS.text(player.displayName!!), true)
+                            0
+                        }
+                    }
+                    sub("set") {
+                        argument("player", player()) {
+                            argumentExec("class", registryEntry(registryAccess, SkillClass.key)) { command ->
+                                val player = getPlayer(command, "player")
+                                val skillClass = getRegistryEntry(command, "class", SkillClass.key)
+                                player[SkillsComponent].skillClass = skillClass
+                                command.source.sendFeedback(SET_CLASS.text(player.displayName!!, skillClass.value.name), true)
+                                0
                             }
                         }
                     }

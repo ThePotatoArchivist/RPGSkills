@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.*
 import java.util.*
 import java.util.stream.Stream
+import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KMutableProperty1
 import com.mojang.datafixers.util.Unit as DFUnit
 
@@ -97,7 +98,23 @@ fun <M, A> MapCodec<A>.forAccess(getValue: M.() -> A, setValue: M.(A) -> Unit) =
     override fun <T> keys(ops: DynamicOps<T>): Stream<T> = this@forAccess.keys(ops)
 }
 
+@JvmName("nullableForAccess")
+fun <M, A: Any> MapCodec<Optional<A>>.forAccess(getValue: M.() -> A?, setValue: M.(A?) -> Unit) = object : RecordMutationCodec<M>() {
+    override fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: M): DataResult<*> =
+        this@forAccess.decode(ops, input).ifSuccess {
+            target.setValue(it.getOrNull())
+        }
+
+    override fun <T> encode(input: M, ops: DynamicOps<T>, prefix: RecordBuilder<T>): RecordBuilder<T> =
+        this@forAccess.encode(Optional.ofNullable(input.getValue()), ops, prefix)
+
+    override fun <T> keys(ops: DynamicOps<T>): Stream<T> = this@forAccess.keys(ops)
+}
+
 fun <M, A> MapCodec<A>.forAccess(property: KMutableProperty1<M, A>) = forAccess(property, property::set)
+
+@JvmName("nullableForAccess")
+fun <M, A: Any> MapCodec<Optional<A>>.forAccess(property: KMutableProperty1<M, A?>) = forAccess(property, property::set)
 
 fun <A> RecordMutationCodec(vararg codecs: RecordMutationCodec<A>) = object : RecordMutationCodec<A>() {
     override fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: A): DataResult<*> {

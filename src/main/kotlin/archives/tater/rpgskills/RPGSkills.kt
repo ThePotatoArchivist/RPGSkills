@@ -4,6 +4,8 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.networking.ChooseClassPayload
+import archives.tater.rpgskills.networking.ClassChoicePayload
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import net.fabricmc.api.ModInitializer
@@ -42,9 +44,11 @@ object RPGSkills : ModInitializer {
 		)
 
 		PayloadTypeRegistry.playS2C().register(RecipeBlockedPayload.ID, RecipeBlockedPayload.CODEC)
+		PayloadTypeRegistry.playS2C().register(ChooseClassPayload.ID, ChooseClassPayload.CODEC)
+		PayloadTypeRegistry.playC2S().register(ClassChoicePayload.ID, ClassChoicePayload.CODEC)
 		PayloadTypeRegistry.playC2S().register(SkillUpgradePayload.ID, SkillUpgradePayload.CODEC)
 
-		SkillsComponent.registerNetworking()
+		SkillsComponent.registerEvents()
 
 		registerLockEvents()
 

@@ -32,5 +32,14 @@ class TestSkillClassGenerator(
                 TestSkillGenerator.GRASS_SKILL.entry to 1
             )
         ))
+        provider.accept(Identifier.of("rpg_test", "engineer"), SkillClass(
+            name = "Engineer",
+            icon = Items.COMPARATOR,
+            description = "Hello and welcome to my TED talk. This is a very long description text to make sure that wrapping and scrolling works properly. I hope you had a good time reading it.",
+            startingLevels = mapOf(
+                TestSkillGenerator.COW_SKILL.entry to 2,
+                TestSkillGenerator.POTATO_SKILL.entry to 1
+            )
+        ))
     }
 }

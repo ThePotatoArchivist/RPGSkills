@@ -1,0 +1,11 @@
+{
+  "description": "Hello and welcome to my TED talk. This is a very long description text to make sure that wrapping and scrolling works properly. I hope you had a good time reading it.",
+  "icon": {
+    "id": "minecraft:comparator"
+  },
+  "name": "Engineer",
+  "starting_levels": {
+    "rpg_test:cow": 2,
+    "rpg_test:potato": 1
+  }
+}

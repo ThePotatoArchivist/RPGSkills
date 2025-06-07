@@ -38,7 +38,7 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
 
         buttonWidget = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE) { close() }.apply {
             width(200)
-            position(client!!.window.scaledWidth / 2 - 100, client!!.window.scaledHeight - 25)
+            position(width / 2 - 100, height - 25)
         }.build())
     }
 

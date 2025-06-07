@@ -3,10 +3,13 @@ package archives.tater.rpgskills.data.cca
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
+import archives.tater.rpgskills.networking.ChooseClassPayload
+import archives.tater.rpgskills.networking.ClassChoicePayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.*
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
@@ -102,11 +105,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         CODEC.encode(this, tag, registryLookup).logIfError()
     }
 
-    companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity>,
-        ServerPlayNetworking.PlayPayloadHandler<SkillUpgradePayload> {
+    companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity> {
 
         val CODEC = recordMutationCodec(
-            RegistryFixedCodec.of(SkillClass.key).fieldOf("class").forAccess(SkillsComponent::_skillClass),
+            RegistryFixedCodec.of(SkillClass.key).optionalFieldOf("class").forAccess(SkillsComponent::_skillClass),
             Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).mutate().fieldFor("skills", SkillsComponent::_skills),
             Codec.INT.fieldOf("spent").forAccess(SkillsComponent::spentLevels),
             Codec.INT.fieldOf("points").forAccess(SkillsComponent::_points)
@@ -131,22 +133,46 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         fun getRemainingPoints(points: Int) =
             points - (LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required < points }?.value ?: 0)
 
-        override fun receive(payload: SkillUpgradePayload, context: ServerPlayNetworking.Context) {
-            val player = context.player()
-            val skillsComponent = player[SkillsComponent]
-            val skill = payload.skill
-            if (skillsComponent.canUpgrade(skill)) {
-                skillsComponent.spendableLevels -= skillsComponent.getUpgradeCost(skill)!!
-                skillsComponent[skill]++
-                player.world.playSoundFromEntity(
-                    null, player,
-                    SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f
-                )
-            }
-        }
+        fun registerEvents() {
+            // Choose class
+            ServerPlayNetworking.registerGlobalReceiver(ClassChoicePayload.ID) { payload, context ->
+                val player = context.player()
+                val skillsComponent = player[SkillsComponent]
+                if (skillsComponent.skillClass != null) {
+                    RPGSkills.logger.warn("${player.name.string} tried to set skills class when it was already set")
+                    return@registerGlobalReceiver
+                }
+                skillsComponent._skills.clear()
+                skillsComponent._skills.putAll(payload.skillClass.value.startingLevels) // Sync is taken care of by the following call
+                skillsComponent.skillClass = payload.skillClass
 
-        fun registerNetworking() {
-            ServerPlayNetworking.registerGlobalReceiver(SkillUpgradePayload.ID, this)
+                player.abilities.invulnerable = false
+                player.sendAbilitiesUpdate()
+            }
+
+            // Upgrade skill
+            ServerPlayNetworking.registerGlobalReceiver(SkillUpgradePayload.ID) { payload, context ->
+                val player = context.player()
+                val skillsComponent = player[SkillsComponent]
+                val skill = payload.skill
+                if (skillsComponent.canUpgrade(skill)) {
+                    skillsComponent.spendableLevels -= skillsComponent.getUpgradeCost(skill)!!
+                    skillsComponent[skill]++
+                    player.world.playSoundFromEntity(
+                        null, player,
+                        SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f
+                    )
+                }
+            }
+
+            // Join without class
+            ServerPlayConnectionEvents.JOIN.register { handler, sender, _ ->
+                val player = handler.player
+                if (player[SkillsComponent].skillClass != null) return@register
+                sender.sendPacket(ChooseClassPayload)
+                player.abilities.invulnerable = true
+                player.sendAbilitiesUpdate()
+            }
         }
     }
 }

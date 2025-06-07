@@ -10,16 +10,11 @@ import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
 import archives.tater.rpgskills.util.withFirst
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.Drawable
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ButtonWidget
-import net.minecraft.client.gui.widget.ScrollableWidget
-import net.minecraft.client.gui.widget.Widget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.screen.ScreenTexts
-import net.minecraft.text.Text
 
 class SkillScreen(
     private val player: PlayerEntity,
@@ -57,7 +52,7 @@ class SkillScreen(
             }
             .toList()
 
-        addDrawableChild(Scrolling(x + 9, y + 42, 226, 141, attributesWidget?.let(lockWidgets::withFirst) ?: lockWidgets))
+        addDrawableChild(AutoScrollingWidget(x + 9, y + 42, 234, 141, attributesWidget?.let(lockWidgets::withFirst) ?: lockWidgets))
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.BACK) { close() }.apply {
             width(200)
@@ -87,36 +82,5 @@ class SkillScreen(
 
         const val WIDTH = 252
         const val HEIGHT = 192
-    }
-
-    class Scrolling<T>(
-        x: Int,
-        y: Int,
-        width: Int,
-        height: Int,
-        private val contents: List<T>
-    ) : ScrollableWidget(x, y, width, height, Text.empty()) where T: Widget, T: Drawable {
-
-        private val contentsHeight = contents.fold(1) { currentY, widget ->
-            widget.y = y + currentY
-            currentY + widget.height + GAP
-        }
-
-        override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {}
-
-        override fun getContentsHeight(): Int = contentsHeight
-
-        override fun getDeltaYPerScroll(): Double = 9.0
-
-        override fun drawBox(context: DrawContext?) {}
-
-        override fun renderContents(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-            for (drawable in contents)
-                drawable.render(context, mouseX, mouseY, delta)
-        }
-
-        companion object {
-            const val GAP = 2
-        }
     }
 }

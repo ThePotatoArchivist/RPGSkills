@@ -19,7 +19,7 @@ data class RecipeBlockedPayload(val lockGroup: Optional<LockGroup>) : CustomPayl
         val CODEC: PacketCodec<RegistryByteBuf, RecipeBlockedPayload> = PacketCodec.tuple(PacketCodecs.optional(PacketCodecs.registryValue(LockGroup.key)), RecipeBlockedPayload::lockGroup) {
             if (it.isEmpty) EMPTY else RecipeBlockedPayload(it)
         }
-        val ID: Id<RecipeBlockedPayload> = Id(RPGSkills.id("recipe_blocked"))
+        val ID = Id<RecipeBlockedPayload>(RPGSkills.id("recipe_blocked"))
 
         @JvmField
         val EMPTY = RecipeBlockedPayload(Optional.empty())

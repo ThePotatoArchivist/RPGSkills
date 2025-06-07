@@ -4,6 +4,7 @@ import archives.tater.rpgskills.ItemLockTooltip
 import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
+import archives.tater.rpgskills.client.gui.screen.ClassScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.gui.widget.AttributesWidget
 import archives.tater.rpgskills.client.gui.widget.LockGroupWidget
@@ -28,8 +29,11 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
         translationBuilder.add(RPGSkillsCommands.ADD_LEVEL, "Gave %3$s levels in skill %2$s to %1$s")
         translationBuilder.add(RPGSkillsCommands.ADD_POINTS, "Gave %2$s level points to %s")
         translationBuilder.add(RPGSkillsCommands.SET_POINTS, "Set %2$s level points on %s")
+        translationBuilder.add(RPGSkillsCommands.RESET_CLASS, "Reset class for %s")
+        translationBuilder.add(RPGSkillsCommands.SET_CLASS, "Set class for %s to %s")
         translationBuilder.add(SkillsScreen.TITLE, "Skills")
         translationBuilder.add(SkillTabWidget.TOOLTIP, "Level %s")
+        translationBuilder.add(ClassScreen.SELECT, "Select Class")
         translationBuilder.add(LockGroupWidget.Texts.ITEMS, "Items")
         translationBuilder.add(LockGroupWidget.Texts.BLOCKS, "Blocks")
         translationBuilder.add(LockGroupWidget.Texts.ENTITIES, "Entities")
