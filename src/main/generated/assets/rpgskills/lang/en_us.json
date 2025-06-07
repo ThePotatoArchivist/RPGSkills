@@ -11,6 +11,7 @@
   "commands.rpgskills.skills.levelpoints.set": "Set %2$s level points on %s",
   "commands.rpgskills.skills.list": "There are %s skills: %s",
   "commands.rpgskills.skills.list.none": "There are no skills",
+  "item.rpgskills.respec_item": "Respec Item",
   "key.rpgskills.screen.skills": "Open Skills",
   "rpgskills.lockgroup.block.message.default": "You don't know how to use this block",
   "rpgskills.lockgroup.entity.message.default": "You don't know how to interact with this mob",

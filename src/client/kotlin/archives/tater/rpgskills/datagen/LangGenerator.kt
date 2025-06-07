@@ -11,6 +11,7 @@ import archives.tater.rpgskills.client.gui.widget.LockGroupWidget
 import archives.tater.rpgskills.client.gui.widget.SkillTabWidget
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.data.LockGroup
+import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
@@ -52,5 +53,6 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
         translationBuilder.add(RPGSkillsClient.SKILLS_KEY_TRANSLATION, "Open Skills")
         translationBuilder.add(RPGSkillsAttributes.BOW_DRAW_TIME, "Bow Draw Time")
         translationBuilder.add(RPGSkillsAttributes.PROJECTILE_DIVERGENCE, "Projectile Divergence")
+        translationBuilder.add(RPGSkillsItems.RESPEC_ITEM, "Respec Item")
     }
 }

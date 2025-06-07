@@ -64,6 +64,14 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = getUpgradeCost(skill)
         ?.let { spendableLevels >= it } ?: false
 
+    fun resetSkillsToClass() {
+        _skills.clear()
+        skillClass?.value?.startingLevels?.let(_skills::putAll)
+        spentLevels = 0
+        updateAttributes()
+        key.sync(player)
+    }
+
     private fun getAttributeModifiers(): HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> =
         HashMultimap.create<RegistryEntry<EntityAttribute>, EntityAttributeModifier>().apply {
             for ((skill, playerLevel) in _skills)
@@ -142,9 +150,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                     RPGSkills.logger.warn("${player.name.string} tried to set skills class when it was already set")
                     return@registerGlobalReceiver
                 }
-                skillsComponent._skills.clear()
-                skillsComponent._skills.putAll(payload.skillClass.value.startingLevels) // Sync is taken care of by the following call
                 skillsComponent.skillClass = payload.skillClass
+                skillsComponent.resetSkillsToClass()
 
                 player.abilities.invulnerable = false
                 player.sendAbilitiesUpdate()

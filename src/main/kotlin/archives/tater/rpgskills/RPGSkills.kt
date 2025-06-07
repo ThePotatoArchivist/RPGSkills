@@ -4,6 +4,7 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.ClassChoicePayload
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
@@ -31,6 +32,8 @@ object RPGSkills : ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
+		RPGSkillsItems.register()
+
 		DynamicRegistries.registerSynced(Skill.key, Skill.CODEC)
 		DynamicRegistries.registerSynced(LockGroup.key, LockGroup.CODEC)
 		DynamicRegistries.registerSynced(SkillClass.key, SkillClass.CODEC)
