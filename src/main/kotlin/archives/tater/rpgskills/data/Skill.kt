@@ -42,7 +42,7 @@ data class Skill(
             ).apply(it, ::Skill)
         }
 
-        override val key: RegistryKey<Registry<Skill>> = RegistryKey.ofRegistry(RPGSkills.id("skills"))
+        override val key: RegistryKey<Registry<Skill>> = RegistryKey.ofRegistry(RPGSkills.id("skill"))
 
         val RegistryEntry<Skill>.name: MutableText get() = Text.literal(value.name)
         val RegistryEntry<Skill>.description: MutableText get() = Text.literal(value.description ?: "")
