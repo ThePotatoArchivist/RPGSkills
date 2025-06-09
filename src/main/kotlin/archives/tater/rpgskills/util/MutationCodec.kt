@@ -14,10 +14,10 @@ interface MutationCodec<A> : Encoder<A> {
     override fun <T> encode(input: A, ops: DynamicOps<T>, prefix: T): DataResult<T>
 
     fun codec(createDefault: () -> A) = object : Codec<A> {
-        override fun <T : Any?> encode(input: A, ops: DynamicOps<T>, prefix: T): DataResult<T> =
+        override fun <T> encode(input: A, ops: DynamicOps<T>, prefix: T): DataResult<T> =
             this@MutationCodec.encode(input, ops, prefix)
 
-        override fun <T : Any?> decode(ops: DynamicOps<T>, input: T): DataResult<Pair<A, T>> {
+        override fun <T> decode(ops: DynamicOps<T>, input: T): DataResult<Pair<A, T>> {
             return createDefault().apply {
                 var error: DataResult.Error<*>? = null
                 this@MutationCodec.update(this, ops, input).ifError { error = it }
@@ -39,7 +39,7 @@ fun <A, C: MutableCollection<A>> Codec<A>.mutateCollection() = object : Mutation
         }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Any?> encode(input: C, ops: DynamicOps<T>, prefix: T): DataResult<T> =
+    override fun <T> encode(input: C, ops: DynamicOps<T>, prefix: T): DataResult<T> =
         listCodec.encode(input as? List<A> ?: input.toList(), ops, prefix)
 }
 
@@ -50,7 +50,7 @@ fun <K, V> Codec<Map<K, V>>.mutate() = object : MutationCodec<MutableMap<K, V>> 
             target.putAll(it.first)
         }
 
-    override fun <T : Any?> encode(input: MutableMap<K, V>, ops: DynamicOps<T>, prefix: T): DataResult<T> =
+    override fun <T> encode(input: MutableMap<K, V>, ops: DynamicOps<T>, prefix: T): DataResult<T> =
         this@mutate.encode(input, ops, prefix)
 }
 
