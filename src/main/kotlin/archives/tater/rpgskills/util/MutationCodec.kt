@@ -118,11 +118,11 @@ fun <M, A: Any> MapCodec<Optional<A>>.forAccess(property: KMutableProperty1<M, A
 
 fun <A> RecordMutationCodec(vararg codecs: RecordMutationCodec<A>) = object : RecordMutationCodec<A>() {
     override fun <T> update(ops: DynamicOps<T>, input: MapLike<T>, target: A): DataResult<*> {
-        val results = codecs.mapNotNull { codec ->
-            codec.update(ops, input, target).takeIf { it.isError }
-        }
-        return if (results.isEmpty()) DataResult.success(DFUnit.INSTANCE) else DataResult.error<DFUnit> {
-            "Some or all fields could not be read: ${results.filter { it.isError }.joinToString(", ") { (it as DataResult.Error).message() }}"
+        val errors = codecs
+            .map { it.update(ops, input, target) }
+            .filter { it.isError }
+        return if (errors.isEmpty()) DataResult.success(DFUnit.INSTANCE) else DataResult.error<DFUnit> {
+            "Some or all fields could not be read: ${errors.joinToString(", ") { (it as DataResult.Error).message() }}"
         }
     }
 
