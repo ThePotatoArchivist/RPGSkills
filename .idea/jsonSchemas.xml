@@ -3,6 +3,25 @@
   <component name="JsonSchemaMappingsProjectConfiguration">
     <state>
       <map>
+        <entry key="Class">
+          <value>
+            <SchemaInfo>
+              <option name="generatedName" value="New Schema" />
+              <option name="name" value="Class" />
+              <option name="relativePathToSchema" value="assets/schemas/class.json" />
+              <option name="schemaVersion" value="JSON Schema 7" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="data/*/rpgskills/class/*.json" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
         <entry key="Lock Group">
           <value>
             <SchemaInfo>
@@ -33,7 +52,7 @@
                 <list>
                   <Item>
                     <option name="pattern" value="true" />
-                    <option name="path" value="data/*/rpgskills/skills/*.json" />
+                    <option name="path" value="data/*/rpgskills/skill/*.json" />
                     <option name="mappingKind" value="Pattern" />
                   </Item>
                 </list>

@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "Identifier": {
+      "pattern": "^[a-z0-9_.-]+:[a-z0-9/._-]+$",
+      "type": "string"
+    },
+    "ItemStack": {
+      "additionalProperties": false,
+      "properties": {
+        "components": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {}
+          }
+        },
+        "count": {
+          "type": "integer"
+        },
+        "id": {
+          "$ref": "#/definitions/Identifier"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "icon": {
+      "$ref": "#/definitions/ItemStack"
+    },
+    "description": {
+      "type": "string"
+    },
+    "starting_levels": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "name",
+    "icon",
+    "description",
+    "starting_levels"
+  ]
+}
