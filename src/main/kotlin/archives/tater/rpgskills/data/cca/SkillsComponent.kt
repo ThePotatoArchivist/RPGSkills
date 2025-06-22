@@ -34,7 +34,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         get() = _skills
 
     var level = 0
-        private set
+        private set // managed by _points
 
     private var _points = 0
         set(value) {
@@ -105,6 +105,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         sameCharacter
 
     override fun copyFrom(other: SkillsComponent, registryLookup: RegistryWrapper.WrapperLookup) {
+        _skillClass = other._skillClass
         _skills = other._skills
         _points = other.points
         spentLevels = other.spentLevels
@@ -169,7 +170,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                 skillsComponent.skillClass = payload.skillClass
                 skillsComponent.resetSkillsToClass()
 
-                player.abilities.invulnerable = false
+                player.interactionManager.gameMode.setAbilities(player.abilities)
                 player.sendAbilitiesUpdate()
             }
 

@@ -47,16 +47,16 @@ class SkillPointOrbEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRe
 //        val blue = 255
 
         val scale = 0.3f + 0.01f * (entity.amount - 1)
-        matrices.translate(0f, 0.1f, 0f)
+        matrices.translate(0f, 0.15f, 0f)
         matrices.multiply(dispatcher.rotation)
         matrices.scale(scale, scale, scale)
 
         val vertexConsumer = vertexConsumers.getBuffer(LAYER)
         val entry = matrices.peek()
-        vertex(vertexConsumer, entry, -0.5f, -0.25f, alpha, 0f, 1f, light)
-        vertex(vertexConsumer, entry, 0.5f, -0.25f, alpha, 1f, 1f, light)
-        vertex(vertexConsumer, entry, 0.5f, 0.75f, alpha, 1f, 0f, light)
-        vertex(vertexConsumer, entry, -0.5f, 0.75f, alpha, 0f, 0f, light)
+        vertex(vertexConsumer, entry, -0.5f, -0.5f, alpha, 0f, 1f, light)
+        vertex(vertexConsumer, entry, 0.5f, -0.5f, alpha, 1f, 1f, light)
+        vertex(vertexConsumer, entry, 0.5f, 0.5f, alpha, 1f, 0f, light)
+        vertex(vertexConsumer, entry, -0.5f, 0.5f, alpha, 0f, 0f, light)
 
         matrices.pop()
 
