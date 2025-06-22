@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.data.cca
 
-import archives.tater.rpgskills.data.SkillPointConstants
+import archives.tater.rpgskills.RPGSkills
 import net.minecraft.block.entity.MobSpawnerBlockEntity
 import net.minecraft.entity.mob.MobEntity
 import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry
@@ -21,7 +21,7 @@ object RPGSkillsComponents : EntityComponentInitializer, ChunkComponentInitializ
 
     override fun registerChunkComponentFactories(registry: ChunkComponentFactoryRegistry) {
         registry.register(SkillSourceComponent.KEY) {
-            SkillSourceComponent(SkillPointConstants.CHUNK_SKILL_POINTS) { it.setNeedsSaving(true) }
+            SkillSourceComponent(RPGSkills.CONFIG.chunkSkillPoints) { it.setNeedsSaving(true) }
         }
     }
 
@@ -31,7 +31,7 @@ object RPGSkillsComponents : EntityComponentInitializer, ChunkComponentInitializ
 
     override fun registerBlockComponentFactories(registry: BlockComponentFactoryRegistry) {
         registry.registerFor(MobSpawnerBlockEntity::class.java, SkillSourceComponent.KEY) {
-            SkillSourceComponent(SkillPointConstants.SPAWNER_SKILL_POINTS) { it.markDirty() }
+            SkillSourceComponent(RPGSkills.CONFIG.spawnerSkillPoints) { it.markDirty() }
         }
     }
 }

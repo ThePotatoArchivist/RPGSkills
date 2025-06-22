@@ -9,6 +9,7 @@ object RPGSkillsTags {
     private fun <T> of(registry: RegistryKey<Registry<T>>, path: String): TagKey<T> = TagKey.of(registry, RPGSkills.id(path))
 
     private fun ofEntity(path: String) = of(RegistryKeys.ENTITY_TYPE, path)
+    private fun ofStructure(path: String) = of(RegistryKeys.STRUCTURE, path)
 
     val MINIBOSS = ofEntity("bosses/miniboss")
     val BASIC_BOSS = ofEntity("bosses/basic")
@@ -17,4 +18,7 @@ object RPGSkillsTags {
     val FINAL_BOSS = ofEntity("bosses/final")
     val DLC_BOSS = ofEntity("bosses/dlc")
     val IGNORES_SKILL_SOURCE = ofEntity("ignores_skill_source")
+
+    val MID_STRUCTURES = ofStructure("skill/mid")
+    val HARD_STRUCTURES = ofStructure("skill/hard")
 }

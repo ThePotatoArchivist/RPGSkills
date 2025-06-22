@@ -138,12 +138,12 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        CODEC.encode(this, nbt)
+        CODEC.encode(this, nbt).logIfError()
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         _owner = null // will be recalculated on the next access
-        CODEC.update(this, nbt)
+        CODEC.update(this, nbt).logIfError()
     }
 
     override fun createSpawnPacket(entityTrackerEntry: EntityTrackerEntry): Packet<ClientPlayPacketListener> =

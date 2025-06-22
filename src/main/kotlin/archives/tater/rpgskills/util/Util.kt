@@ -118,6 +118,7 @@ infix fun ItemStack.isOf(item: Item) = this.isOf(item)
 infix fun ItemStack.isIn(tag: TagKey<Item>) = this.isIn(tag)
 infix fun EntityType<*>.isIn(tag: TagKey<EntityType<*>>) = this.isIn(tag)
 infix fun Entity.isIn(tag: TagKey<EntityType<*>>) = type isIn tag
+infix fun <T> RegistryEntry<T>.isIn(tag: TagKey<T>) = this.isIn(tag)
 
 fun <T, K, V> Iterable<T>.associateNotNull(transform: (T) -> Pair<K, V>?) = mapNotNull(transform).toMap()
 

@@ -30,18 +30,18 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     var skillClass by ::_skillClass.synced(key, player)
 
     private var _skills = mutableMapOf<RegistryEntry<Skill>, Int>()
-    val skills: Map<RegistryEntry<Skill>, Int> get() = _skills
+    val skills: Map<RegistryEntry<Skill>, Int>
+        get() = _skills
+
+    var level = 0
+        private set
 
     private var _points = 0
-    var points
-        get() = _points
         set(value) {
-            _points = value.coerceAtMost(MAX_POINTS)
-            key.sync(player)
+            field = value.coerceAtMost(MAX_POINTS)
+            level = getLevelForPoints(value)
         }
-
-    val level
-        get() = getLevelForPoints(points)
+    var points by ::_points.synced(key, player)
 
     private var spentLevels = 0
     var spendableLevels
@@ -134,7 +134,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
         const val MAX_LEVEL = 50
 
-        private val LEVEL_REQUIREMENTS = (1..MAX_LEVEL)
+        private val LEVEL_REQUIREMENTS = (0..<MAX_LEVEL)
             .runningFold(0) { acc, lvl -> acc + getPointsForNextLevel(lvl) }
         private val LEVEL_REQUIREMENTS_REVERSED = LEVEL_REQUIREMENTS.withIndex().reversed()
 
@@ -151,11 +151,11 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         }
 
         fun getLevelForPoints(points: Int): Int =
-            LEVEL_REQUIREMENTS_REVERSED.firstNotNullOfOrNull { (level, required) -> level.takeIf { required < points } }
+            LEVEL_REQUIREMENTS_REVERSED.firstNotNullOfOrNull { (level, required) -> level.takeIf { required <= points } }
                 ?: 0
 
         fun getRemainingPoints(points: Int) =
-            points - (LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required < points }?.value ?: 0)
+            points - (LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required <= points }?.value ?: 0)
 
         fun registerEvents() {
             // Choose class

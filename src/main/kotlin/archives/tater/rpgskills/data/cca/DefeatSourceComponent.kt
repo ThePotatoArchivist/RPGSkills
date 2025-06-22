@@ -2,7 +2,6 @@ package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
-import archives.tater.rpgskills.data.SkillPointConstants
 import archives.tater.rpgskills.data.SkillSource
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.util.*
@@ -56,7 +55,7 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
             skillSource.getComponent(entity.world) ?: return mapOf()
 
         return skillPointProportions.mapValues { (uuid, proportion) ->
-            val points = (proportion * SkillPointConstants.getEntityPoints(entity)).toInt()
+            val points = (proportion * RPGSkills.CONFIG.getEntityPoints(entity)).toInt()
             source?.removeSkillPoints(uuid, points) ?: points
         }
     }

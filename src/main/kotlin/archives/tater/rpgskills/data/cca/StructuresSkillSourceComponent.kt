@@ -1,7 +1,6 @@
 package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.data.SkillPointConstants
 import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -9,19 +8,22 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
+import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.util.math.BlockBox
 import net.minecraft.world.World
 import net.minecraft.world.gen.structure.Structure
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
+import kotlin.jvm.optionals.getOrNull
 
 class StructuresSkillSourceComponent(val world: World) : Component {
     private val structures = mutableListOf<Entry>()
 
     fun getOrCreate(box: BlockBox, structure: RegistryKey<Structure>): SkillSourceComponent =
         (structures.firstOrNull { it.box == box && it.structure == structure }
-            ?: Entry(box, structure, SkillSourceComponent(SkillPointConstants.getStructurePoints(structure))).also(structures::add)
+            ?: Entry(box, structure, SkillSourceComponent(getStructurePoints(structure)))
+                .also(structures::add)
         ).component
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
@@ -31,6 +33,12 @@ class StructuresSkillSourceComponent(val world: World) : Component {
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         CODEC.encode(this, tag).logIfError()
     }
+
+    private fun getStructure(key: RegistryKey<Structure>): RegistryEntry.Reference<Structure>? =
+        world.registryManager[RegistryKeys.STRUCTURE].getEntry(key).getOrNull()
+
+    private fun getStructurePoints(key: RegistryKey<Structure>) =
+        getStructure(key)?.let { RPGSkills.CONFIG.getStructurePoints(it) } ?: 0
 
     companion object : ComponentKeyHolder<StructuresSkillSourceComponent, World> {
         val CODEC = recordMutationCodec(
