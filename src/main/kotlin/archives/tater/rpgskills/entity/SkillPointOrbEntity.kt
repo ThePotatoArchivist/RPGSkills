@@ -1,12 +1,15 @@
 package archives.tater.rpgskills.entity
 
 import archives.tater.rpgskills.data.cca.SkillsComponent
-import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.*
+import com.mojang.serialization.Codec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.MovementType
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
+import net.minecraft.entity.data.TrackedData
+import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.listener.ClientPlayPacketListener
@@ -17,6 +20,7 @@ import net.minecraft.server.network.EntityTrackerEntry
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
+import net.minecraft.util.Uuids
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper.square
 import net.minecraft.util.math.Vec3d
@@ -43,9 +47,12 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
         }
     private var nearOwner = false
 
-    constructor(world: World, x: Double, y: Double, z: Double, owner: PlayerEntity?) : this(RPGSkillsEntities.SKILL_POINT_ORB, world) {
+    var amount by AMOUNT
+
+    constructor(world: World, x: Double, y: Double, z: Double, owner: PlayerEntity?, amount: Int = 1) : this(RPGSkillsEntities.SKILL_POINT_ORB, world) {
         setPosition(x, y, z)
         this.owner = owner
+        this.amount = amount
         yaw = random.nextFloat() * 360f
         setVelocity(
             random.nextDouble() * 0.4 - 0.2,
@@ -56,7 +63,8 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
 
     override fun getMoveEffect(): MoveEffect = MoveEffect.NONE
 
-    override fun initDataTracker(builder: DataTracker.Builder?) {
+    override fun initDataTracker(builder: DataTracker.Builder) {
+        builder.add(AMOUNT, 1)
     }
 
     override fun getGravity(): Double = 0.03
@@ -130,18 +138,12 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        nbt.putShort("Health", health.toShort())
-        nbt.putShort("Age", orbAge.toShort())
-        ownerUuid ?.let { nbt.putUuid("Owner", it) }
+        CODEC.encode(this, nbt)
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        health = nbt.getShort("Health").toInt()
-        orbAge = nbt.getShort("Age").toInt()
-        if (nbt.containsUuid("Owner")) {
-            _owner = null
-            ownerUuid = nbt.getUuid("Owner")
-        }
+        _owner = null // will be recalculated on the next access
+        CODEC.update(this, nbt)
     }
 
     override fun createSpawnPacket(entityTrackerEntry: EntityTrackerEntry): Packet<ClientPlayPacketListener> =
@@ -157,10 +159,10 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
     override fun getSoundCategory(): SoundCategory = SoundCategory.AMBIENT
 
     override fun onPlayerCollision(player: PlayerEntity?) {
-        if (player !is ServerPlayerEntity || (ownerUuid != null && player != owner) || player.experiencePickUpDelay > 0) return
+        if (player !is ServerPlayerEntity || (ownerUuid != null && player != owner) || player.experiencePickUpDelay > 0 || player[SkillsComponent].isPointsFull) return
         player.experiencePickUpDelay = 2
         player.sendPickup(this, 1)
-        player[SkillsComponent].points++
+        player[SkillsComponent].points += amount
         discard()
     }
 
@@ -168,13 +170,28 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
         private const val DESPAWN_AGE = 6000
         private const val EXPENSIVE_UPDATE_INTERVAL = 20
         private const val MAX_TARGET_DISTANCE = 8
+        private const val MAX_SIMULTANEOUS_SPAWN = 20
+
+        val CODEC = recordMutationCodec(
+            Codec.INT.fieldOf("health").forAccess(SkillPointOrbEntity::health),
+            Codec.INT.fieldOf("orb_age").forAccess(SkillPointOrbEntity::orbAge),
+            Uuids.CODEC.optionalFieldOf("owner").forAccess(SkillPointOrbEntity::ownerUuid),
+            Codec.INT.fieldOf("amount").forAccess(SkillPointOrbEntity::amount),
+        )
+
+        val AMOUNT: TrackedData<Int> = DataTracker.registerData(SkillPointOrbEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
 
         @JvmStatic
         fun spawnOrbs(world: ServerWorld, owner: PlayerEntity?, pos: Vec3d, amount: Int) {
-            repeat (amount) {
-                world.spawnEntity(SkillPointOrbEntity(world, pos.getX(), pos.getY(), pos.getZ(), owner))
+            if (amount == 0) return
+            val normalOrbAmount = amount ceilDiv amount.coerceAtMost(MAX_SIMULTANEOUS_SPAWN)
+            val normalOrbCount = amount / normalOrbAmount
+            val lastOrbAmount = amount - normalOrbAmount * (normalOrbCount)
+            repeat(normalOrbCount) {
+                world.spawnEntity(SkillPointOrbEntity(world, pos.getX(), pos.getY(), pos.getZ(), owner, normalOrbAmount))
             }
+            if (lastOrbAmount > 0)
+                world.spawnEntity(SkillPointOrbEntity(world, pos.getX(), pos.getY(), pos.getZ(), owner, lastOrbAmount))
         }
-
     }
 }

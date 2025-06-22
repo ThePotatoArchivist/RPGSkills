@@ -4,24 +4,22 @@ import archives.tater.rpgskills.RPGSkills
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
-import com.mojang.serialization.DynamicOps
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
+import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityType
+import net.minecraft.entity.data.TrackedData
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtElement
 import net.minecraft.nbt.NbtList
-import net.minecraft.nbt.NbtOps
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryOps
 import net.minecraft.registry.RegistryWrapper
-import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.resource.ResourceManager
@@ -118,6 +116,8 @@ operator fun <T> DFPair<*, T>.component2(): T = second
 
 infix fun ItemStack.isOf(item: Item) = this.isOf(item)
 infix fun ItemStack.isIn(tag: TagKey<Item>) = this.isIn(tag)
+infix fun EntityType<*>.isIn(tag: TagKey<EntityType<*>>) = this.isIn(tag)
+infix fun Entity.isIn(tag: TagKey<EntityType<*>>) = type isIn tag
 
 fun <T, K, V> Iterable<T>.associateNotNull(transform: (T) -> Pair<K, V>?) = mapNotNull(transform).toMap()
 
@@ -148,22 +148,6 @@ fun <T: DataResult<*>> T.logIfError(logger: Logger = RPGSkills.logger): T {
     return this
 }
 
-fun <A> MutationCodec<A>.update(input: A, tag: NbtCompound) = update(input, NbtOps.INSTANCE, tag)
-
-fun <A> MutationCodec<A>.update(input: A, tag: NbtCompound, registryLookup: WrapperLookup) =
-    update(input, RegistryOps.of(NbtOps.INSTANCE, registryLookup), tag)
-
-fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, ops: DynamicOps<NbtElement> = NbtOps.INSTANCE): DataResult<*> =
-    encode(input, ops, tag).flatMap {
-        val compound = it as? NbtCompound ?: return@flatMap DataResult.error({ "$it was not an NbtCompound" }, it)
-        for (key in compound.keys)
-            tag.put(key, compound[key])
-        DataResult.success(it)
-    }
-
-fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, registryLookup: WrapperLookup) =
-    encode(input, tag, RegistryOps.of(NbtOps.INSTANCE, registryLookup))
-
 infix fun Int.ceilDiv(other: Int) = (this + other - 1) / other
 
 fun <T> Collection<T>.withFirst(element: T): List<T> {
@@ -171,4 +155,9 @@ fun <T> Collection<T>.withFirst(element: T): List<T> {
     result.add(element)
     result.addAll(this)
     return result
+}
+
+operator fun <T> TrackedData<T>.getValue(thisRef: Entity, property: KProperty<*>): T = thisRef.dataTracker[this]
+operator fun <T> TrackedData<T>.setValue(thisRef: Entity, property: KProperty<*>, value: T) {
+    thisRef.dataTracker[this] = value
 }

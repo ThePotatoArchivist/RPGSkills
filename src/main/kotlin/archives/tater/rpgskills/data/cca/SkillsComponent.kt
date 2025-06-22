@@ -33,7 +33,12 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     val skills: Map<RegistryEntry<Skill>, Int> get() = _skills
 
     private var _points = 0
-    var points by ::_points.synced(key, player)
+    var points
+        get() = _points
+        set(value) {
+            _points = value.coerceAtMost(MAX_POINTS)
+            key.sync(player)
+        }
 
     val level
         get() = getLevelForPoints(points)
@@ -46,7 +51,9 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             key.sync(player)
         }
 
-    val levelProgress get() = getRemainingPoints(points) / getPointsForNextLevel(level + 1).toFloat()
+    val levelProgress get() = getRemainingPoints(points) / getPointsForNextLevel(level).toFloat()
+
+    val isPointsFull get() = level >= MAX_LEVEL
 
     private var modifiers: HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> =
         HashMultimap.create()
@@ -125,14 +132,23 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         override val key: ComponentKey<SkillsComponent> =
             ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
 
-        private val LEVEL_REQUIREMENTS = (0..100)
+        const val MAX_LEVEL = 50
+
+        private val LEVEL_REQUIREMENTS = (1..MAX_LEVEL)
             .runningFold(0) { acc, lvl -> acc + getPointsForNextLevel(lvl) }
         private val LEVEL_REQUIREMENTS_REVERSED = LEVEL_REQUIREMENTS.withIndex().reversed()
 
+        val MAX_POINTS = LEVEL_REQUIREMENTS[MAX_LEVEL]
+
         /**
-         * @return The number of points needed to get to `level` from `level - 1`
+         * Matches vanilla XP
+         * @return The number of points needed to get to `currentLevel + 1` from `currentLevel`
          */
-        fun getPointsForNextLevel(nextLevel: Int) = 10 + (nextLevel - 1) // TODO
+        fun getPointsForNextLevel(currentLevel: Int) = when {
+            currentLevel < 16 -> 2 * currentLevel + 7
+            currentLevel < 31 -> 5 * currentLevel - 28
+            else -> 9 * currentLevel - 158
+        }
 
         fun getLevelForPoints(points: Int): Int =
             LEVEL_REQUIREMENTS_REVERSED.firstNotNullOfOrNull { (level, required) -> level.takeIf { required < points } }

@@ -1,0 +1,8 @@
+// 1.21.1	2025-06-21T23:54:27.83190016	RPG Skills/Tags for minecraft:entity_type
+48feb07cbb3f1906b0d7038b7282c8bddf242ab3 data/rpgskills/tags/entity_type/bosses/dlc.json
+81eef2967c09406dbd97d60fc3de59e0b368d784 data/rpgskills/tags/entity_type/ignores_skill_source.json
+c6304b7e4d04459824f39e9101ab5025473e5642 data/rpgskills/tags/entity_type/bosses/final.json
+02b6a7799286f073bd43ecf20b3eab2e16d73deb data/rpgskills/tags/entity_type/bosses/basic.json
+da7bd94033dc2fcf5c5ec79ce3937c1c93f2197f data/rpgskills/tags/entity_type/bosses/miniboss.json
+a060d789fd17db1a7ac0e141958107ca1780f474 data/rpgskills/tags/entity_type/bosses/early.json
+04ef505b25e4a12d58308675a1211840fb51880f data/rpgskills/tags/entity_type/bosses/mid.json

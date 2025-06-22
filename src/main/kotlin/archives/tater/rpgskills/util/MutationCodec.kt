@@ -2,6 +2,11 @@ package archives.tater.rpgskills.util
 
 import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.*
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtElement
+import net.minecraft.nbt.NbtOps
+import net.minecraft.registry.RegistryOps
+import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import java.util.*
 import java.util.stream.Stream
 import kotlin.jvm.optionals.getOrNull
@@ -136,3 +141,21 @@ fun <A> RecordMutationCodec(vararg codecs: RecordMutationCodec<A>) = object : Re
 }
 
 fun <A> recordMutationCodec(vararg codecs: RecordMutationCodec<A>) = RecordMutationCodec(*codecs).codec()
+
+fun <A> MutationCodec<A>.update(input: A, tag: NbtCompound, ops: DynamicOps<NbtElement> = NbtOps.INSTANCE) =
+    update(input, ops, tag)
+
+fun <A> MutationCodec<A>.update(input: A, tag: NbtCompound, registryLookup: WrapperLookup) =
+    update(input, tag, RegistryOps.of(NbtOps.INSTANCE, registryLookup))
+
+fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, ops: DynamicOps<NbtElement> = NbtOps.INSTANCE): DataResult<*> =
+    encode(input, ops, tag).flatMap {
+        val compound = it as? NbtCompound ?: return@flatMap DataResult.error({ "$it was not an NbtCompound" }, it)
+        for (key in compound.keys)
+            tag.put(key, compound[key])
+        DataResult.success(it)
+    }
+
+fun <A> MutationCodec<A>.encode(input: A, tag: NbtCompound, registryLookup: WrapperLookup) =
+    encode(input, tag, RegistryOps.of(NbtOps.INSTANCE, registryLookup))
+

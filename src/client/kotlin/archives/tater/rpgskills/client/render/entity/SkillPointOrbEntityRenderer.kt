@@ -26,7 +26,7 @@ class SkillPointOrbEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRe
         x: Double,
         y: Double,
         z: Double
-    ): Boolean = super.shouldRender(entity, frustum, x, y, z) && entity.owner == MinecraftClient.getInstance().player
+    ): Boolean = super.shouldRender(entity, frustum, x, y, z) && (entity.owner == null || entity.owner == MinecraftClient.getInstance().player)
 
     override fun render(
         entity: SkillPointOrbEntity,
@@ -46,9 +46,10 @@ class SkillPointOrbEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRe
 //        val green = ((sin(age) + 3f) * 0.25f * 255f).toInt()
 //        val blue = 255
 
+        val scale = 0.3f + 0.01f * (entity.amount - 1)
         matrices.translate(0f, 0.1f, 0f)
         matrices.multiply(dispatcher.rotation)
-        matrices.scale(0.3f, 0.3f, 0.3f)
+        matrices.scale(scale, scale, scale)
 
         val vertexConsumer = vertexConsumers.getBuffer(LAYER)
         val entry = matrices.peek()

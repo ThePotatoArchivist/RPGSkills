@@ -50,9 +50,14 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
     }
 
     fun getSkillPointAmounts(): Map<UUID, Int> {
-        val source = skillSource.getComponent(entity.world) ?: return mapOf()
+        val source = if (entity isIn RPGSkillsTags.IGNORES_SKILL_SOURCE)
+            null
+        else
+            skillSource.getComponent(entity.world) ?: return mapOf()
+
         return skillPointProportions.mapValues { (uuid, proportion) ->
-            source.removeSkillPoints(uuid, (proportion * SkillPointConstants.getEntityPoints(entity)).toInt())
+            val points = (proportion * SkillPointConstants.getEntityPoints(entity)).toInt()
+            source?.removeSkillPoints(uuid, points) ?: points
         }
     }
 
@@ -69,7 +74,7 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
             val component = entity[DefeatSourceComponent]
             if (component.skillSource != SkillSource.EmptySource) return
 
-            val structure = (entity.world as ServerWorld).structureAccessor.getStructureContaining(entity.blockPos, RPGSkillsTags.HAS_SKILL_POOL_STRUCTURE)
+            val structure = (entity.world as ServerWorld).structureAccessor.getStructureContaining(entity.blockPos) { true }
             component.skillSource =
                 if (structure != StructureStart.DEFAULT)
                     SkillSource.StructureSource(structure.boundingBox, entity.registryManager[RegistryKeys.STRUCTURE].getKey(structure.structure).orElseThrow())

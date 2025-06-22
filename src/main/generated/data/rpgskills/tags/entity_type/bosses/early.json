@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "cataclysm:netherite_monstrosity",
+      "required": false
+    },
+    {
+      "id": "cataclysm:ender_guardian",
+      "required": false
+    }
+  ]
+}
