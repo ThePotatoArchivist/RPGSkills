@@ -190,9 +190,9 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             }
 
             // Join without class
-            ServerPlayConnectionEvents.JOIN.register { handler, sender, _ ->
+            ServerPlayConnectionEvents.JOIN.register { handler, sender, server ->
                 val player = handler.player
-                if (player[SkillsComponent].skillClass != null) return@register
+                if (player[SkillsComponent].skillClass != null || server.registryManager[SkillClass].isEmpty()) return@register
                 sender.sendPacket(ChooseClassPayload)
                 player.abilities.invulnerable = true
                 player.sendAbilitiesUpdate()

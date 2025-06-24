@@ -7,11 +7,13 @@ import archives.tater.rpgskills.client.render.SkillBarRenderer
 import archives.tater.rpgskills.client.render.entity.SkillPointOrbEntityRenderer
 import archives.tater.rpgskills.client.util.wasPressed
 import archives.tater.rpgskills.data.LockGroup
+import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.entity.RPGSkillsEntities
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.isEmpty
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
@@ -51,7 +53,7 @@ object RPGSkillsClient : ClientModInitializer {
 
 		ClientPlayNetworking.registerGlobalReceiver(ChooseClassPayload.ID) { _, context ->
 			val player = context.player()
-			if (player[SkillsComponent].skillClass == null)
+			if (player[SkillsComponent].skillClass == null && !player.registryManager[SkillClass].isEmpty())
 				context.client().setScreen(ClassScreen(player))
 		}
 

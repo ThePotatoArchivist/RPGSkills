@@ -168,3 +168,5 @@ fun <T> FabricTagProvider<T>.FabricTagBuilder.addOptional(vararg ids: Identifier
     for (id in ids)
         addOptional(id)
 }
+
+fun RegistryWrapper<*>.isEmpty() = streamEntries().findAny().isEmpty

@@ -18,6 +18,7 @@ import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.text.Text
 
+// NOTE: will crash if no classes exist
 class ClassScreen(
     val player: PlayerEntity,
 ) : Screen(Text.empty()), Paged {
