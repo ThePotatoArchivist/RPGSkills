@@ -39,6 +39,14 @@
     {
       "id": "cataclysm:aptrgangr",
       "required": false
+    },
+    {
+      "id": "cataclysm:hippocamtus",
+      "required": false
+    },
+    {
+      "id": "cataclysm:clawdian",
+      "required": false
     }
   ]
 }

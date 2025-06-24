@@ -32,7 +32,8 @@ class EntityTagGenerator(
 
             addOptional(cataclysmId("aptrgangr"))
 
-            // TODO Scylla miniboss(es)
+            addOptional(cataclysmId("hippocamtus"))
+            addOptional(cataclysmId("clawdian"))
         }
         getOrCreateTagBuilder(RPGSkillsTags.BASIC_BOSS).add(
             EntityType.ENDER_DRAGON,
