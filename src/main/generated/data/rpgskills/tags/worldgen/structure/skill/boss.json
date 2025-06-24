@@ -1,0 +1,36 @@
+{
+  "values": [
+    {
+      "id": "cataclysm:acropolis",
+      "required": false
+    },
+    {
+      "id": "cataclysm:ancient_factory",
+      "required": false
+    },
+    {
+      "id": "cataclysm:burning_arena",
+      "required": false
+    },
+    {
+      "id": "cataclysm:cursed_pyramid",
+      "required": false
+    },
+    {
+      "id": "cataclysm:frosted_prison",
+      "required": false
+    },
+    {
+      "id": "cataclysm:ruined_citadel",
+      "required": false
+    },
+    {
+      "id": "cataclysm:soul_black_smith",
+      "required": false
+    },
+    {
+      "id": "cataclysm:sunken_city",
+      "required": false
+    }
+  ]
+}

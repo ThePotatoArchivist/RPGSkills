@@ -8,6 +8,7 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.minecraft.entity.Entity
@@ -161,4 +162,9 @@ fun <T> Collection<T>.withFirst(element: T): List<T> {
 operator fun <T> TrackedData<T>.getValue(thisRef: Entity, property: KProperty<*>): T = thisRef.dataTracker[this]
 operator fun <T> TrackedData<T>.setValue(thisRef: Entity, property: KProperty<*>, value: T) {
     thisRef.dataTracker[this] = value
+}
+
+fun <T> FabricTagProvider<T>.FabricTagBuilder.addOptional(vararg ids: Identifier) {
+    for (id in ids)
+        addOptional(id)
 }

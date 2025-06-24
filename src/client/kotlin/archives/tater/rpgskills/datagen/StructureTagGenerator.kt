@@ -1,6 +1,8 @@
 package archives.tater.rpgskills.datagen
 
 import archives.tater.rpgskills.RPGSkillsTags
+import archives.tater.rpgskills.util.addOptional
+import archives.tater.rpgskills.util.cataclysmId
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.registry.RegistryKeys
@@ -23,6 +25,16 @@ class StructureTagGenerator(
             StructureKeys.MONUMENT,
             StructureKeys.MANSION,
             StructureKeys.TRIAL_CHAMBERS
+        )
+        getOrCreateTagBuilder(RPGSkillsTags.BOSS_STRUCTURES).addOptional(
+            cataclysmId("acropolis"),
+            cataclysmId("ancient_factory"),
+            cataclysmId("burning_arena"),
+            cataclysmId("cursed_pyramid"),
+            cataclysmId("frosted_prison"),
+            cataclysmId("ruined_citadel"),
+            cataclysmId("soul_black_smith"),
+            cataclysmId("sunken_city"),
         )
     }
 }

@@ -21,4 +21,5 @@ object RPGSkillsTags {
 
     val MID_STRUCTURES = ofStructure("skill/mid")
     val HARD_STRUCTURES = ofStructure("skill/hard")
+    val BOSS_STRUCTURES = ofStructure("skill/boss")
 }

@@ -20,6 +20,7 @@ data class RPGSkillsConfig(
     val structureSkillPoints: Map<TagKey<Structure>, Int> = mapOf(
         RPGSkillsTags.MID_STRUCTURES to 30,
         RPGSkillsTags.HARD_STRUCTURES to 50,
+        RPGSkillsTags.BOSS_STRUCTURES to 80,
     ),
     val defaultStructureSkillPoints: Int = 7,
     val entitySkillPoints: Map<TagKey<EntityType<*>>, Int> = mapOf(
