@@ -46,8 +46,8 @@ class SkillPointOrbEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRe
 //        val green = ((sin(age) + 3f) * 0.25f * 255f).toInt()
 //        val blue = 255
 
-        val scale = 0.3f + 0.01f * (entity.amount - 1)
-        matrices.translate(0f, 0.15f, 0f)
+        val scale = 0.3f + 0.02f * (entity.amount - 1)
+        matrices.translate(0f, 0.2f, 0f)
         matrices.multiply(dispatcher.rotation)
         matrices.scale(scale, scale, scale)
 
