@@ -15,14 +15,19 @@ class AlternateCodec<A>(
     private val useSecond: (A) -> Boolean,
 ) : Codec<A> {
     override fun <T : Any> decode(ops: DynamicOps<T>, input: T): DataResult<Pair<A, T>> {
-        first.decode(ops, input).let {
-            return if (it.result().isPresent) it else second.decode(ops, input)
+        val firstError = first.decode(ops, input).also {
+            if (it.isSuccess) return it
+        }
+        val secondError = second.decode(ops, input).also {
+            if (it.isSuccess) return it
+        }
+        return DataResult.error {
+            "Failed to parse alternatives. First: ${firstError.error().orElseThrow().message()}; Second: ${secondError.error().orElseThrow().message()}"
         }
     }
 
-    override fun <T : Any> encode(input: A, ops: DynamicOps<T>, prefix: T): DataResult<T> {
-        return (if (useSecond(input)) second else first).encode(input, ops, prefix)
-    }
+    override fun <T : Any> encode(input: A, ops: DynamicOps<T>, prefix: T): DataResult<T> =
+        (if (useSecond(input)) second else first).encode(input, ops, prefix)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
