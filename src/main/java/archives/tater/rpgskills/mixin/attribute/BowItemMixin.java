@@ -34,7 +34,7 @@ public abstract class BowItemMixin {
             at = @At(value = "CONSTANT", args = "floatValue=20.0")
     )
     private static float modifyDrawTime(float original) {
-        return rpgskills$user == null ? original : (float) rpgskills$user.getAttributeInstance(RPGSkillsAttributes.BOW_DRAW_TIME).getValue();
+        return rpgskills$user == null ? original : (float) rpgskills$user.getAttributeValue(RPGSkillsAttributes.BOW_DRAW_TIME);
     }
 
     @ModifyArg(

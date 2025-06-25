@@ -3,7 +3,6 @@ package archives.tater.rpgskills.data
 import archives.tater.rpgskills.data.cca.SkillSourceComponent
 import archives.tater.rpgskills.data.cca.StructuresSkillSourceComponent
 import archives.tater.rpgskills.data.cca.skillSource
-import archives.tater.rpgskills.util.field
 import archives.tater.rpgskills.util.get
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
@@ -34,8 +33,8 @@ sealed class SkillSource {
 
         companion object {
             val CODEC: MapCodec<ChunkSource> = RecordCodecBuilder.mapCodec { it.group(
-                field("x", ChunkSource::x, Codec.INT),
-                field("z", ChunkSource::z, Codec.INT),
+                Codec.INT.fieldOf("x").forGetter(ChunkSource::x),
+                Codec.INT.fieldOf("z").forGetter(ChunkSource::z),
             ).apply(it, ::ChunkSource) }
         }
     }
@@ -46,7 +45,7 @@ sealed class SkillSource {
 
         companion object {
             val CODEC: MapCodec<SpawnerSource> = RecordCodecBuilder.mapCodec { it.group(
-                field("pos", SpawnerSource::pos, BlockPos.CODEC)
+                BlockPos.CODEC.fieldOf("pos").forGetter(SpawnerSource::pos)
             ).apply(it, ::SpawnerSource) }
         }
     }
@@ -58,8 +57,8 @@ sealed class SkillSource {
         companion object {
             val CODEC: MapCodec<StructureSource> = RecordCodecBuilder.mapCodec {
                 it.group(
-                    field("box", StructureSource::box, BlockBox.CODEC),
-                    field("structure", StructureSource::structure, RegistryKey.createCodec(RegistryKeys.STRUCTURE)),
+                    BlockBox.CODEC.fieldOf("box").forGetter(StructureSource::box),
+                    RegistryKey.createCodec(RegistryKeys.STRUCTURE).fieldOf("structure").forGetter(StructureSource::structure),
                 ).apply(it, ::StructureSource)
             }
         }

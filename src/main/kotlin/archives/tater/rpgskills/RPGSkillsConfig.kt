@@ -47,7 +47,7 @@ data class RPGSkillsConfig(
             Codec.INT.fieldOf("spawner_skill_points").forGetter(RPGSkillsConfig::spawnerSkillPoints),
             Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.STRUCTURE), Codec.INT).fieldOf("structure_skill_points").forGetter(RPGSkillsConfig::structureSkillPoints),
             Codec.INT.fieldOf("default_structure_skill_points").forGetter(RPGSkillsConfig::defaultStructureSkillPoints),
-            Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.ENTITY_TYPE), Codec.INT).fieldOf("entity_skill_points").forGetter { it.entitySkillPoints },
+            Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.ENTITY_TYPE), Codec.INT).fieldOf("entity_skill_points").forGetter(RPGSkillsConfig::entitySkillPoints),
             Codec.INT.fieldOf("default_entity_skill_point_divisor").forGetter(RPGSkillsConfig::defaultEntitySkillPointDivisor),
         ).apply(it, ::RPGSkillsConfig) }
 

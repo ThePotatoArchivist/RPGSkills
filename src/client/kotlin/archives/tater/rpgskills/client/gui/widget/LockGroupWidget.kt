@@ -61,7 +61,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
             stacks.forEachIndexed { index, stack ->
                 val slotX = x + MARGIN + SLOT_SIZE * (index % columns)
                 val slotY = currentY + textRenderer.fontHeight + SLOT_SIZE * (index / columns)
-                context.drawGuiTexture(SLOT_TEXTURE, slotX, slotY, 0, 18, 18);
+                context.drawGuiTexture(SLOT_TEXTURE, slotX, slotY, 0, 18, 18)
                 context.drawItem(stack, slotX + 1, slotY + 1)
                 context.drawItemInSlot(textRenderer, stack, slotX + 1, slotY + 1)
             }

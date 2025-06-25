@@ -35,9 +35,4 @@ class RPGSkillsMixinConfigPlugin : IMixinConfigPlugin {
         mixinInfo: IMixinInfo?
     ) {
     }
-
-    companion object {
-        const val MIXIN_PACKAGE = "archives.tater.rpgskills.mixin.client"
-        const val MIXIN_COMPAT_PACKAGE = "$MIXIN_PACKAGE.compat"
-    }
 }

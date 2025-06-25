@@ -1,7 +1,10 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.util.*
+import archives.tater.rpgskills.util.AlternateCodec
+import archives.tater.rpgskills.util.RegistryKeyHolder
+import archives.tater.rpgskills.util.forGetter
+import archives.tater.rpgskills.util.value
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.entity.attribute.EntityAttribute
@@ -35,10 +38,10 @@ data class Skill(
     companion object : RegistryKeyHolder<Registry<Skill>> {
         val CODEC: Codec<Skill> = RecordCodecBuilder.create {
             it.group(
-                field("icon", Skill::icon, ItemStack.UNCOUNTED_CODEC),
-                field("levels", Skill::levels, Level.SHORT_CODEC.listOf()),
-                field("name", Skill::name, Codec.STRING),
-                optionalField("description", Skill::description, Codec.STRING)
+                ItemStack.UNCOUNTED_CODEC.fieldOf("icon").forGetter(Skill::icon),
+                Level.SHORT_CODEC.listOf().fieldOf("levels").forGetter(Skill::levels),
+                Codec.STRING.fieldOf("name").forGetter(Skill::name),
+                Codec.STRING.optionalFieldOf("description").forGetter(Skill::description)
             ).apply(it, ::Skill)
         }
 
@@ -56,8 +59,8 @@ data class Skill(
         companion object {
             val CODEC: Codec<Level> = RecordCodecBuilder.create {
                 it.group(
-                    field("cost", Level::cost, Codec.INT),
-                    field("attributes", Level::attributes, mapOf(), Codec.unboundedMap(Registries.ATTRIBUTE.entryCodec, AnonymousAttributeModifier.SHORT_CODEC)),
+                    Codec.INT.fieldOf("cost").forGetter(Level::cost),
+                    Codec.unboundedMap(Registries.ATTRIBUTE.entryCodec, AnonymousAttributeModifier.SHORT_CODEC).optionalFieldOf("attributes", mapOf()).forGetter(Level::attributes),
                 ).apply(it, ::Level)
             }
 
@@ -76,12 +79,12 @@ data class Skill(
         fun build(identifier: Identifier) = EntityAttributeModifier(identifier, amount, operation)
 
         companion object {
-            val CODEC = RecordCodecBuilder.create { it.group(
-                field("amount", AnonymousAttributeModifier::amount, Codec.DOUBLE),
-                field("operation", AnonymousAttributeModifier::operation, Operation.ADD_VALUE, Operation.CODEC)
+            val CODEC: Codec<AnonymousAttributeModifier> = RecordCodecBuilder.create { it.group(
+                Codec.DOUBLE.fieldOf("amount").forGetter(AnonymousAttributeModifier::amount),
+                Operation.CODEC.optionalFieldOf("operation", Operation.ADD_VALUE).forGetter(AnonymousAttributeModifier::operation)
             ).apply(it, ::AnonymousAttributeModifier) }
 
-            val SHORT_CODEC = AlternateCodec(
+            val SHORT_CODEC: Codec<AnonymousAttributeModifier> = AlternateCodec(
                 CODEC,
                 Codec.DOUBLE.xmap({ AnonymousAttributeModifier(it) }, { it.amount })
             ) { it.operation == Operation.ADD_VALUE }

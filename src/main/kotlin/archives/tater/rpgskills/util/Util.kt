@@ -2,7 +2,6 @@ package archives.tater.rpgskills.util
 
 import archives.tater.rpgskills.RPGSkills
 import com.google.common.collect.HashMultimap
-import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -39,17 +38,8 @@ import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KProperty
 import com.mojang.datafixers.util.Pair as DFPair
 
-internal fun <T, C> field(name: String, getter: (C) -> T, codec: Codec<T>): RecordCodecBuilder<C, T> =
-    codec.fieldOf(name).forGetter(getter)
-
-internal fun <T, C> field(name: String, getter: (C) -> T, codec: MapCodec<T>): RecordCodecBuilder<C, T> =
-    codec.fieldOf(name).forGetter(getter)
-
-internal fun <T, C> field(name: String, getter: (C) -> T, default: T, codec: Codec<T>): RecordCodecBuilder<C, T> =
-    codec.optionalFieldOf(name, default).forGetter(getter)
-
-internal fun <T: Any, C> optionalField(name: String, getter: (C) -> T?, codec: Codec<T>): RecordCodecBuilder<C, Optional<T>> =
-    codec.optionalFieldOf(name).forGetter { Optional.ofNullable(getter(it)) }
+internal inline fun <T: Any, C> MapCodec<Optional<T>>.forGetter(crossinline getter: (C) -> T?): RecordCodecBuilder<C, Optional<T>> =
+    forGetter { Optional.ofNullable(getter(it)) }
 
 inline val <T> RegistryEntry<T>.value: T get() = value()
 

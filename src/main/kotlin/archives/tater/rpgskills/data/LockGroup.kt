@@ -72,8 +72,8 @@ data class LockGroup(
 
         companion object {
             fun <T> createCodec(containerCodec: Codec<T>): Codec<LockList<T>> = RecordCodecBuilder.create { instance -> instance.group(
-                field("entries", LockList<T>::entries, containerCodec),
-                optionalField("message", LockList<T>::message, Codec.STRING),
+                containerCodec.fieldOf("entries").forGetter(LockList<T>::entries),
+                Codec.STRING.optionalFieldOf("message").forGetter(LockList<T>::message),
             ).apply(instance, ::LockList) }
 
             fun <T> createCodec(registry: Registry<T>): Codec<LockList<RegistryIngredient.Composite<T>>> = createCodec(RegistryIngredient.createCodec(registry))
@@ -90,24 +90,19 @@ data class LockGroup(
         val DEFAULT_RECIPE_MESSAGE = Translation.unit("rpgskills.lockgroup.recipe.message.default")
 
 
-        val CODEC = RecordCodecBuilder.create { it.group(
-            field("requirements", LockGroup::requirements, Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList()),
-            optionalField("item_name", LockGroup::itemName, Codec.STRING),
-            field("items", LockGroup::items, LockList.empty(), LockList.createCodec(Registries.ITEM)),
-            field("blocks", LockGroup::blocks, LockList.empty(), LockList.createCodec(Registries.BLOCK)),
-            field("entities", LockGroup::entities, LockList.empty(), LockList.createCodec(Registries.ENTITY_TYPE)),
-            field("recipes", LockGroup::recipes, LockList(listOf()), LockList.createCodec(Identifier.CODEC.listOf())),
+        val CODEC: Codec<LockGroup> = RecordCodecBuilder.create { it.group(
+            Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList().fieldOf("requirements").forGetter(LockGroup::requirements),
+            Codec.STRING.optionalFieldOf("item_name").forGetter(LockGroup::itemName),
+            LockList.createCodec(Registries.ITEM).optionalFieldOf("items", LockList.empty()).forGetter(LockGroup::items),
+            LockList.createCodec(Registries.BLOCK).optionalFieldOf("blocks", LockList.empty()).forGetter(LockGroup::blocks),
+            LockList.createCodec(Registries.ENTITY_TYPE).optionalFieldOf("entities", LockList.empty()).forGetter(LockGroup::entities),
+            LockList.createCodec(Identifier.CODEC.listOf()).optionalFieldOf("recipes", LockList(listOf())).forGetter(LockGroup::recipes),
         ).apply(it, ::LockGroup) }
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))
 
         inline fun find(registries: WrapperLookup, crossinline condition: (LockGroup) -> Boolean): LockGroup? =
             registries[LockGroup].streamEntries().filter { condition(it.value) }.findFirst().getOrNull()?.value
-
-        @JvmStatic fun find(registries: WrapperLookup, stack: ItemStack) = find(registries) { it.items.entries.test(stack.item) }
-        @JvmStatic fun find(registries: WrapperLookup, state: BlockState) = find(registries) { it.blocks.entries.test(state.block) }
-        @JvmStatic fun find(registries: WrapperLookup, entity: Entity) = find(registries) { it.entities.entries.test(entity.type) }
-        @JvmStatic fun find(registries: WrapperLookup, recipe: RecipeEntry<*>) = find(registries) { recipe.id in it.recipes.entries }
 
         private fun LockGroup.check(player: PlayerEntity) = takeIf { !isSatisfiedBy(player) }
 
