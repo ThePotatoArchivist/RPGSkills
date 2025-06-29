@@ -52,6 +52,7 @@ class TestSkillsLockGenerator(
                 RegistryIngredient.ofItems {
                     +Items.TRIDENT
                     +Items.DIAMOND_HELMET
+                    +Items.COD
                 },
                 "You don't know how to eat with this fork",
             ),

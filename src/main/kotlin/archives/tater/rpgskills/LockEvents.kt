@@ -1,10 +1,13 @@
 package archives.tater.rpgskills
 
 import archives.tater.rpgskills.data.LockGroup
+import io.wispforest.accessories.api.events.CanEquipCallback
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.fabricmc.fabric.api.event.player.UseBlockCallback
 import net.fabricmc.fabric.api.event.player.UseEntityCallback
 import net.fabricmc.fabric.api.event.player.UseItemCallback
+import net.fabricmc.fabric.api.util.TriState
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
@@ -41,6 +44,15 @@ internal fun registerLockEvents() {
     AttackBlockCallback.EVENT.register { player, _, hand, _, _ ->
         failIfLocked(player, LockGroup::itemMessage) {
             LockGroup.findLocked(player, player.getStackInHand(hand))
+        }
+    }
+
+    if (FabricLoader.getInstance().isModLoaded("accessories")) {
+        CanEquipCallback.EVENT.register { stack, slotReference ->
+            if ((slotReference.entity() as? PlayerEntity)?.let { LockGroup.isLocked(it, stack) } == true)
+                TriState.FALSE
+            else
+                TriState.DEFAULT
         }
     }
 }

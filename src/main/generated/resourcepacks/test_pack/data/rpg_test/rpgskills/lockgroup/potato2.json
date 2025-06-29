@@ -9,7 +9,8 @@
   "items": {
     "entries": [
       "minecraft:trident",
-      "minecraft:diamond_helmet"
+      "minecraft:diamond_helmet",
+      "minecraft:cod"
     ],
     "message": "You don't know how to eat with this fork"
   },
