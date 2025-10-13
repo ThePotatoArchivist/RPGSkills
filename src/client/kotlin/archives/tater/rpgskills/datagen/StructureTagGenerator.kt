@@ -19,12 +19,12 @@ class StructureTagGenerator(
         getOrCreateTagBuilder(RPGSkillsTags.MID_STRUCTURES).add(
             StructureKeys.FORTRESS,
             StructureKeys.END_CITY,
-            StructureKeys.BASTION_REMNANT
+            StructureKeys.MANSION,
         )
         getOrCreateTagBuilder(RPGSkillsTags.HARD_STRUCTURES).add(
             StructureKeys.MONUMENT,
-            StructureKeys.MANSION,
-            StructureKeys.TRIAL_CHAMBERS
+            StructureKeys.BASTION_REMNANT,
+            StructureKeys.TRIAL_CHAMBERS,
         )
         getOrCreateTagBuilder(RPGSkillsTags.BOSS_STRUCTURES).addOptional(
             cataclysmId("acropolis"),
