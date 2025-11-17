@@ -24,13 +24,4 @@ public class ClientPlayNetworkHandlerMixin {
     private boolean playXpSound(Object object, Operation<Boolean> original) {
         return original.call(object) || object instanceof SkillPointOrbEntity;
     }
-
-    @Inject(
-            method = "onItemPickupAnimation",
-            at = @At("TAIL")
-    )
-    private void triggerRenderer(ItemPickupAnimationS2CPacket packet, CallbackInfo ci, @Local Entity entity) {
-        if (entity instanceof SkillPointOrbEntity)
-            SkillBarRenderer.onSkillOrbPickup();
-    }
 }

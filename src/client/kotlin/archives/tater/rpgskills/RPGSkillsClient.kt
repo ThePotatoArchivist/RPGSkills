@@ -12,6 +12,7 @@ import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.entity.RPGSkillsEntities
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
+import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.isEmpty
 import net.fabricmc.api.ClientModInitializer
@@ -51,11 +52,13 @@ object RPGSkillsClient : ClientModInitializer {
 			blockedRecipeGroup = payload.lockGroup.getOrNull()
 		}
 
-		ClientPlayNetworking.registerGlobalReceiver(ChooseClassPayload.ID) { _, context ->
+		ClientPlayNetworking.registerGlobalReceiver(ChooseClassPayload.id) { _, context ->
 			val player = context.player()
 			if (player[SkillsComponent].skillClass == null && !player.registryManager[SkillClass].isEmpty())
 				context.client().setScreen(ClassScreen(player))
 		}
+
+        ClientPlayNetworking.registerGlobalReceiver(SkillPointIncreasePayload.id, SkillBarRenderer)
 
 		ClientTickEvents.END_CLIENT_TICK.register { client ->
 			if (skillsKeyBinding.wasPressed)

@@ -6,9 +6,4 @@ import net.minecraft.network.codec.PacketCodec
 import net.minecraft.network.packet.CustomPayload
 import net.minecraft.network.packet.CustomPayload.Id
 
-object ChooseClassPayload : CustomPayload {
-    override fun getId(): Id<out CustomPayload> = ID
-
-    val CODEC: PacketCodec<ByteBuf, ChooseClassPayload> = PacketCodec.unit(this)
-    val ID = Id<ChooseClassPayload>(RPGSkills.id("choose_class"))
-}
+object ChooseClassPayload : SingletonPayload<ChooseClassPayload>(RPGSkills.id("choose_class"))

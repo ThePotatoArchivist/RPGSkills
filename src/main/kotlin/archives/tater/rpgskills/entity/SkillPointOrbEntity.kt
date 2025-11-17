@@ -1,7 +1,9 @@
 package archives.tater.rpgskills.entity
 
 import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.*
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import com.mojang.serialization.Codec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
@@ -17,6 +19,7 @@ import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
 import net.minecraft.registry.tag.FluidTags
 import net.minecraft.server.network.EntityTrackerEntry
+import net.minecraft.server.network.ServerPlayNetworkHandler
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
@@ -163,6 +166,7 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
         player.experiencePickUpDelay = 2
         player.sendPickup(this, 1)
         player[SkillsComponent].points += amount
+        ServerPlayNetworking.send(player, SkillPointIncreasePayload)
         discard()
     }
 

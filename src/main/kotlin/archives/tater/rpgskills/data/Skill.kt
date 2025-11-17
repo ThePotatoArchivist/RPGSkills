@@ -55,12 +55,14 @@ data class Skill(
     data class Level(
         val cost: Int,
         val attributes: Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier> = mapOf(),
+        val jobs: List<PassiveJob> = listOf(),
     ) {
         companion object {
             val CODEC: Codec<Level> = RecordCodecBuilder.create {
                 it.group(
                     Codec.INT.fieldOf("cost").forGetter(Level::cost),
                     Codec.unboundedMap(Registries.ATTRIBUTE.entryCodec, AnonymousAttributeModifier.SHORT_CODEC).optionalFieldOf("attributes", mapOf()).forGetter(Level::attributes),
+                    PassiveJob.CODEC.listOf().optionalFieldOf("jobs", listOf()).forGetter(Level::jobs),
                 ).apply(it, ::Level)
             }
 

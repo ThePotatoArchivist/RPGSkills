@@ -1,31 +1,44 @@
 package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.data.PassiveJob
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
+import archives.tater.rpgskills.data.cca.SkillsComponent.JobEntry
+import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.ClassChoicePayload
+import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.*
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.advancement.criterion.AbstractCriterion
+import net.minecraft.advancement.criterion.Criterion
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.registry.RegistryCodecs
 import net.minecraft.registry.RegistryWrapper
+import net.minecraft.registry.entry.RegistryElementCodec
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundEvents
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
+import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
+import java.util.function.Predicate
 
 @Suppress("UnstableApiUsage")
-class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
+class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent, ServerTickingComponent {
     private var _skillClass: RegistryEntry<SkillClass>? = null
     var skillClass by ::_skillClass.synced(key, player)
 
@@ -51,6 +64,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             key.sync(player)
         }
 
+    private var jobCooldowns = mutableMapOf<JobEntry, Int>()
+
     val levelProgress get() = getRemainingPoints(points) / getPointsForNextLevel(level).toFloat()
 
     val isPointsFull get() = level >= MAX_LEVEL
@@ -62,6 +77,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     operator fun set(skill: RegistryEntry<Skill>, level: Int) {
         _skills[skill] = level.coerceIn(0, skill.value.levels.size)
         updateAttributes()
+        updateJobs()
         key.sync(player)
     }
 
@@ -101,6 +117,45 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         }
     }
 
+    private fun updateJobs() {
+        if (player.world.isClient) return
+        val newJobCooldowns = mutableMapOf<JobEntry, Int>()
+        for ((skill, maxLevel) in _skills)
+            for (levelIndex in 0..<maxLevel) {
+                val level = skill.value.levels[levelIndex]
+                for (job in level.jobs) {
+                    val entry = JobEntry(job, skill, level)
+                    newJobCooldowns[entry] = jobCooldowns[entry] ?: 0
+                }
+            }
+        jobCooldowns = newJobCooldowns
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T: AbstractCriterion.Conditions> onCriterion(criterion: Criterion<T>, condition: Predicate<T>) {
+        val player = player as? ServerPlayerEntity ?: return
+
+        for ((jobEntry, cooldown) in jobCooldowns) {
+            if (cooldown > 0) continue
+            val job = jobEntry.job
+            if (job.criteria.trigger == criterion && condition.test(job.criteria.conditions as T)) {
+                if (job.spawnAsOrbs) {
+                    SkillPointOrbEntity.spawnOrbs(player.serverWorld, player, player.pos, job.rewardPoints)
+                } else {
+                    points += job.rewardPoints
+                    ServerPlayNetworking.send(player, SkillPointIncreasePayload)
+                }
+                jobCooldowns[jobEntry] = job.cooldownTicks
+            }
+        }
+    }
+
+    override fun serverTick() {
+        for ((job, cooldown) in jobCooldowns)
+            if (cooldown > 0)
+                jobCooldowns[job] = cooldown - 1
+    }
+
     override fun shouldCopyForRespawn(lossless: Boolean, keepInventory: Boolean, sameCharacter: Boolean): Boolean =
         sameCharacter
 
@@ -109,16 +164,40 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         _skills = other._skills
         _points = other.points
         spentLevels = other.spentLevels
+        jobCooldowns = other.jobCooldowns
         updateAttributes()
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         CODEC.update(this, tag, registryLookup).logIfError()
         updateAttributes()
+        updateJobs()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         CODEC.encode(this, tag, registryLookup).logIfError()
+    }
+
+    @ConsistentCopyVisibility
+    data class JobEntry private constructor(
+        val job: PassiveJob,
+        val skill: RegistryEntry<Skill>,
+        val level: Int,
+        val index: Int,
+    ) {
+        private constructor(skill: RegistryEntry<Skill>, level: Int, index: Int) :
+                this(skill.value.levels[level].jobs[index], skill, level, index)
+
+        constructor(job: PassiveJob, skill: RegistryEntry<Skill>, level: Skill.Level) :
+                this(job, skill, skill.value.levels.indexOf(level), level.jobs.indexOf(job))
+
+        companion object {
+            val CODEC: Codec<JobEntry> = RecordCodecBuilder.create { it.group(
+                RegistryFixedCodec.of(Skill.key).fieldOf("skill").forGetter(JobEntry::skill),
+                intRangeCodec(min = 0).fieldOf("level").forGetter(JobEntry::level),
+                intRangeCodec(min = 0).fieldOf("index").forGetter(JobEntry::index)
+            ).apply(it, ::JobEntry) }
+        }
     }
 
     companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity> {
@@ -127,11 +206,14 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             RegistryFixedCodec.of(SkillClass.key).optionalFieldOf("class").forAccess(SkillsComponent::_skillClass),
             Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).mutate().fieldFor("skills", SkillsComponent::_skills),
             Codec.INT.fieldOf("spent").forAccess(SkillsComponent::spentLevels),
-            Codec.INT.fieldOf("points").forAccess(SkillsComponent::_points)
+            Codec.INT.fieldOf("points").forAccess(SkillsComponent::_points),
+            Codec.unboundedMap(JobEntry.CODEC, Codec.INT).mutate().fieldFor("job_cooldowns", SkillsComponent::jobCooldowns),
         )
 
-        override val key: ComponentKey<SkillsComponent> =
-            ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
+        @JvmField
+        val KEY: ComponentKey<SkillsComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
+
+        override val key: ComponentKey<SkillsComponent> get() = KEY
 
         const val MAX_LEVEL = 50
 

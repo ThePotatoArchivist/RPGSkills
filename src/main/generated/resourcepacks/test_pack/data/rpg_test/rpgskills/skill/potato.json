@@ -20,7 +20,24 @@
           "operation": "add_multiplied_base"
         }
       },
-      "cost": 2
+      "cost": 2,
+      "jobs": [
+        {
+          "cooldown_ticks": 20,
+          "criteria": {
+            "conditions": {
+              "location": [
+                {
+                  "block": "minecraft:stone",
+                  "condition": "minecraft:block_state_property"
+                }
+              ]
+            },
+            "trigger": "minecraft:placed_block"
+          },
+          "reward_points": 1
+        }
+      ]
     },
     3
   ],

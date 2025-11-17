@@ -8,7 +8,9 @@ import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.ClassChoicePayload
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
+import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
+import archives.tater.rpgskills.networking.register
 import io.wispforest.accessories.api.events.CanEquipCallback
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
@@ -51,10 +53,15 @@ object RPGSkills : ModInitializer {
 			if (FabricLoader.getInstance().isDevelopmentEnvironment) ResourcePackActivationType.DEFAULT_ENABLED else ResourcePackActivationType.NORMAL
 		)
 
-		PayloadTypeRegistry.playS2C().register(RecipeBlockedPayload.ID, RecipeBlockedPayload.CODEC)
-		PayloadTypeRegistry.playS2C().register(ChooseClassPayload.ID, ChooseClassPayload.CODEC)
-		PayloadTypeRegistry.playC2S().register(ClassChoicePayload.ID, ClassChoicePayload.CODEC)
-		PayloadTypeRegistry.playC2S().register(SkillUpgradePayload.ID, SkillUpgradePayload.CODEC)
+		with (PayloadTypeRegistry.playS2C()) {
+            register(RecipeBlockedPayload.ID, RecipeBlockedPayload.CODEC)
+            register(ChooseClassPayload)
+            register(SkillPointIncreasePayload)
+        }
+        with (PayloadTypeRegistry.playC2S()) {
+            register(ClassChoicePayload.ID, ClassChoicePayload.CODEC)
+            register(SkillUpgradePayload.ID, SkillUpgradePayload.CODEC)
+        }
 
 		SkillsComponent.registerEvents()
 
