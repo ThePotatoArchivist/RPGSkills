@@ -2,7 +2,7 @@ package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.data.BuildsRegistry
-import archives.tater.rpgskills.data.PassiveJob
+import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.AnonymousAttributeModifier
 import archives.tater.rpgskills.data.SkillProvider
@@ -17,7 +17,6 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition
-import net.minecraft.loot.condition.LootCondition
 import net.minecraft.predicate.entity.LootContextPredicate
 import net.minecraft.registry.Registerable
 import net.minecraft.registry.RegistryWrapper
@@ -56,7 +55,7 @@ class TestSkillGenerator(
                 Skill.Level(2, mapOf(
                     EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
                 ), listOf(
-                    PassiveJob(AdvancementCriterion(Criteria.PLACED_BLOCK, ItemCriterion.Conditions(Optional.empty(),
+                    Job(AdvancementCriterion(Criteria.PLACED_BLOCK, ItemCriterion.Conditions(Optional.empty(),
                         Optional.of(LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.STONE).build())))
                     ), 1, 20)
                 )),
