@@ -1,0 +1,34 @@
+{
+  "cooldown_ticks": 24000,
+  "description": "Tend the farm",
+  "name": "Farmin'",
+  "reward_points": 20,
+  "tasks": {
+    "harvest_crops": {
+      "count": 20,
+      "criteria": {
+        "trigger": "minecraft:consume_item"
+      },
+      "description": "Eat anything"
+    },
+    "plant_crops": {
+      "count": 20,
+      "criteria": {
+        "conditions": {
+          "location": [
+            {
+              "condition": "minecraft:location_check",
+              "predicate": {
+                "block": {
+                  "blocks": "#minecraft:crops"
+                }
+              }
+            }
+          ]
+        },
+        "trigger": "minecraft:placed_block"
+      },
+      "description": "Plant any crop"
+    }
+  }
+}

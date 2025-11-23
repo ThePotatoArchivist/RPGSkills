@@ -56,10 +56,14 @@ class TestSkillGenerator(
             ) 
         }
 
-        val COW_SKILL = BuildEntry(Identifier.of("rpg_test", "cow")) {
+        val COW_SKILL = depBuildEntry(Identifier.of("rpg_test", "cow")) { registerable ->
             Skill(
                 icon = ItemStack(Items.COW_SPAWN_EGG),
-                levels = listOf(1, 2, 3).map(Skill::Level),
+                levels = listOf(
+                    Skill.Level(1),
+                    Skill.Level(2),
+                    Skill.Level(3, jobs = listOf(registerable[TestJobGenerator.GATHER_WHEAT]))
+                ),
                 name = "Cow Skill",
                 description = "Unlocks cows I guess"
             )
