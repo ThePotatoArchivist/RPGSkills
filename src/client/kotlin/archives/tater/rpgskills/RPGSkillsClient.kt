@@ -73,7 +73,10 @@ object RPGSkillsClient : ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(SkillPointIncreasePayload.id, SkillBarRenderer)
 
         ClientPlayNetworking.registerGlobalReceiver(JobCompletedPayload.ID) { payload, context ->
-            context.client().toastManager.add(JobCompletedToast(payload.job.value, RPGSkillsCaches.JOB_TO_SKILL[payload.job.key.orElseThrow()]))
+            context.client().toastManager.add(JobCompletedToast(
+                payload.job.value,
+                RPGSkillsCaches.JOB_TO_SKILL[context.player().registryManager][payload.job]?.value
+            ))
         }
 
 		ClientTickEvents.END_CLIENT_TICK.register { client ->

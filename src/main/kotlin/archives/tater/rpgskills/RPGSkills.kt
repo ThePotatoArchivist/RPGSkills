@@ -45,8 +45,6 @@ object RPGSkills : ModInitializer {
 		DynamicRegistries.registerSynced(SkillClass.key, SkillClass.CODEC)
         DynamicRegistries.registerSynced(Job.key, Job.CODEC)
 
-        RPGSkillsCaches.register()
-
 		CommandRegistrationCallback.EVENT.register(RPGSkillsCommands)
 
 		ResourceManagerHelper.registerBuiltinResourcePack(

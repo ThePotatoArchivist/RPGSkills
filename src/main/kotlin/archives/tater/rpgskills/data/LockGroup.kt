@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsCaches
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
@@ -14,7 +15,6 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.recipe.RecipeEntry
 import net.minecraft.registry.*
-import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.Text
@@ -101,15 +101,12 @@ data class LockGroup(
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))
 
-        inline fun find(registries: WrapperLookup, crossinline condition: (LockGroup) -> Boolean): LockGroup? =
-            registries[LockGroup].streamEntries().filter { condition(it.value) }.findFirst().getOrNull()?.value
+        private fun <T> findLocked(player: PlayerEntity, cache: RegistryCache<T, LockGroup>, value: T) = cache[player.registryManager][value]?.value?.takeIf { !it.isSatisfiedBy(player) }
 
-        private fun LockGroup.check(player: PlayerEntity) = takeIf { !isSatisfiedBy(player) }
-
-        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = find(player.registryManager) { it.items.entries.test(stack.item) }?.check(player)
-        @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = find(player.registryManager) { it.blocks.entries.test(state.block) }?.check(player)
-        @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = find(player.registryManager) { it.entities.entries.test(entity.type) }?.check(player)
-        @JvmStatic fun findLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = find(player.registryManager) { recipe.id in it.recipes.entries }?.check(player)
+        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, RPGSkillsCaches.ITEM_TO_LOCKGROUP, stack.item)
+        @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = findLocked(player, RPGSkillsCaches.BLOCK_TO_LOCKGROUP, state.block)
+        @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = findLocked(player, RPGSkillsCaches.ENTITY_TO_LOCKGROUP, entity.type)
+        @JvmStatic fun findLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = findLocked(player, RPGSkillsCaches.RECIPE_TO_LOCKGROUP, recipe.id)
 
         @JvmStatic fun isLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, stack) != null
         @JvmStatic fun isLocked(player: PlayerEntity, state: BlockState) = findLocked(player, state) != null
