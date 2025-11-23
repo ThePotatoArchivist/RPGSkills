@@ -1,7 +1,21 @@
 {
-  "cooldown_ticks": 20,
+  "cooldown_ticks": 600,
   "reward_points": 1,
   "tasks": {
+    "place_granite": {
+      "count": 10,
+      "criteria": {
+        "conditions": {
+          "location": [
+            {
+              "block": "minecraft:granite",
+              "condition": "minecraft:block_state_property"
+            }
+          ]
+        },
+        "trigger": "minecraft:placed_block"
+      }
+    },
     "place_stone": {
       "count": 20,
       "criteria": {

@@ -138,7 +138,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             
             val job = jobEntry.value
             for ((name, task) in job.tasks) {
-                if (task.criteria.trigger != criterion || !condition.test(task.criteria.conditions as T)) continue
+                if (name !in tasks || task.criteria.trigger != criterion || !condition.test(task.criteria.conditions as T)) continue
 
                 val newCount = (tasks[name] ?: 0) + 1
                 

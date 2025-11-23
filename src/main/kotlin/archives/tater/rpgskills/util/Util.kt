@@ -2,6 +2,7 @@ package archives.tater.rpgskills.util
 
 import archives.tater.rpgskills.RPGSkills
 import com.google.common.collect.HashMultimap
+import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -10,7 +11,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
-import com.mojang.serialization.Codec
+import net.minecraft.advancement.criterion.ItemCriterion
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.data.TrackedData
@@ -18,6 +19,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
+import net.minecraft.predicate.entity.LootContextPredicate
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryWrapper
@@ -33,7 +35,6 @@ import org.slf4j.Logger
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
-import kotlin.Pair
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KProperty
@@ -163,3 +164,6 @@ fun <T> FabricTagProvider<T>.FabricTagBuilder.addOptional(vararg ids: Identifier
 fun RegistryWrapper<*>.isEmpty() = streamEntries().findAny().isEmpty
 
 fun intRangeCodec(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Codec<Int> = Codec.intRange(min, max)
+
+fun itemCriterionConditions(playerPredicate: LootContextPredicate? = null, location: LootContextPredicate? = null) =
+    ItemCriterion.Conditions(Optional.ofNullable(playerPredicate), Optional.ofNullable(location))
