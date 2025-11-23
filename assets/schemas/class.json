@@ -36,7 +36,14 @@
       "type": "string"
     },
     "icon": {
-      "$ref": "#/definitions/ItemStack"
+      "anyOf": [
+        {
+          "$ref": "#/definitions/ItemStack"
+        },
+        {
+          "$ref": "#/definitions/Identifier"
+        }
+      ]
     },
     "description": {
       "type": "string"

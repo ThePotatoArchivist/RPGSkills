@@ -36,6 +36,7 @@
         "attributes": {
           "type": "object",
           "additionalProperties": false,
+          "minProperties": 1,
           "patternProperties": {
             "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {
               "anyOf": [
@@ -66,12 +67,18 @@
             }
           }
         },
+        "jobs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/Identifier"
+          }
+        },
         "cost": {
           "type": "integer"
         }
       },
       "required": [
-        "attributes",
         "cost"
       ]
     }
@@ -81,7 +88,14 @@
       "type": "string"
     },
     "icon": {
-      "$ref": "#/definitions/ItemStack"
+      "anyOf": [
+        {
+          "$ref": "#/definitions/ItemStack"
+        },
+        {
+          "$ref": "#/definitions/Identifier"
+        }
+      ]
     },
     "levels": {
       "items": {
