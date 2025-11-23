@@ -10,6 +10,8 @@ import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 
 data class Job(
+    val name: String,
+    val description: String,
     val tasks: Map<String, Task>,
     val rewardPoints: Int,
     val cooldownTicks: Int,
@@ -29,6 +31,8 @@ data class Job(
 
     companion object : RegistryKeyHolder<Registry<Job>> {
         val CODEC: Codec<Job> = RecordCodecBuilder.create { it.group(
+            Codec.STRING.fieldOf("name").forGetter(Job::name),
+            Codec.STRING.fieldOf("description").forGetter(Job::description),
             Codec.unboundedMap(Codec.STRING, Task.CODEC).fieldOf("tasks").forGetter(Job::tasks),
             intRangeCodec(min = 0).fieldOf("reward_points").forGetter(Job::rewardPoints),
             intRangeCodec(min = 0).fieldOf("cooldown_ticks").forGetter(Job::cooldownTicks),

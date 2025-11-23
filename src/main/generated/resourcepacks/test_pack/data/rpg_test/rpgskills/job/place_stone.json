@@ -1,5 +1,7 @@
 {
   "cooldown_ticks": 600,
+  "description": "Place stone and granite",
+  "name": "Stone Placer",
   "reward_points": 1,
   "tasks": {
     "place_granite": {

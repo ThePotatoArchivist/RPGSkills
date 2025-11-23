@@ -25,6 +25,7 @@
   "screen.rpgskills.skills": "Skills",
   "screen.rpgskills.skills.max": "MAX",
   "screen.widget.rpgskills.attributes.title": "Attributes",
+  "screen.widget.rpgskills.jobs.title": "Job: %s",
   "screen.widget.rpgskills.lockgroup.blocks": "Blocks",
   "screen.widget.rpgskills.lockgroup.entities": "Entities",
   "screen.widget.rpgskills.lockgroup.items": "Items",

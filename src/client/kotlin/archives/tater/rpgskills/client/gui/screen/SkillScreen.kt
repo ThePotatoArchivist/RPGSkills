@@ -8,7 +8,6 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
-import archives.tater.rpgskills.util.withFirst
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
@@ -41,18 +40,23 @@ class SkillScreen(
 
         addDrawableChild(SkillUpgradeButton(x + WIDTH - SkillUpgradeButton.WIDTH - 8, y + 21, player, skill))
 
-        val attributesWidget = skill.value.levels[selectedTab].attributes.takeIf { it.isNotEmpty() }?.let {
-            AttributesWidget(x + 10, 0, 224, it)
+        val scrollContents = buildList {
+            skill.value.levels[selectedTab].attributes.takeIf { it.isNotEmpty() }?.let {
+                add(AttributesWidget(x + 10, 0, 224, it))
+            }
+
+            for (job in skill.value.levels[selectedTab].jobs) {
+                add(SkillJobWidget(x + 10, 0, 224, job))
+            }
+
+            player.registryManager[LockGroup].streamEntries()
+                .filter { lockEntry -> lockEntry.value.requirements.any { it[skill] == selectedLevel } }
+                .forEach {
+                    add(LockGroupWidget(x + 10, 0, 224, it.value, player.registryManager, player.world.recipeManager))
+                }
         }
 
-        val lockWidgets: List<LockGroupWidget> = player.registryManager[LockGroup].streamEntries()
-            .filter { lockEntry -> lockEntry.value.requirements.any { it[skill] == selectedLevel } }
-            .map {
-                LockGroupWidget(x + 10, 0, 224, it.value, player.registryManager, player.world.recipeManager)
-            }
-            .toList()
-
-        addDrawableChild(AutoScrollingWidget(x + 9, y + 42, 234, 141, attributesWidget?.let(lockWidgets::withFirst) ?: lockWidgets))
+        addDrawableChild(AutoScrollingWidget(x + 9, y + 42, 234, 141, scrollContents))
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.BACK) { close() }.apply {
             width(200)

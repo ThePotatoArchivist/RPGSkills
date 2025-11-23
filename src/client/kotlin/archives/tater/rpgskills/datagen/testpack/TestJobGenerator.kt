@@ -33,6 +33,8 @@ class TestJobGenerator(
             Identifier.of("rpg_test", "place_stone")
         ) {
             Job(
+                "Stone Placer",
+                "Place stone and granite",
                 mapOf(
                     "place_stone" to Job.Task(20, AdvancementCriterion(
                         Criteria.PLACED_BLOCK, itemCriterionConditions(
