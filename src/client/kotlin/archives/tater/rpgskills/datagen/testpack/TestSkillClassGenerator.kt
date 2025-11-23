@@ -14,7 +14,7 @@ class TestSkillClassGenerator(
     registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>,
 ) : ClassProvider(dataOutput, registriesFuture) {
     override fun configure(provider: BiConsumer<Identifier, SkillClass>, lookup: RegistryWrapper.WrapperLookup) {
-        provider.accept(Identifier.of("rpg_test", "archer"), SkillClass(
+        provider.accept(testPackId("archer"), SkillClass(
             name = "Archer",
             icon = Items.BOW,
             description = "Shoots arrows",
@@ -23,7 +23,7 @@ class TestSkillClassGenerator(
                 TestSkillGenerator.GRASS_SKILL.entry to 2
             )
         ))
-        provider.accept(Identifier.of("rpg_test", "blacksmith"), SkillClass(
+        provider.accept(testPackId("blacksmith"), SkillClass(
             name = "Blacksmith",
             icon = Items.IRON_AXE,
             description = "Makes stuff",
@@ -32,7 +32,7 @@ class TestSkillClassGenerator(
                 TestSkillGenerator.GRASS_SKILL.entry to 1
             )
         ))
-        provider.accept(Identifier.of("rpg_test", "engineer"), SkillClass(
+        provider.accept(testPackId("engineer"), SkillClass(
             name = "Engineer",
             icon = Items.COMPARATOR,
             description = "Hello and welcome to my TED talk. This is a very long description text to make sure that wrapping and scrolling works properly. I hope you had a good time reading it.",

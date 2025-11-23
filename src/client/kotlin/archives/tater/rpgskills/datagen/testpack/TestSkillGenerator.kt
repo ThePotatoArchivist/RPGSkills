@@ -27,7 +27,7 @@ class TestSkillGenerator(
         provider.accept(COW_SKILL)
         provider.accept(GRASS_SKILL)
         repeat(5) {
-            provider.accept(Identifier.of("rpg_test", "test$it"), Skill(
+            provider.accept(testPackId("test$it"), Skill(
                 icon = ItemStack(Items.IRON_INGOT),
                 levels = List(5) { level -> Skill.Level(level + 2)},
                 name = "Test $it",
@@ -39,7 +39,7 @@ class TestSkillGenerator(
     companion object : BuildsRegistry<Skill> {
         override val registry = Skill.key
 
-        val POTATO_SKILL = depBuildEntry(Identifier.of("rpg_test", "potato")) { registerable ->
+        val POTATO_SKILL = depBuildEntry(testPackId("potato")) { registerable ->
             Skill(
                 icon = ItemStack(Items.POTATO),
                 levels = listOf(
@@ -56,7 +56,7 @@ class TestSkillGenerator(
             ) 
         }
 
-        val COW_SKILL = depBuildEntry(Identifier.of("rpg_test", "cow")) { registerable ->
+        val COW_SKILL = depBuildEntry(testPackId("cow")) { registerable ->
             Skill(
                 icon = ItemStack(Items.COW_SPAWN_EGG),
                 levels = listOf(
@@ -69,7 +69,7 @@ class TestSkillGenerator(
             )
         }
 
-        val GRASS_SKILL = depBuildEntry(Identifier.of("rpg_test", "grass")) { registerable ->
+        val GRASS_SKILL = depBuildEntry(testPackId("grass")) { registerable ->
             Skill(
                 icon = ItemStack(Items.GRASS_BLOCK),
                 levels = listOf(

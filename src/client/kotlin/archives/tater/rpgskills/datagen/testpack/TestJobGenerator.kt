@@ -42,7 +42,7 @@ class TestJobGenerator(
     companion object : BuildsRegistry<Job> {
         override val registry = Job.key
 
-        val PLACE_STONE = BuildEntry(Identifier.of("rpg_test", "place_stone")) {
+        val PLACE_STONE = BuildEntry(testPackId("place_stone")) {
             Job(
                 "Stone Placer",
                 "Place stone and granite",
@@ -61,7 +61,7 @@ class TestJobGenerator(
             )
         }
 
-        val GATHER_WHEAT = BuildEntry(Identifier.of("rpg_test", "gather_wheat")) {
+        val GATHER_WHEAT = BuildEntry(testPackId("gather_wheat")) {
             Job(
                 "Farmin'",
                 "Tend the farm",
@@ -86,7 +86,7 @@ class TestJobGenerator(
         }
 
         val OTHERS = (1..10).map {
-            BuildEntry(Identifier.of("rpg_test", "job$it")) {
+            BuildEntry(testPackId("job$it")) {
                 Job("Job $it", "EEEEE", mapOf("task" to Job.Task("Place Granite", 10, AdvancementCriterion(
                     Criteria.PLACED_BLOCK, itemCriterionConditions(
                         location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())

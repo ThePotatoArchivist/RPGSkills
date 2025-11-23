@@ -20,7 +20,7 @@ class TestSkillsLockGenerator(
     registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
 ) : LockGroupProvider(dataOutput, registriesFuture) {
     override fun configure(provider: BiConsumer<Identifier, LockGroup>, registries: RegistryWrapper.WrapperLookup) {
-        provider.accept(Identifier.of("rpg_test", "potato1"), LockGroup(
+        provider.accept(testPackId("potato1"), LockGroup(
             requirements = mapOf(
                 TestSkillGenerator.POTATO_SKILL.entry to 1
             ),
@@ -42,7 +42,7 @@ class TestSkillsLockGenerator(
                 "You don't know how to cook this potato",
             ),
         ))
-        provider.accept(Identifier.of("rpg_test", "potato2"), LockGroup(
+        provider.accept(testPackId("potato2"), LockGroup(
             requirements = mapOf(
                 TestSkillGenerator.POTATO_SKILL.entry to 2,
                 TestSkillGenerator.COW_SKILL.entry to 2,
@@ -67,7 +67,7 @@ class TestSkillsLockGenerator(
                 "You don't know how to assemble this prismarine",
             ),
         ))
-        provider.accept(Identifier.of("rpg_test", "potato3"), LockGroup(
+        provider.accept(testPackId("potato3"), LockGroup(
             requirements = listOf(
                 mapOf(
                     TestSkillGenerator.POTATO_SKILL.entry to 3
@@ -95,7 +95,7 @@ class TestSkillsLockGenerator(
                 "You don't know how to assemble this button",
             ),
         ))
-        provider.accept(Identifier.of("rpg_test", "potato4"), LockGroup(
+        provider.accept(testPackId("potato4"), LockGroup(
             requirements = mapOf(
                 TestSkillGenerator.POTATO_SKILL.entry to 2,
             ),
