@@ -22,21 +22,7 @@
       },
       "cost": 2,
       "jobs": [
-        {
-          "cooldown_ticks": 20,
-          "criteria": {
-            "conditions": {
-              "location": [
-                {
-                  "block": "minecraft:stone",
-                  "condition": "minecraft:block_state_property"
-                }
-              ]
-            },
-            "trigger": "minecraft:placed_block"
-          },
-          "reward_points": 1
-        }
+        "rpg_test:place_stone"
       ]
     },
     3

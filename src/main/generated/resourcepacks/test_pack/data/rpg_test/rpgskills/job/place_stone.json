@@ -1,0 +1,20 @@
+{
+  "cooldown_ticks": 20,
+  "reward_points": 1,
+  "tasks": {
+    "place_stone": {
+      "count": 20,
+      "criteria": {
+        "conditions": {
+          "location": [
+            {
+              "block": "minecraft:stone",
+              "condition": "minecraft:block_state_property"
+            }
+          ]
+        },
+        "trigger": "minecraft:placed_block"
+      }
+    }
+  }
+}

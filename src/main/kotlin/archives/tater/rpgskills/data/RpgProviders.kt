@@ -29,11 +29,18 @@ abstract class ClassProvider(
     override fun getName(): String = "Skill Classes"
 }
 
+abstract class JobProvider(
+    dataOutput: FabricDataOutput, registriesFuture: CompletableFuture<RegistryWrapper.WrapperLookup>,
+) : FabricCodecDataProvider<Job>(dataOutput, registriesFuture, OutputType.DATA_PACK, dynamicRegistryPath(Job.key), Job.CODEC) {
+    override fun getName(): String = "Jobs"
+}
+
 class BuildEntry<T>(
     val registry: RegistryKey<out Registry<T>>,
     val id: Identifier,
-    val value: T,
+    getValue: () -> T,
 ) {
+    val value by lazy(getValue)
     val key: RegistryKey<T> = RegistryKey.of(registry, id)
     lateinit var entry: RegistryEntry<T>
 }
@@ -45,7 +52,7 @@ fun <T> BiConsumer<Identifier, T>.accept(buildEntry: BuildEntry<T>) {
 interface BuildsRegistry<T> {
     val registry: RegistryKey<out Registry<T>>
 
-    fun BuildEntry(id: Identifier, value: T) = BuildEntry(registry, id, value)
+    fun BuildEntry(id: Identifier, value: () -> T) = BuildEntry(registry, id, value)
 
     fun buildRegistry(registryBuilder: RegistryBuilder) {
         registryBuilder.addRegistry(registry, ::bootstrap)

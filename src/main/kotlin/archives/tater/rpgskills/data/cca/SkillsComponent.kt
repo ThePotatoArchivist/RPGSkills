@@ -4,7 +4,6 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
-import archives.tater.rpgskills.data.cca.SkillsComponent.JobInstance
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.ClassChoicePayload
@@ -13,12 +12,11 @@ import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.*
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.advancement.criterion.AbstractCriterion
 import net.minecraft.advancement.criterion.Criterion
-import net.minecraft.entity.ai.brain.task.SonicBoomTask.cooldown
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
@@ -62,7 +60,9 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             key.sync(player)
         }
 
-    private var jobCooldowns = mutableMapOf<RegistryEntry<Job>, JobInstance>()
+    private var _jobs = mutableMapOf<RegistryEntry<Job>, JobInstance>()
+    val jobs: Map<RegistryEntry<Job>, JobInstance>
+        get() = _jobs
 
     val levelProgress get() = getRemainingPoints(points) / getPointsForNextLevel(level).toFloat()
 
@@ -117,47 +117,58 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     private fun updateJobs() {
         if (player.world.isClient) return
-        val newJobCooldowns = mutableMapOf<RegistryEntry<Job>, JobInstance>()
+        val newJobs = mutableMapOf<RegistryEntry<Job>, JobInstance>()
         for ((skill, maxLevel) in _skills)
             for (levelIndex in 0..<maxLevel) {
                 val level = skill.value.levels[levelIndex]
                 for (job in level.jobs) {
-                    newJobCooldowns[job] = jobCooldowns[job] ?: JobInstance()
+                    newJobs[job] = _jobs[job] ?: JobInstance(job.value)
                 }
             }
-        jobCooldowns = newJobCooldowns
+        _jobs = newJobs
     }
 
     @Suppress("UNCHECKED_CAST")
     fun <T: AbstractCriterion.Conditions> onCriterion(criterion: Criterion<T>, condition: Predicate<T>) {
         val player = player as? ServerPlayerEntity ?: return
 
-        for ((jobEntry, instance) in jobCooldowns) {
+        for ((jobEntry, instance) in _jobs) {
             val (cooldown, tasks) = instance
             if (cooldown > 0) continue
+            
             val job = jobEntry.value
             for ((name, task) in job.tasks) {
-                if (task.criteria.trigger == criterion && condition.test(task.criteria.conditions as T)) {
-//                    jobCooldowns[jobEntry] = job.cooldownTicks
-                    TODO()
-                }
+                if (task.criteria.trigger != criterion || !condition.test(task.criteria.conditions as T)) continue
+
+                val newCount = (tasks[name] ?: 0) + 1
+                
+                if (newCount >= task.count) {
+                    // Complete task
+                    tasks.remove(name)
+                    if (tasks.isEmpty()) {
+                        completeJob(player, job, instance)
+                    }
+                } else
+                    tasks[name] = newCount
             }
         }
     }
 
-    private fun tmp(job: Job) {
+    private fun completeJob(player: ServerPlayerEntity, job: Job, instance: JobInstance) {
         if (job.spawnAsOrbs) {
             SkillPointOrbEntity.spawnOrbs(player.serverWorld, player, player.pos, job.rewardPoints)
         } else {
             points += job.rewardPoints
             ServerPlayNetworking.send(player, SkillPointIncreasePayload)
         }
+        instance.cooldown = job.cooldownTicks
+        instance.resetTasks(job)
     }
 
     override fun serverTick() {
-        for ((job, cooldown) in jobCooldowns)
-            if (cooldown > 0)
-                jobCooldowns[job] = cooldown - 1
+        for ((_, instance) in _jobs)
+            if (instance.cooldown > 0)
+                instance.cooldown--
     }
 
     override fun shouldCopyForRespawn(lossless: Boolean, keepInventory: Boolean, sameCharacter: Boolean): Boolean =
@@ -168,7 +179,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         _skills = other._skills
         _points = other.points
         spentLevels = other.spentLevels
-        jobCooldowns = other.jobCooldowns
+        _jobs = other._jobs
         updateAttributes()
     }
 
@@ -186,6 +197,16 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         var cooldown: Int = 0,
         val tasks: MutableMap<String, Int> = mutableMapOf(),
     ) {
+        constructor(job: Job) : this() {
+            resetTasks(job)
+        }
+
+        fun resetTasks(job: Job) {
+            tasks.clear()
+            for ((task, _) in job.tasks)
+                tasks[task] = 0
+        }
+
         companion object {
             val CODEC: Codec<JobInstance> = RecordCodecBuilder.create { it.group(
                 Codec.INT.fieldOf("cooldown").forGetter(JobInstance::cooldown),
@@ -201,7 +222,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).mutate().fieldFor("skills", SkillsComponent::_skills),
             Codec.INT.fieldOf("spent").forAccess(SkillsComponent::spentLevels),
             Codec.INT.fieldOf("points").forAccess(SkillsComponent::_points),
-            Codec.unboundedMap(RegistryFixedCodec.of(Job.key), JobInstance.CODEC).mutate().fieldFor("job_cooldowns", SkillsComponent::jobCooldowns),
+            Codec.unboundedMap(RegistryFixedCodec.of(Job.key), JobInstance.CODEC).mutate().fieldFor("jobs", SkillsComponent::_jobs),
         )
 
         @JvmField
