@@ -1,7 +1,6 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.data.Job.Task
 import archives.tater.rpgskills.util.RegistryKeyHolder
 import archives.tater.rpgskills.util.intRangeCodec
 import com.mojang.serialization.Codec
@@ -9,7 +8,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.advancement.AdvancementCriterion
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
-import com.ibm.icu.lang.UCharacter.GraphemeClusterBreak.T
 
 data class Job(
     val tasks: Map<String, Task>,
@@ -18,13 +16,13 @@ data class Job(
     val spawnAsOrbs: Boolean = false,
 ) {
     data class Task(
-        val criteria: AdvancementCriterion<*>,
         val count: Int,
+        val criteria: AdvancementCriterion<*>,
     ) {
         companion object {
             val CODEC: Codec<Task> = RecordCodecBuilder.create { it.group(
-                AdvancementCriterion.CODEC.fieldOf("criteria").forGetter(Task::criteria),
                 intRangeCodec(min = 1).fieldOf("count").forGetter(Task::count),
+                AdvancementCriterion.CODEC.fieldOf("criteria").forGetter(Task::criteria),
             ).apply(it, ::Task) }
         }
     }

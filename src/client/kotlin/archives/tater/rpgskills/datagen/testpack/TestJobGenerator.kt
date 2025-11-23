@@ -1,6 +1,5 @@
 package archives.tater.rpgskills.datagen.testpack
 
-import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.data.*
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.advancement.AdvancementCriterion
@@ -37,7 +36,7 @@ class TestJobGenerator(
             Job(
                 mapOf(
                     "place_stone" to Job.Task(
-                        AdvancementCriterion(
+                        20, AdvancementCriterion(
                             Criteria.PLACED_BLOCK, ItemCriterion.Conditions(
                                 Optional.empty(),
                                 Optional.of(
@@ -46,7 +45,7 @@ class TestJobGenerator(
                                     )
                                 )
                             )
-                        ), 20
+                        )
                     )
                 ), 1, 20
             )

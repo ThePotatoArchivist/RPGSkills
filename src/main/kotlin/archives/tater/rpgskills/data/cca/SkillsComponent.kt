@@ -133,7 +133,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         val player = player as? ServerPlayerEntity ?: return
 
         for ((jobEntry, instance) in _jobs) {
-            val (cooldown, tasks) = instance
+            val (tasks, cooldown) = instance
             if (cooldown > 0) continue
             
             val job = jobEntry.value
@@ -194,8 +194,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     }
 
     data class JobInstance(
-        var cooldown: Int = 0,
         val tasks: MutableMap<String, Int> = mutableMapOf(),
+        var cooldown: Int = 0,
     ) {
         constructor(job: Job) : this() {
             resetTasks(job)
@@ -209,9 +209,9 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
         companion object {
             val CODEC: Codec<JobInstance> = RecordCodecBuilder.create { it.group(
-                Codec.INT.fieldOf("cooldown").forGetter(JobInstance::cooldown),
                 Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("tasks").forGetter(JobInstance::tasks),
-            ).apply(it) { cooldown, tasks -> JobInstance(cooldown, tasks.toMutableMap()) } }
+                Codec.INT.fieldOf("cooldown").forGetter(JobInstance::cooldown),
+            ).apply(it) { tasks, cooldown -> JobInstance(tasks.toMutableMap(), cooldown) } }
         }
     }
 
