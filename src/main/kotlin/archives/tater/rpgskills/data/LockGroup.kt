@@ -1,7 +1,6 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.RPGSkillsCaches
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
@@ -76,7 +75,8 @@ data class LockGroup(
                 Codec.STRING.optionalFieldOf("message").forGetter(LockList<T>::message),
             ).apply(instance, ::LockList) }
 
-            fun <T> createCodec(registry: Registry<T>): Codec<LockList<RegistryIngredient.Composite<T>>> = createCodec(RegistryIngredient.createCodec(registry))
+            fun <T> createCodec(registry: Registry<T>): Codec<LockList<RegistryIngredient.Composite<T>>> =
+                createCodec(RegistryIngredient.createCodec(registry))
 
             fun <T> empty() = LockList<RegistryIngredient.Composite<T>>(RegistryIngredient.empty())
         }
@@ -89,7 +89,6 @@ data class LockGroup(
         val DEFAULT_ENTITY_MESSAGE = Translation.unit("rpgskills.lockgroup.entity.message.default")
         val DEFAULT_RECIPE_MESSAGE = Translation.unit("rpgskills.lockgroup.recipe.message.default")
 
-
         val CODEC: Codec<LockGroup> = RecordCodecBuilder.create { it.group(
             Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList().fieldOf("requirements").forGetter(LockGroup::requirements),
             Codec.STRING.optionalFieldOf("item_name").forGetter(LockGroup::itemName),
@@ -101,12 +100,18 @@ data class LockGroup(
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))
 
-        private fun <T> findLocked(player: PlayerEntity, cache: RegistryCache<T, LockGroup>, value: T) = cache[player.registryManager][value]?.value?.takeIf { !it.isSatisfiedBy(player) }
+        private val ITEM_CACHE = RegistryCache(key) { it.value.items.entries.matchingValues }
+        private val BLOCK_CACHE = RegistryCache(key) { it.value.blocks.entries.matchingValues }
+        private val ENTITY_CACHE = RegistryCache(key) { it.value.entities.entries.matchingValues }
+        private val RECIPE_CACHE = RegistryCache(key) { it.value.recipes.entries }
 
-        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, RPGSkillsCaches.ITEM_TO_LOCKGROUP, stack.item)
-        @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = findLocked(player, RPGSkillsCaches.BLOCK_TO_LOCKGROUP, state.block)
-        @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = findLocked(player, RPGSkillsCaches.ENTITY_TO_LOCKGROUP, entity.type)
-        @JvmStatic fun findLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = findLocked(player, RPGSkillsCaches.RECIPE_TO_LOCKGROUP, recipe.id)
+        private fun <T> findLocked(player: PlayerEntity, cache: RegistryCache<T, LockGroup>, value: T) =
+            cache[player.registryManager][value]?.value?.takeIf { !it.isSatisfiedBy(player) }
+
+        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, ITEM_CACHE, stack.item)
+        @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = findLocked(player, BLOCK_CACHE, state.block)
+        @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = findLocked(player, ENTITY_CACHE, entity.type)
+        @JvmStatic fun findLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = findLocked(player, RECIPE_CACHE, recipe.id)
 
         @JvmStatic fun isLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, stack) != null
         @JvmStatic fun isLocked(player: PlayerEntity, state: BlockState) = findLocked(player, state) != null

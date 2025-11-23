@@ -9,6 +9,7 @@ import archives.tater.rpgskills.client.render.SkillBarRenderer
 import archives.tater.rpgskills.client.render.entity.SkillPointOrbEntityRenderer
 import archives.tater.rpgskills.client.util.wasPressed
 import archives.tater.rpgskills.data.LockGroup
+import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.entity.RPGSkillsEntities
@@ -16,6 +17,7 @@ import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.JobCompletedPayload
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
+import archives.tater.rpgskills.util.RegistryCache
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.isEmpty
 import archives.tater.rpgskills.util.value
@@ -54,6 +56,8 @@ object RPGSkillsClient : ClientModInitializer {
         RPG_SKILLS_CATEGORY,
     ))
 
+    private val JOB_SKILL_CACHE = RegistryCache(Skill.key) { skill -> skill.value.levels.flatMap { level -> level.jobs } }
+
 	override fun onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 		EntityRendererRegistry.register(RPGSkillsEntities.SKILL_POINT_ORB, ::SkillPointOrbEntityRenderer)
@@ -75,7 +79,7 @@ object RPGSkillsClient : ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(JobCompletedPayload.ID) { payload, context ->
             context.client().toastManager.add(JobCompletedToast(
                 payload.job.value,
-                RPGSkillsCaches.JOB_TO_SKILL[context.player().registryManager][payload.job]?.value
+                JOB_SKILL_CACHE[context.player().registryManager][payload.job]?.value
             ))
         }
 
