@@ -38,15 +38,17 @@ class JobWidget(private val skillsComponent: SkillsComponent, private val job: R
         tasks.forEachIndexed { i, (name, task) ->
             context.drawText(
                 textRenderer,
-                (if (name in instance.tasks) INCOMPLETE_TASK else COMPLETE_TASK).text().apply {
-                    append(" ${task.description} ")
-                    append(TASK_PROGRESS.text(instance.tasks[name] ?: task.count, task.count).apply {
-                        if (!onCooldown && name in instance.tasks) withColor(0x707070)
-                    })
-                     when {
-                         onCooldown -> withColor(0x909090)
-                         name !in instance.tasks -> formatted(Formatting.DARK_GREEN)
-                     }
+                TASK.text(
+                    if (name in instance.tasks) INCOMPLETE_TASK.text else COMPLETE_TASK.text,
+                    Text.literal(task.description),
+                    TASK_PROGRESS.text(instance.tasks[name] ?: task.count, task.count).apply {
+                        if (!onCooldown && name in instance.tasks) withColor(0x5555FF)
+                    },
+                ).apply {
+                    when {
+                        onCooldown -> withColor(0x909090)
+                        name !in instance.tasks -> formatted(Formatting.DARK_GREEN)
+                    }
                 },
                 x + MARGIN,
                 y + MARGIN + (i + 1) * (textRenderer.fontHeight + 1) + 2,
@@ -94,6 +96,7 @@ class JobWidget(private val skillsComponent: SkillsComponent, private val job: R
 
         const val MARGIN = 6
 
+        val TASK = Translation.arg("screen.widget.$MOD_ID.job.task")
         val INCOMPLETE_TASK = Translation.unit("screen.widget.$MOD_ID.job.incomplete_task")
         val COMPLETE_TASK = Translation.unit("screen.widget.$MOD_ID.job.complete_task")
         val TASK_PROGRESS = Translation.arg("screen.widget.$MOD_ID.job.task_progress")

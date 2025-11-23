@@ -4,6 +4,7 @@ import archives.tater.rpgskills.ItemLockTooltip
 import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
+import archives.tater.rpgskills.client.gui.JobCompletedToast
 import archives.tater.rpgskills.client.gui.screen.ClassScreen
 import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
@@ -34,6 +35,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
         translationBuilder.add(SkillTabWidget.TOOLTIP, "Level %s")
         translationBuilder.add(ClassScreen.SELECT, "Select Class")
         translationBuilder.add(JobsScreen.TITLE, "Jobs")
+        translationBuilder.add(JobWidget.TASK, "%s %s: %s")
         translationBuilder.add(JobWidget.INCOMPLETE_TASK, "\u2610")
         translationBuilder.add(JobWidget.COMPLETE_TASK, "\u2611")
         translationBuilder.add(JobWidget.TASK_PROGRESS, "%s/%s")
@@ -43,6 +45,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
         translationBuilder.add(LockGroupWidget.Texts.RECIPES, "Recipes")
         translationBuilder.add(AttributesWidget.TITLE, "Attributes")
         translationBuilder.add(SkillJobWidget.TITLE, "Job: %s")
+        translationBuilder.add(JobCompletedToast.TITLE, "Job Complete!")
         translationBuilder.add(LockGroup.DEFAULT_ITEM_NAME, "Unknown Item")
         translationBuilder.add(LockGroup.DEFAULT_ITEM_MESSAGE, "You don't know how to use this item")
         translationBuilder.add(LockGroup.DEFAULT_BLOCK_MESSAGE, "You don't know how to use this block")

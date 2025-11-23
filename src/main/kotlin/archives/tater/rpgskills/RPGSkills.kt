@@ -8,6 +8,7 @@ import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.ClassChoicePayload
+import archives.tater.rpgskills.networking.JobCompletedPayload
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
@@ -44,6 +45,8 @@ object RPGSkills : ModInitializer {
 		DynamicRegistries.registerSynced(SkillClass.key, SkillClass.CODEC)
         DynamicRegistries.registerSynced(Job.key, Job.CODEC)
 
+        RPGSkillsCaches.register()
+
 		CommandRegistrationCallback.EVENT.register(RPGSkillsCommands)
 
 		ResourceManagerHelper.registerBuiltinResourcePack(
@@ -56,6 +59,7 @@ object RPGSkills : ModInitializer {
             register(RecipeBlockedPayload.ID, RecipeBlockedPayload.CODEC)
             register(ChooseClassPayload)
             register(SkillPointIncreasePayload)
+            register(JobCompletedPayload.ID, JobCompletedPayload.CODEC)
         }
         with (PayloadTypeRegistry.playC2S()) {
             register(ClassChoicePayload.ID, ClassChoicePayload.CODEC)

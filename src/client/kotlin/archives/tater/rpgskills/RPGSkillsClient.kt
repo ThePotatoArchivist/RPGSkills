@@ -1,6 +1,7 @@
 package archives.tater.rpgskills
 
 import archives.tater.rpgskills.RPGSkills.MOD_ID
+import archives.tater.rpgskills.client.gui.JobCompletedToast
 import archives.tater.rpgskills.client.gui.screen.ClassScreen
 import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
@@ -12,10 +13,12 @@ import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.entity.RPGSkillsEntities
 import archives.tater.rpgskills.networking.ChooseClassPayload
+import archives.tater.rpgskills.networking.JobCompletedPayload
 import archives.tater.rpgskills.networking.RecipeBlockedPayload
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.isEmpty
+import archives.tater.rpgskills.util.value
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
@@ -68,6 +71,10 @@ object RPGSkillsClient : ClientModInitializer {
 		}
 
         ClientPlayNetworking.registerGlobalReceiver(SkillPointIncreasePayload.id, SkillBarRenderer)
+
+        ClientPlayNetworking.registerGlobalReceiver(JobCompletedPayload.ID) { payload, context ->
+            context.client().toastManager.add(JobCompletedToast(payload.job.value, RPGSkillsCaches.JOB_TO_SKILL[payload.job.key.orElseThrow()]))
+        }
 
 		ClientTickEvents.END_CLIENT_TICK.register { client ->
 			if (skillsKey.wasPressed)

@@ -40,7 +40,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                 subExec("list") { command ->
                     val skills = command.source.registryManager[Skill].streamEntries().toList()
 
-                    if (skills.size == 0)
+                    if (skills.isEmpty())
                         command.source.sendFeedback(LIST_NONE.text, false)
                     else
                         command.source.sendFeedback(LIST.text(skills.size, Text.empty().apply {

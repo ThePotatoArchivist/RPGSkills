@@ -28,11 +28,13 @@
   "screen.widget.rpgskills.attributes.title": "Attributes",
   "screen.widget.rpgskills.job.complete_task": "☑",
   "screen.widget.rpgskills.job.incomplete_task": "☐",
+  "screen.widget.rpgskills.job.task": "%s %s: %s",
   "screen.widget.rpgskills.job.task_progress": "%s/%s",
   "screen.widget.rpgskills.jobs.title": "Job: %s",
   "screen.widget.rpgskills.lockgroup.blocks": "Blocks",
   "screen.widget.rpgskills.lockgroup.entities": "Entities",
   "screen.widget.rpgskills.lockgroup.items": "Items",
   "screen.widget.rpgskills.lockgroup.recipes": "Recipes",
-  "screen.widget.rpgskills.skilltab.tooltip": "Level %s"
+  "screen.widget.rpgskills.skilltab.tooltip": "Level %s",
+  "toast.rpgskills.job_complete": "Job Complete!"
 }

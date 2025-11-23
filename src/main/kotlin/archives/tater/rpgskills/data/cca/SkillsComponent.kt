@@ -7,6 +7,7 @@ import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.ClassChoicePayload
+import archives.tater.rpgskills.networking.JobCompletedPayload
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.*
@@ -155,7 +156,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                     // Complete task
                     tasks.remove(name)
                     if (tasks.isEmpty()) {
-                        completeJob(player, job, instance)
+                        completeJob(player, jobEntry, instance)
                     }
                 } else
                     tasks[name] = newCount
@@ -167,7 +168,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         if (changed) sync()
     }
 
-    private fun completeJob(player: ServerPlayerEntity, job: Job, instance: JobInstance) {
+    private fun completeJob(player: ServerPlayerEntity, jobEntry: RegistryEntry<Job>, instance: JobInstance) {
+        val job = jobEntry.value
         if (job.spawnAsOrbs) {
             SkillPointOrbEntity.spawnOrbs(player.serverWorld, player, player.pos, job.rewardPoints)
         } else {
@@ -176,6 +178,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         }
         instance.cooldown = job.cooldownTicks
         instance.resetTasks(job)
+        ServerPlayNetworking.send(player, JobCompletedPayload(jobEntry))
     }
 
     fun tickCooldowns() {
