@@ -29,12 +29,13 @@ import net.minecraft.sound.SoundEvents
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
+import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
 import java.util.function.Predicate
 
 @Suppress("UnstableApiUsage")
-class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent, ServerTickingComponent {
+class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent, ServerTickingComponent, ClientTickingComponent {
     private var _skillClass: RegistryEntry<SkillClass>? = null
     var skillClass by ::_skillClass.synced(key, player)
 
@@ -57,7 +58,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         get() = level - spentLevels
         set(value) {
             spentLevels = level - value
-            key.sync(player)
+            sync()
         }
 
     private var _jobs = mutableMapOf<RegistryEntry<Job>, JobInstance>()
@@ -71,12 +72,16 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     private var modifiers: HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> =
         HashMultimap.create()
 
+    private fun sync() {
+        key.sync(player)
+    }
+
     operator fun get(skill: RegistryEntry<Skill>) = _skills.getOrDefault(skill, 0)
     operator fun set(skill: RegistryEntry<Skill>, level: Int) {
         _skills[skill] = level.coerceIn(0, skill.value.levels.size)
         updateAttributes()
         updateJobs()
-        key.sync(player)
+        sync()
     }
 
     fun getUpgradeCost(skill: RegistryEntry<Skill>): Int? = skill.value.levels
@@ -90,7 +95,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         skillClass?.value?.startingLevels?.let(_skills::putAll)
         spentLevels = 0
         updateAttributes()
-        key.sync(player)
+        sync()
     }
 
     private fun getAttributeModifiers(): HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> =
@@ -131,17 +136,18 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     @Suppress("UNCHECKED_CAST")
     fun <T: AbstractCriterion.Conditions> onCriterion(criterion: Criterion<T>, condition: Predicate<T>) {
         val player = player as? ServerPlayerEntity ?: return
+        var changed = false
 
         for ((jobEntry, instance) in _jobs) {
             val (tasks, cooldown) = instance
             if (cooldown > 0) continue
-            
+
             val job = jobEntry.value
             for ((name, task) in job.tasks) {
                 if (name !in tasks || task.criteria.trigger != criterion || !condition.test(task.criteria.conditions as T)) continue
 
                 val newCount = (tasks[name] ?: 0) + 1
-                
+
                 if (newCount >= task.count) {
                     // Complete task
                     tasks.remove(name)
@@ -150,8 +156,12 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                     }
                 } else
                     tasks[name] = newCount
+
+                changed = true
             }
         }
+
+        if (changed) sync()
     }
 
     private fun completeJob(player: ServerPlayerEntity, job: Job, instance: JobInstance) {
@@ -165,10 +175,20 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         instance.resetTasks(job)
     }
 
-    override fun serverTick() {
+    fun tickCooldowns() {
         for ((_, instance) in _jobs)
             if (instance.cooldown > 0)
                 instance.cooldown--
+    }
+
+    override fun serverTick() {
+        tickCooldowns()
+        if (_jobs.isNotEmpty() && player.age % JOB_SYNC_FREQUENCY == 0)
+            sync()
+    }
+
+    override fun clientTick() {
+        tickCooldowns()
     }
 
     override fun shouldCopyForRespawn(lossless: Boolean, keepInventory: Boolean, sameCharacter: Boolean): Boolean =
@@ -237,6 +257,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         private val LEVEL_REQUIREMENTS_REVERSED = LEVEL_REQUIREMENTS.withIndex().reversed()
 
         val MAX_POINTS = LEVEL_REQUIREMENTS[MAX_LEVEL]
+        
+        const val JOB_SYNC_FREQUENCY = 20 * 60
 
         /**
          * Matches vanilla XP
