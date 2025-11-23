@@ -17,7 +17,7 @@ class SkillJobWidget(x: Int, y: Int, width: Int, job: RegistryEntry<Job>) :
 
     val text = listOf(
         TITLE.text(job.value.name),
-        Text.literal(job.value.description).formatted(Formatting.DARK_GRAY),
+        Text.literal(job.value.description).withColor(0x707070),
     )
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {

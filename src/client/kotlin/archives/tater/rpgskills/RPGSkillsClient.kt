@@ -31,6 +31,8 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
+import net.minecraft.command.argument.EntityArgumentType.player
+import net.minecraft.sound.SoundEvents
 import org.lwjgl.glfw.GLFW
 import kotlin.jvm.optionals.getOrNull
 
@@ -77,9 +79,11 @@ object RPGSkillsClient : ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(SkillPointIncreasePayload.id, SkillBarRenderer)
 
         ClientPlayNetworking.registerGlobalReceiver(JobCompletedPayload.ID) { payload, context ->
+            val player = context.player()
+            player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 0.1f, (player.random.nextFloat() - player.random.nextFloat()) * 0.35F + 0.9F)
             context.client().toastManager.add(JobCompletedToast(
                 payload.job.value,
-                JOB_SKILL_CACHE[context.player().registryManager][payload.job]?.value
+                JOB_SKILL_CACHE[player.registryManager][payload.job]?.value
             ))
         }
 

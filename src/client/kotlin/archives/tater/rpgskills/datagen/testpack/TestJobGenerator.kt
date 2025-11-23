@@ -48,7 +48,7 @@ class TestJobGenerator(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())
                         )
                     )),
-                ), 1, 20 * 60 * 2
+                ), 20, 20 * 60 * 2, spawnAsOrbs = true
             )
         }
 
