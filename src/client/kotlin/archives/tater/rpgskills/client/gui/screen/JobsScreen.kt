@@ -9,7 +9,9 @@ import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.screen.ScreenTexts
 
 class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
     private var x = 0
@@ -22,6 +24,11 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148, player[SkillsComponent].let {
             it.jobs.map { (job, _) -> JobWidget(it, job, 168, x + 10, 0) }
         }))
+
+        addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE) { close() }.apply {
+            width(200)
+            position(width / 2 - 100, height - 25)
+        }.build())
     }
 
     override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
