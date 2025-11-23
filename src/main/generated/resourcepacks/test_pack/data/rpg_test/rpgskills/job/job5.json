@@ -5,19 +5,17 @@
   "reward_points": 1,
   "tasks": {
     "task": {
-      "count": 10,
-      "criteria": {
-        "conditions": {
-          "location": [
-            {
-              "block": "minecraft:granite",
-              "condition": "minecraft:block_state_property"
-            }
-          ]
-        },
-        "trigger": "minecraft:placed_block"
+      "conditions": {
+        "location": [
+          {
+            "block": "minecraft:granite",
+            "condition": "minecraft:block_state_property"
+          }
+        ]
       },
-      "description": "Place Granite"
+      "count": 10,
+      "description": "Place Granite",
+      "trigger": "minecraft:placed_block"
     }
   }
 }

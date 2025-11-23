@@ -6,29 +6,25 @@
   "tasks": {
     "harvest_crops": {
       "count": 20,
-      "criteria": {
-        "trigger": "minecraft:consume_item"
-      },
-      "description": "Eat anything"
+      "description": "Eat anything",
+      "trigger": "minecraft:consume_item"
     },
     "plant_crops": {
-      "count": 20,
-      "criteria": {
-        "conditions": {
-          "location": [
-            {
-              "condition": "minecraft:location_check",
-              "predicate": {
-                "block": {
-                  "blocks": "#minecraft:crops"
-                }
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "#minecraft:crops"
               }
             }
-          ]
-        },
-        "trigger": "minecraft:placed_block"
+          }
+        ]
       },
-      "description": "Plant any crop"
+      "count": 20,
+      "description": "Plant any crop",
+      "trigger": "minecraft:placed_block"
     }
   }
 }

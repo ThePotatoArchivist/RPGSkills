@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.mixin.job.AdvancementCriterionAccessor
 import archives.tater.rpgskills.util.RegistryKeyHolder
 import archives.tater.rpgskills.util.intRangeCodec
 import com.mojang.serialization.Codec
@@ -26,7 +27,7 @@ data class Job(
             val CODEC: Codec<Task> = RecordCodecBuilder.create { it.group(
                 Codec.STRING.fieldOf("description").forGetter(Task::description),
                 intRangeCodec(min = 1).fieldOf("count").forGetter(Task::count),
-                AdvancementCriterion.CODEC.fieldOf("criteria").forGetter(Task::criteria),
+                AdvancementCriterionAccessor.getMAP_CODEC().forGetter(Task::criteria)
             ).apply(it, ::Task) }
         }
     }

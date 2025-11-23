@@ -6,34 +6,30 @@
   "spawn_as_orbs": true,
   "tasks": {
     "place_granite": {
-      "count": 10,
-      "criteria": {
-        "conditions": {
-          "location": [
-            {
-              "block": "minecraft:granite",
-              "condition": "minecraft:block_state_property"
-            }
-          ]
-        },
-        "trigger": "minecraft:placed_block"
+      "conditions": {
+        "location": [
+          {
+            "block": "minecraft:granite",
+            "condition": "minecraft:block_state_property"
+          }
+        ]
       },
-      "description": "Place Granite"
+      "count": 10,
+      "description": "Place Granite",
+      "trigger": "minecraft:placed_block"
     },
     "place_stone": {
-      "count": 20,
-      "criteria": {
-        "conditions": {
-          "location": [
-            {
-              "block": "minecraft:stone",
-              "condition": "minecraft:block_state_property"
-            }
-          ]
-        },
-        "trigger": "minecraft:placed_block"
+      "conditions": {
+        "location": [
+          {
+            "block": "minecraft:stone",
+            "condition": "minecraft:block_state_property"
+          }
+        ]
       },
-      "description": "Place Stone"
+      "count": 20,
+      "description": "Place Stone",
+      "trigger": "minecraft:placed_block"
     }
   }
 }
