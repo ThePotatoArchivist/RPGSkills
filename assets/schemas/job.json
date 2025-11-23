@@ -16,10 +16,12 @@
       "type": "string"
     },
     "cooldown_ticks": {
-      "type": "integer"
+      "type": "integer",
+      "minimum": 0
     },
     "reward_points": {
-      "type": "integer"
+      "type": "integer",
+      "minimum": 0
     },
     "spawn_as_orbs": {
       "type": "boolean"
@@ -30,16 +32,19 @@
           "type": "object",
           "properties": {
             "trigger": {
-              "$ref": "#/definitions/Identifier"
+              "$ref": "#/definitions/Identifier",
+              "description": "See https://misode.github.io/advancement/"
             },
             "conditions": {
-              "type": "object"
+              "type": "object",
+              "description": "See https://misode.github.io/advancement/"
             },
             "description": {
               "type": "string"
             },
             "count": {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 1
             }
           },
           "additionalProperties": false,
