@@ -95,6 +95,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         skillClass?.value?.startingLevels?.let(_skills::putAll)
         spentLevels = 0
         updateAttributes()
+        updateJobs()
         sync()
     }
 
@@ -183,7 +184,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     override fun serverTick() {
         tickCooldowns()
-        if (_jobs.isNotEmpty() && player.age % JOB_SYNC_FREQUENCY == 0)
+        if (_jobs.any { (_, instance) -> instance.cooldown > 0 } && player.age % JOB_SYNC_FREQUENCY == 0)
             sync()
     }
 

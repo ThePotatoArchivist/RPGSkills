@@ -42,11 +42,14 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
         }.build())
     }
 
-    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        this.renderBackground(context, mouseX, mouseY, delta)
-        buttonWidget.render(context, mouseX, mouseY, delta)
-        // Background
+    override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+        super.renderBackground(context, mouseX, mouseY, delta)
         context.drawTexture(TEXTURE, x, y, 0, 0, WIDTH, HEIGHT)
+    }
+
+    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+        renderBackground(context, mouseX, mouseY, delta)
+        buttonWidget.render(context, mouseX, mouseY, delta)
         // Title
         context.drawText(textRenderer, title, x + 8, y + 7, 0x404040, false)
         // Experience Number
@@ -56,7 +59,8 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
             context.drawOutlinedText(textRenderer, it, x + 139 - it.length * 6, y + 6, 0x70DACD)
         }
         // Experience Bar
-        context.drawTexture(TEXTURE, x + 143, y + 8, 143, 141, (skills.levelProgress * XP_BAR_WIDTH).toInt(), XP_BAR_HEIGHT)
+        context.drawGuiTexture(BAR_EMPTY_TEXTURE, x + 143, y + 8, XP_BAR_WIDTH, XP_BAR_HEIGHT)
+        context.drawGuiTexture(BAR_FILLED_TEXTURE, XP_BAR_WIDTH, XP_BAR_HEIGHT, 0, 0, x + 143, y + 8, (skills.levelProgress * XP_BAR_WIDTH).toInt(), XP_BAR_HEIGHT)
         // List
         (if (skillWidgets.size > MAX_VISIBLE) skillWidgets.subList(indexOffset, indexOffset + MAX_VISIBLE) else skillWidgets)
             .forEachIndexed { index, (widget, button) ->
@@ -67,12 +71,10 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
                 button.render(context, mouseX, mouseY, delta)
             }
         // Scrollbar
-        context.drawTexture(
-            TEXTURE,
+        context.drawGuiTexture(
+            if (canScroll) SCROLLBAR_TEXTURE else SCROLLBAR_DISABLED_TEXTURE,
             x + SCROLLBAR_X,
             y + SCROLLBAR_Y + (SCROLL_HEIGHT - SCROLLBAR_HEIGHT) * indexOffset / (skillWidgets.size - MAX_VISIBLE),
-            if (canScroll) 237 else 243,
-            147,
             SCROLL_WIDTH,
             SCROLLBAR_HEIGHT
         )
@@ -112,6 +114,11 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
         val TEXTURE = RPGSkills.id("textures/gui/skills.png")
         const val WIDTH = 252
         const val HEIGHT = 138
+
+        val BAR_EMPTY_TEXTURE = RPGSkills.id("skill/large_bar_empty")
+        val BAR_FILLED_TEXTURE = RPGSkills.id("skill/large_bar_filled")
+        val SCROLLBAR_TEXTURE = RPGSkills.id("skill/scroll_bar")
+        val SCROLLBAR_DISABLED_TEXTURE = RPGSkills.id("skill/scroll_bar_disabled")
 
         const val XP_BAR_WIDTH = 101
         const val XP_BAR_HEIGHT = 5
