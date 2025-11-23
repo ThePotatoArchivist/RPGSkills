@@ -18,11 +18,13 @@ data class Job(
     val spawnAsOrbs: Boolean = false,
 ) {
     data class Task(
+        val description: String,
         val count: Int,
         val criteria: AdvancementCriterion<*>,
     ) {
         companion object {
             val CODEC: Codec<Task> = RecordCodecBuilder.create { it.group(
+                Codec.STRING.fieldOf("description").forGetter(Task::description),
                 intRangeCodec(min = 1).fieldOf("count").forGetter(Task::count),
                 AdvancementCriterion.CODEC.fieldOf("criteria").forGetter(Task::criteria),
             ).apply(it, ::Task) }

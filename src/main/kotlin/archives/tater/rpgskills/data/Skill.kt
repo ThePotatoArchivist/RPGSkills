@@ -70,7 +70,7 @@ data class Skill(
             val SHORT_CODEC: Codec<Level> = AlternateCodec(
                 CODEC,
                 Codec.INT.xmap({ Level(it) }, { it.cost })
-            ) { it.attributes.isEmpty() }
+            ) { it.attributes.isEmpty() && it.jobs.isEmpty() }
         }
     }
 

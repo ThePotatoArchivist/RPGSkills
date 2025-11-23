@@ -84,6 +84,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         sync()
     }
 
+    operator fun get(job: RegistryEntry<Job>) = _jobs[job]
+
     fun getUpgradeCost(skill: RegistryEntry<Skill>): Int? = skill.value.levels
         .getOrNull(this[skill])?.cost
 

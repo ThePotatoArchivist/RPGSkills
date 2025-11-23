@@ -23,6 +23,8 @@ class TestJobGenerator(
         lookup: RegistryWrapper.WrapperLookup
     ) {
         provider.accept(PLACE_STONE)
+        for (job in OTHERS)
+            provider.accept(job)
     }
 
     companion object : BuildsRegistry<Job> {
@@ -36,22 +38,34 @@ class TestJobGenerator(
                 "Stone Placer",
                 "Place stone and granite",
                 mapOf(
-                    "place_stone" to Job.Task(20, AdvancementCriterion(
+                    "place_stone" to Job.Task("Place Stone", 20, AdvancementCriterion(
                         Criteria.PLACED_BLOCK, itemCriterionConditions(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.STONE).build())
                         )
                     )),
-                    "place_granite" to Job.Task(10, AdvancementCriterion(
+                    "place_granite" to Job.Task("Place Granite", 10, AdvancementCriterion(
                         Criteria.PLACED_BLOCK, itemCriterionConditions(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())
                         )
                     )),
-                ), 1, 20 * 30
+                ), 1, 20 * 60 * 2
             )
+        }
+
+        val OTHERS = (1..10).map {
+            BuildEntry(Identifier.of("rpg_test", "job$it")) {
+                Job("Job $it", "EEEEE", mapOf("task" to Job.Task("Place Granite", 10, AdvancementCriterion(
+                    Criteria.PLACED_BLOCK, itemCriterionConditions(
+                        location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())
+                    )
+                ))), 1, 20)
+            }
         }
 
         override fun bootstrap(registerable: Registerable<Job>) {
             registerable.register(PLACE_STONE)
+            for (job in OTHERS)
+                registerable.register(job)
         }
     }
 }

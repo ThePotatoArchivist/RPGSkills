@@ -1,5 +1,5 @@
 {
-  "cooldown_ticks": 600,
+  "cooldown_ticks": 2400,
   "description": "Place stone and granite",
   "name": "Stone Placer",
   "reward_points": 1,
@@ -16,7 +16,8 @@
           ]
         },
         "trigger": "minecraft:placed_block"
-      }
+      },
+      "description": "Place Granite"
     },
     "place_stone": {
       "count": 20,
@@ -30,7 +31,8 @@
           ]
         },
         "trigger": "minecraft:placed_block"
-      }
+      },
+      "description": "Place Stone"
     }
   }
 }

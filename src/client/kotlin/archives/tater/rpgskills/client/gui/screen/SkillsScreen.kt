@@ -12,11 +12,12 @@ import archives.tater.rpgskills.util.get
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
+import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
 import net.minecraft.util.math.MathHelper.clamp
 
-class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
+class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
     private var x = 0
     private var y = 0
     private lateinit var skillWidgets: List<Pair<SkillWidget, SkillUpgradeButton>>
@@ -52,15 +53,8 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
         buttonWidget.render(context, mouseX, mouseY, delta)
         // Title
         context.drawText(textRenderer, title, x + 8, y + 7, 0x404040, false)
-        // Experience Number
-        val skills = player[SkillsComponent]
-
-        "${skills.spendableLevels}/${skills.level}".let {
-            context.drawOutlinedText(textRenderer, it, x + 139 - it.length * 6, y + 6, 0x70DACD)
-        }
-        // Experience Bar
-        context.drawGuiTexture(BAR_EMPTY_TEXTURE, x + 143, y + 8, XP_BAR_WIDTH, XP_BAR_HEIGHT)
-        context.drawGuiTexture(BAR_FILLED_TEXTURE, XP_BAR_WIDTH, XP_BAR_HEIGHT, 0, 0, x + 143, y + 8, (skills.levelProgress * XP_BAR_WIDTH).toInt(), XP_BAR_HEIGHT)
+        // Bar
+        drawXpBar(context, x + 244, y + 6)
         // List
         (if (skillWidgets.size > MAX_VISIBLE) skillWidgets.subList(indexOffset, indexOffset + MAX_VISIBLE) else skillWidgets)
             .forEachIndexed { index, (widget, button) ->
@@ -115,13 +109,8 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
         const val WIDTH = 252
         const val HEIGHT = 138
 
-        val BAR_EMPTY_TEXTURE = RPGSkills.id("skill/large_bar_empty")
-        val BAR_FILLED_TEXTURE = RPGSkills.id("skill/large_bar_filled")
         val SCROLLBAR_TEXTURE = RPGSkills.id("skill/scroll_bar")
         val SCROLLBAR_DISABLED_TEXTURE = RPGSkills.id("skill/scroll_bar_disabled")
-
-        const val XP_BAR_WIDTH = 101
-        const val XP_BAR_HEIGHT = 5
 
         const val MAX_VISIBLE = 5
         const val SCROLL_WIDTH = 6
@@ -131,5 +120,6 @@ class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
         const val SCROLLBAR_Y = 19
 
         val TITLE = Translation.unit("screen.$MOD_ID.skills")
+
     }
 }

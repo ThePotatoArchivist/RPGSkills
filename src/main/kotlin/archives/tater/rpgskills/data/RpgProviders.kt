@@ -35,24 +35,30 @@ abstract class JobProvider(
     override fun getName(): String = "Jobs"
 }
 
-class BuildEntry<T>(
+class BuildEntry<T: Any>(
     val registry: RegistryKey<out Registry<T>>,
     val id: Identifier,
-    getValue: () -> T,
+    private val create: (Registerable<T>) -> T,
 ) {
-    val value by lazy(getValue)
+    lateinit var value: T
     val key: RegistryKey<T> = RegistryKey.of(registry, id)
     lateinit var entry: RegistryEntry<T>
+
+    fun getValue(registerable: Registerable<T>): T {
+        value = create(registerable)
+        return value
+    }
 }
 
-fun <T> BiConsumer<Identifier, T>.accept(buildEntry: BuildEntry<T>) {
+fun <T: Any> BiConsumer<Identifier, T>.accept(buildEntry: BuildEntry<T>) {
     accept(buildEntry.id, buildEntry.value)
 }
 
-interface BuildsRegistry<T> {
+interface BuildsRegistry<T: Any> {
     val registry: RegistryKey<out Registry<T>>
 
-    fun BuildEntry(id: Identifier, value: () -> T) = BuildEntry(registry, id, value)
+    fun BuildEntry(id: Identifier, value: () -> T) = BuildEntry(registry, id) { value() }
+    fun depBuildEntry(id: Identifier, create: (Registerable<T>) -> T) = BuildEntry(registry, id, create)
 
     fun buildRegistry(registryBuilder: RegistryBuilder) {
         registryBuilder.addRegistry(registry, ::bootstrap)
@@ -61,6 +67,11 @@ interface BuildsRegistry<T> {
     fun bootstrap(registerable: Registerable<T>)
 
     fun Registerable<T>.register(buildEntry: BuildEntry<T>) {
-        buildEntry.entry = register(RegistryKey.of(registry, buildEntry.id), buildEntry.value)
+        buildEntry.entry = register(RegistryKey.of(registry, buildEntry.id), buildEntry.getValue(this))
     }
 }
+
+operator fun <S> Registerable<*>.get(registryRef: RegistryKey<out Registry<S>>): RegistryEntryLookup<S> =
+    getRegistryLookup(registryRef)
+
+operator fun <S: Any> Registerable<*>.get(buildEntry: BuildEntry<S>): RegistryEntry<S> = this[buildEntry.registry].getOrThrow(buildEntry.key)

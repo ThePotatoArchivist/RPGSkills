@@ -5,6 +5,7 @@ import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
 import archives.tater.rpgskills.client.gui.screen.ClassScreen
+import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
@@ -32,6 +33,10 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
         translationBuilder.add(SkillsScreen.TITLE, "Skills")
         translationBuilder.add(SkillTabWidget.TOOLTIP, "Level %s")
         translationBuilder.add(ClassScreen.SELECT, "Select Class")
+        translationBuilder.add(JobsScreen.TITLE, "Jobs")
+        translationBuilder.add(JobWidget.INCOMPLETE_TASK, "\u2610")
+        translationBuilder.add(JobWidget.COMPLETE_TASK, "\u2611")
+        translationBuilder.add(JobWidget.TASK_PROGRESS, "%s/%s")
         translationBuilder.add(LockGroupWidget.Texts.ITEMS, "Items")
         translationBuilder.add(LockGroupWidget.Texts.BLOCKS, "Blocks")
         translationBuilder.add(LockGroupWidget.Texts.ENTITIES, "Entities")

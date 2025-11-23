@@ -2,6 +2,7 @@ package archives.tater.rpgskills
 
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.gui.screen.ClassScreen
+import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.render.SkillBarRenderer
 import archives.tater.rpgskills.client.render.entity.SkillPointOrbEntityRenderer
@@ -34,13 +35,21 @@ object RPGSkillsClient : ClientModInitializer {
 
 	const val RPG_SKILLS_CATEGORY = "category.$MOD_ID.$MOD_ID"
 	const val SKILLS_KEY_TRANSLATION = "key.$MOD_ID.screen.skills"
+    const val JOBS_KEY_TRANSLATION = "key.$MOD_ID.screen.jobs"
 
-	val skillsKeyBinding: KeyBinding = KeyBindingHelper.registerKeyBinding(KeyBinding(
+	val skillsKey: KeyBinding = KeyBindingHelper.registerKeyBinding(KeyBinding(
 		SKILLS_KEY_TRANSLATION,
 		InputUtil.Type.KEYSYM,
 		GLFW.GLFW_KEY_O,
 		RPG_SKILLS_CATEGORY,
 	))
+
+    val jobsKey: KeyBinding = KeyBindingHelper.registerKeyBinding(KeyBinding(
+        JOBS_KEY_TRANSLATION,
+        InputUtil.Type.KEYSYM,
+        GLFW.GLFW_KEY_J,
+        RPG_SKILLS_CATEGORY,
+    ))
 
 	override fun onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
@@ -61,10 +70,14 @@ object RPGSkillsClient : ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(SkillPointIncreasePayload.id, SkillBarRenderer)
 
 		ClientTickEvents.END_CLIENT_TICK.register { client ->
-			if (skillsKeyBinding.wasPressed)
+			if (skillsKey.wasPressed)
 				client.player?.let {
 					client.setScreen(SkillsScreen(it))
 				}
+            if (jobsKey.wasPressed)
+                client.player?.let {
+                    client.setScreen(JobsScreen(it))
+                }
 		}
 
 		ScreenEvents.BEFORE_INIT.register { _, _, _, _ ->

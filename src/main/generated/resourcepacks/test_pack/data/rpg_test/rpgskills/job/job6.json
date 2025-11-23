@@ -1,0 +1,23 @@
+{
+  "cooldown_ticks": 20,
+  "description": "EEEEE",
+  "name": "Job 6",
+  "reward_points": 1,
+  "tasks": {
+    "task": {
+      "count": 10,
+      "criteria": {
+        "conditions": {
+          "location": [
+            {
+              "block": "minecraft:granite",
+              "condition": "minecraft:block_state_property"
+            }
+          ]
+        },
+        "trigger": "minecraft:placed_block"
+      },
+      "description": "Place Granite"
+    }
+  }
+}

@@ -6,6 +6,7 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.AnonymousAttributeModifier
 import archives.tater.rpgskills.data.SkillProvider
 import archives.tater.rpgskills.data.accept
+import archives.tater.rpgskills.data.get
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation
 import net.minecraft.entity.attribute.EntityAttributes
@@ -38,20 +39,22 @@ class TestSkillGenerator(
     companion object : BuildsRegistry<Skill> {
         override val registry = Skill.key
 
-        val POTATO_SKILL = BuildEntry(Identifier.of("rpg_test", "potato")) { Skill(
-            icon = ItemStack(Items.POTATO),
-            levels = listOf(
-                Skill.Level(1, mapOf(
-                    EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
-                )),
-                Skill.Level(2, mapOf(
-                    EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
-                ), listOf(TestJobGenerator.PLACE_STONE.entry)),
-                Skill.Level(3),
-            ),
-            name = "Potato Skill",
-            description = "Unlocks potatoes & other stuff"
-        ) }
+        val POTATO_SKILL = depBuildEntry(Identifier.of("rpg_test", "potato")) { registerable ->
+            Skill(
+                icon = ItemStack(Items.POTATO),
+                levels = listOf(
+                    Skill.Level(1, mapOf(
+                        EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
+                    )),
+                    Skill.Level(2, mapOf(
+                        EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
+                    ), listOf(registerable[TestJobGenerator.PLACE_STONE])),
+                    Skill.Level(3),
+                ),
+                name = "Potato Skill",
+                description = "Unlocks potatoes & other stuff"
+            ) 
+        }
 
         val COW_SKILL = BuildEntry(Identifier.of("rpg_test", "cow")) {
             Skill(
@@ -62,14 +65,14 @@ class TestSkillGenerator(
             )
         }
 
-        val GRASS_SKILL = BuildEntry(Identifier.of("rpg_test", "grass")) {
+        val GRASS_SKILL = depBuildEntry(Identifier.of("rpg_test", "grass")) { registerable ->
             Skill(
                 icon = ItemStack(Items.GRASS_BLOCK),
                 levels = listOf(
                     Skill.Level(1, mapOf(
                         RPGSkillsAttributes.BOW_DRAW_TIME to AnonymousAttributeModifier(-10.0, Operation.ADD_VALUE)
                     )),
-                    Skill.Level(2),
+                    Skill.Level(2, jobs = TestJobGenerator.OTHERS.map { registerable[it] }),
                 ),
                 name = "Grass Skill",
                 description = "Unlocks cows I guess"
