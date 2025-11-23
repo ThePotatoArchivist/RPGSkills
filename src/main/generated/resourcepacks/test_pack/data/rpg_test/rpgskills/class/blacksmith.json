@@ -1,8 +1,6 @@
 {
   "description": "Makes stuff",
-  "icon": {
-    "id": "minecraft:iron_axe"
-  },
+  "icon": "minecraft:iron_axe",
   "name": "Blacksmith",
   "starting_levels": {
     "rpg_test:grass": 1,

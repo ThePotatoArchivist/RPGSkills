@@ -20,6 +20,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
 import net.minecraft.predicate.entity.LootContextPredicate
+import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryWrapper
@@ -167,3 +168,8 @@ fun intRangeCodec(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Codec<Int
 
 fun itemCriterionConditions(playerPredicate: LootContextPredicate? = null, location: LootContextPredicate? = null) =
     ItemCriterion.Conditions(Optional.ofNullable(playerPredicate), Optional.ofNullable(location))
+
+val SHORT_STACK_CODEC = AlternateCodec(
+    ItemStack.UNCOUNTED_CODEC,
+    Registries.ITEM.codec.xmap({ it.defaultStack }, { it.item })
+) { ItemStack.areItemsAndComponentsEqual(it, it.item.defaultStack) }

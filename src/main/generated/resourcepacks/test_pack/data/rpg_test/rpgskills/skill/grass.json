@@ -1,8 +1,6 @@
 {
   "description": "Unlocks cows I guess",
-  "icon": {
-    "id": "minecraft:grass_block"
-  },
+  "icon": "minecraft:grass_block",
   "levels": [
     {
       "attributes": {
