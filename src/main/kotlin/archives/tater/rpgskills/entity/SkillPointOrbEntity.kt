@@ -1,18 +1,29 @@
 package archives.tater.rpgskills.entity
 
+import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.*
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import com.mojang.serialization.Codec
+import net.minecraft.advancement.AdvancementRewards.Builder.experience
+import net.minecraft.block.BlockState
+import net.minecraft.block.entity.BlockEntity
+import net.minecraft.command.argument.EntityArgumentType.player
+import net.minecraft.enchantment.Enchantment
+import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
+import net.minecraft.entity.ItemSteerable
 import net.minecraft.entity.MovementType
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.Packet
@@ -29,6 +40,7 @@ import net.minecraft.util.math.MathHelper.square
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import java.util.*
+import kotlin.math.exp
 import kotlin.math.sqrt
 
 class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: World) : Entity(type, world) {
@@ -197,5 +209,22 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
             if (lastOrbAmount > 0)
                 world.spawnEntity(SkillPointOrbEntity(world, pos.getX(), pos.getY(), pos.getZ(), owner, lastOrbAmount))
         }
+
+        @JvmStatic
+        fun dropBlockSkillPoints(
+            world: ServerWorld,
+            pos: BlockPos,
+            state: BlockState,
+            tool: ItemStack,
+            baseExperience: Int,
+        ) {
+            if (state.isIn(RPGSkillsTags.NON_SKILL_POINT_DROP)) return
+
+            val points = EnchantmentHelper.getBlockExperience(world, tool, baseExperience)
+            if (points <= 0) return
+
+            spawnOrbs(world, null, pos.toCenterPos(), RPGSkills.CONFIG.getBlockPoints(points))
+        }
+
     }
 }

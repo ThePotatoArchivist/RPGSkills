@@ -32,6 +32,7 @@ data class RPGSkillsConfig(
         RPGSkillsTags.DLC_BOSS to 8000, // TODO tweak value
     ),
     val defaultEntitySkillPointDivisor: Int = 2,
+    val blockSkillPointDivisor: Int = 1,
     val baseLevelCap: Int = 10,
     val levelCapIncreasePerBoss: Int = 10,
 ) {
@@ -43,6 +44,8 @@ data class RPGSkillsConfig(
         entitySkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { entity isIn tag } }
             ?: (entity.getXpToDrop(entity.world as ServerWorld, null) ceilDiv defaultEntitySkillPointDivisor)
 
+    fun getBlockPoints(experiencePoints: Int) = experiencePoints ceilDiv blockSkillPointDivisor
+
     companion object : CodecConfig<RPGSkillsConfig>(RPGSkills.MOD_ID, RPGSkills.logger) {
         override val codec: Codec<RPGSkillsConfig> = RecordCodecBuilder.create { it.group(
             Codec.INT.fieldOf("chunk_skill_points").forGetter(RPGSkillsConfig::chunkSkillPoints),
@@ -51,6 +54,7 @@ data class RPGSkillsConfig(
             Codec.INT.fieldOf("default_structure_skill_points").forGetter(RPGSkillsConfig::defaultStructureSkillPoints),
             Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.ENTITY_TYPE), Codec.INT).fieldOf("entity_skill_points").forGetter(RPGSkillsConfig::entitySkillPoints),
             Codec.INT.fieldOf("default_entity_skill_point_divisor").forGetter(RPGSkillsConfig::defaultEntitySkillPointDivisor),
+            Codec.INT.fieldOf("block_skill_point_divisor").forGetter(RPGSkillsConfig::defaultEntitySkillPointDivisor),
             Codec.INT.fieldOf("base_level_cap").forGetter(RPGSkillsConfig::baseLevelCap),
             Codec.INT.fieldOf("level_cap_increase_per_boss").forGetter(RPGSkillsConfig::levelCapIncreasePerBoss),
         ).apply(it, ::RPGSkillsConfig) }

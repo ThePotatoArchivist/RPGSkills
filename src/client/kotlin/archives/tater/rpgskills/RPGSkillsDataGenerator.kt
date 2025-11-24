@@ -1,5 +1,6 @@
 package archives.tater.rpgskills
 
+import archives.tater.rpgskills.datagen.BlockTagGenerator
 import archives.tater.rpgskills.datagen.EntityTagGenerator
 import archives.tater.rpgskills.datagen.LangGenerator
 import archives.tater.rpgskills.datagen.ModelGenerator
@@ -21,6 +22,7 @@ object RPGSkillsDataGenerator : DataGeneratorEntrypoint {
 			addProvider(::ModelGenerator)
 			addProvider(::StructureTagGenerator)
 			addProvider(::EntityTagGenerator)
+            addProvider(::BlockTagGenerator)
 		}
 		fabricDataGenerator.createBuiltinResourcePack(RPGSkills.id("test_pack")).apply {
             addProvider(::TestJobGenerator)

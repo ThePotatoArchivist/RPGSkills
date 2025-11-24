@@ -16,5 +16,9 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "plugin": "archives.tater.rpgskills.client.RPGSkillsMixinConfigPlugin"
+  "plugin": "archives.tater.rpgskills.client.RPGSkillsMixinConfigPlugin",
+  "mixins": [
+    "xp.ExperienceDroppingBlockMixin",
+    "xp.RedstoneOreBlockMixin"
+  ]
 }
