@@ -13,6 +13,9 @@
     "locking.LivingEntityMixin",
     "locking.RecipeUnlockerMixin",
     "locking.ServerPlayerInteractionManagerMixin",
+    "xp.AdvancementRewardsMixin",
+    "xp.AnimalEntityMixin",
+    "xp.FishingBobberEntityMixin",
     "xp.LivingEntityMixin",
     "xp.MobEntityMixin",
     "xp.MobSpawnerLogicMixin"

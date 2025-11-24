@@ -10,14 +10,10 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ExperienceDroppingBlock;
-import net.minecraft.block.RedstoneOreBlock;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.intprovider.IntProvider;
-
-import static java.lang.Math.exp;
 
 @Mixin(ExperienceDroppingBlock.class)
 public class ExperienceDroppingBlockMixin {
@@ -27,6 +23,6 @@ public class ExperienceDroppingBlockMixin {
     )
     private void dropSkillPoints(ExperienceDroppingBlock instance, ServerWorld world, BlockPos blockPos, ItemStack stack, IntProvider experience, Operation<Void> original, @Local(argsOnly = true) BlockPos pos, @Local(argsOnly = true) BlockState state, @Local(argsOnly = true) ItemStack tool) {
         original.call(instance, world, blockPos, stack, experience);
-        SkillPointOrbEntity.dropBlockSkillPoints(world, pos, state, tool, experience.get(world.random));
+        SkillPointOrbEntity.spawnForBlock(world, pos, state, tool, experience.get(world.random));
     }
 }

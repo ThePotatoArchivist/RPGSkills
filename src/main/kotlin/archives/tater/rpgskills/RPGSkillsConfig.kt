@@ -6,12 +6,16 @@ import archives.tater.rpgskills.util.ceilDiv
 import archives.tater.rpgskills.util.isIn
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.advancement.Advancement
+import net.minecraft.advancement.AdvancementRewards
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.intprovider.IntProvider
+import net.minecraft.util.math.intprovider.UniformIntProvider
 import net.minecraft.world.gen.structure.Structure
 
 data class RPGSkillsConfig(
@@ -33,6 +37,9 @@ data class RPGSkillsConfig(
     ),
     val defaultEntitySkillPointDivisor: Int = 2,
     val blockSkillPointDivisor: Int = 1,
+    val advancementSkillPointDivisor: Int = 1,
+    val fishingSkillPoints: IntProvider = UniformIntProvider.create(1, 3),
+    val breedingSkillPoints: IntProvider = UniformIntProvider.create(1, 2),
     val baseLevelCap: Int = 10,
     val levelCapIncreasePerBoss: Int = 10,
 ) {
@@ -46,6 +53,8 @@ data class RPGSkillsConfig(
 
     fun getBlockPoints(experiencePoints: Int) = experiencePoints ceilDiv blockSkillPointDivisor
 
+    fun getAdvancementPoints(rewards: AdvancementRewards) = rewards.experience ceilDiv advancementSkillPointDivisor
+
     companion object : CodecConfig<RPGSkillsConfig>(RPGSkills.MOD_ID, RPGSkills.logger) {
         override val codec: Codec<RPGSkillsConfig> = RecordCodecBuilder.create { it.group(
             Codec.INT.fieldOf("chunk_skill_points").forGetter(RPGSkillsConfig::chunkSkillPoints),
@@ -54,7 +63,10 @@ data class RPGSkillsConfig(
             Codec.INT.fieldOf("default_structure_skill_points").forGetter(RPGSkillsConfig::defaultStructureSkillPoints),
             Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.ENTITY_TYPE), Codec.INT).fieldOf("entity_skill_points").forGetter(RPGSkillsConfig::entitySkillPoints),
             Codec.INT.fieldOf("default_entity_skill_point_divisor").forGetter(RPGSkillsConfig::defaultEntitySkillPointDivisor),
-            Codec.INT.fieldOf("block_skill_point_divisor").forGetter(RPGSkillsConfig::defaultEntitySkillPointDivisor),
+            Codec.INT.fieldOf("block_skill_point_divisor").forGetter(RPGSkillsConfig::blockSkillPointDivisor),
+            Codec.INT.fieldOf("advancement_skill_point_divisor").forGetter(RPGSkillsConfig::advancementSkillPointDivisor),
+            IntProvider.POSITIVE_CODEC.fieldOf("fishing_skill_points").forGetter(RPGSkillsConfig::fishingSkillPoints),
+            IntProvider.POSITIVE_CODEC.fieldOf("breeding_skill_points").forGetter(RPGSkillsConfig::breedingSkillPoints),
             Codec.INT.fieldOf("base_level_cap").forGetter(RPGSkillsConfig::baseLevelCap),
             Codec.INT.fieldOf("level_cap_increase_per_boss").forGetter(RPGSkillsConfig::levelCapIncreasePerBoss),
         ).apply(it, ::RPGSkillsConfig) }

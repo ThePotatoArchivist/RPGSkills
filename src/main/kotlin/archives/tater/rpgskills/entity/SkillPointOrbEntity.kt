@@ -5,18 +5,14 @@ import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.*
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import com.mojang.serialization.Codec
-import net.minecraft.advancement.AdvancementRewards.Builder.experience
+import net.minecraft.advancement.Advancement
+import net.minecraft.advancement.AdvancementRewards
 import net.minecraft.block.BlockState
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.command.argument.EntityArgumentType.player
-import net.minecraft.enchantment.Enchantment
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
-import net.minecraft.entity.ItemSteerable
 import net.minecraft.entity.MovementType
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.DataTracker
@@ -30,7 +26,6 @@ import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
 import net.minecraft.registry.tag.FluidTags
 import net.minecraft.server.network.EntityTrackerEntry
-import net.minecraft.server.network.ServerPlayNetworkHandler
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundCategory
@@ -40,7 +35,6 @@ import net.minecraft.util.math.MathHelper.square
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import java.util.*
-import kotlin.math.exp
 import kotlin.math.sqrt
 
 class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: World) : Entity(type, world) {
@@ -211,7 +205,7 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
         }
 
         @JvmStatic
-        fun dropBlockSkillPoints(
+        fun spawnForBlock(
             world: ServerWorld,
             pos: BlockPos,
             state: BlockState,
@@ -226,5 +220,19 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
             spawnOrbs(world, null, pos.toCenterPos(), RPGSkills.CONFIG.getBlockPoints(points))
         }
 
+        @JvmStatic
+        fun spawnForFishing(world: ServerWorld, pos: Vec3d, player: PlayerEntity) {
+            spawnOrbs(world, player, pos, RPGSkills.CONFIG.fishingSkillPoints.get(world.random))
+        }
+
+        @JvmStatic
+        fun spawnForBreeding(world: ServerWorld, pos: Vec3d, player: PlayerEntity) {
+            spawnOrbs(world, player, pos, RPGSkills.CONFIG.breedingSkillPoints.get(world.random))
+        }
+
+        @JvmStatic
+        fun spawnForAdvancement(world: ServerWorld, rewards: AdvancementRewards, player: PlayerEntity) {
+            spawnOrbs(world, player, player.pos, RPGSkills.CONFIG.getAdvancementPoints(rewards))
+        }
     }
 }
