@@ -5,11 +5,9 @@
     {
       "attributes": {
         "rpgskills:bow_draw_time": -10.0
-      },
-      "cost": 1
+      }
     },
     {
-      "cost": 2,
       "jobs": [
         "rpg_test:job1",
         "rpg_test:job2",

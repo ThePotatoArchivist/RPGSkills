@@ -89,11 +89,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     operator fun get(job: RegistryEntry<Job>) = _jobs[job]
 
-    fun getUpgradeCost(skill: RegistryEntry<Skill>): Int? = skill.value.levels
-        .getOrNull(this[skill])?.cost
-
-    fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = getUpgradeCost(skill)
-        ?.let { spendableLevels >= it } ?: false
+    fun canUpgrade(skill: RegistryEntry<Skill>): Boolean = spendableLevels > 0 && this[skill] < skill.value.levels.size
 
     fun resetSkillsToClass() {
         _skills.clear()
@@ -108,8 +104,9 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         HashMultimap.create<RegistryEntry<EntityAttribute>, EntityAttributeModifier>().apply {
             for ((skill, playerLevel) in _skills)
                 skill.value.levels
-                    .filter { playerLevel >= it.cost }
                     .forEachIndexed { levelIndex, level ->
+                        if (playerLevel < levelIndex + 1) return@forEachIndexed
+
                         for ((attribute, modifier) in level.attributes)
                             put(
                                 attribute,
@@ -306,7 +303,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                 val skillsComponent = player[SkillsComponent]
                 val skill = payload.skill
                 if (skillsComponent.canUpgrade(skill)) {
-                    skillsComponent.spendableLevels -= skillsComponent.getUpgradeCost(skill)!!
+                    skillsComponent.spendableLevels--
                     skillsComponent[skill]++
                     player.world.playSoundFromEntity(
                         null, player,

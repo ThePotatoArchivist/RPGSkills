@@ -8,8 +8,7 @@
           "amount": 0.1,
           "operation": "add_multiplied_base"
         }
-      },
-      "cost": 1
+      }
     },
     {
       "attributes": {
@@ -18,12 +17,11 @@
           "operation": "add_multiplied_base"
         }
       },
-      "cost": 2,
       "jobs": [
         "rpg_test:place_stone"
       ]
     },
-    3
+    {}
   ],
   "name": "Potato Skill"
 }

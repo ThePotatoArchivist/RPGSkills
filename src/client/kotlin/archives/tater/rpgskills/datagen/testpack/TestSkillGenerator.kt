@@ -29,7 +29,7 @@ class TestSkillGenerator(
         repeat(5) {
             provider.accept(testPackId("test$it"), Skill(
                 icon = ItemStack(Items.IRON_INGOT),
-                levels = List(5) { level -> Skill.Level(level + 2)},
+                levels = List(5) { Skill.Level() },
                 name = "Test $it",
                 description = "Things"
             ))
@@ -43,13 +43,13 @@ class TestSkillGenerator(
             Skill(
                 icon = ItemStack(Items.POTATO),
                 levels = listOf(
-                    Skill.Level(1, mapOf(
+                    Skill.Level(mapOf(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
                     )),
-                    Skill.Level(2, mapOf(
+                    Skill.Level(mapOf(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
                     ), listOf(registerable[TestJobGenerator.PLACE_STONE])),
-                    Skill.Level(3),
+                    Skill.Level(),
                 ),
                 name = "Potato Skill",
                 description = "Unlocks potatoes & other stuff"
@@ -60,9 +60,9 @@ class TestSkillGenerator(
             Skill(
                 icon = ItemStack(Items.COW_SPAWN_EGG),
                 levels = listOf(
-                    Skill.Level(1),
-                    Skill.Level(2),
-                    Skill.Level(3, jobs = listOf(registerable[TestJobGenerator.GATHER_WHEAT]))
+                    Skill.Level(),
+                    Skill.Level(),
+                    Skill.Level(jobs = listOf(registerable[TestJobGenerator.GATHER_WHEAT]))
                 ),
                 name = "Cow Skill",
                 description = "Unlocks cows I guess"
@@ -73,10 +73,10 @@ class TestSkillGenerator(
             Skill(
                 icon = ItemStack(Items.GRASS_BLOCK),
                 levels = listOf(
-                    Skill.Level(1, mapOf(
+                    Skill.Level(mapOf(
                         RPGSkillsAttributes.BOW_DRAW_TIME to AnonymousAttributeModifier(-10.0, Operation.ADD_VALUE)
                     )),
-                    Skill.Level(2, jobs = TestJobGenerator.OTHERS.map { registerable[it] }),
+                    Skill.Level(jobs = TestJobGenerator.OTHERS.map { registerable[it] }),
                 ),
                 name = "Grass Skill",
                 description = "Unlocks cows I guess"

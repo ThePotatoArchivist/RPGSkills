@@ -41,7 +41,7 @@ data class Skill(
         val CODEC: Codec<Skill> = RecordCodecBuilder.create {
             it.group(
                 SHORT_STACK_CODEC.fieldOf("icon").forGetter(Skill::icon),
-                Level.SHORT_CODEC.listOf().fieldOf("levels").forGetter(Skill::levels),
+                Level.CODEC.listOf().fieldOf("levels").forGetter(Skill::levels),
                 Codec.STRING.fieldOf("name").forGetter(Skill::name),
                 Codec.STRING.optionalFieldOf("description").forGetter(Skill::description)
             ).apply(it, ::Skill)
@@ -55,23 +55,16 @@ data class Skill(
 
     @JvmRecord
     data class Level(
-        val cost: Int,
         val attributes: Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier> = mapOf(),
         val jobs: List<RegistryEntry<Job>> = listOf(),
     ) {
         companion object {
             val CODEC: Codec<Level> = RecordCodecBuilder.create {
                 it.group(
-                    Codec.INT.fieldOf("cost").forGetter(Level::cost),
                     Codec.unboundedMap(Registries.ATTRIBUTE.entryCodec, AnonymousAttributeModifier.SHORT_CODEC).optionalFieldOf("attributes", mapOf()).forGetter(Level::attributes),
                     RegistryFixedCodec.of(Job.key).listOf().optionalFieldOf("jobs", listOf()).forGetter(Level::jobs),
                 ).apply(it, ::Level)
             }
-
-            val SHORT_CODEC: Codec<Level> = AlternateCodec(
-                CODEC,
-                Codec.INT.xmap({ Level(it) }, { it.cost })
-            ) { it.attributes.isEmpty() && it.jobs.isEmpty() }
         }
     }
 

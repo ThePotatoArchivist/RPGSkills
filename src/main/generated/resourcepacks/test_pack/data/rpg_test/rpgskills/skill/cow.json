@@ -2,10 +2,9 @@
   "description": "Unlocks cows I guess",
   "icon": "minecraft:cow_spawn_egg",
   "levels": [
-    1,
-    2,
+    {},
+    {},
     {
-      "cost": 3,
       "jobs": [
         "rpg_test:gather_wheat"
       ]

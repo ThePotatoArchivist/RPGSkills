@@ -7,6 +7,7 @@ import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.value
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -25,7 +26,7 @@ class SkillUpgradeButton(
 ) : ClickableWidget(x, y, WIDTH, HEIGHT, Text.empty()) {
     private val skillsComponent = player[SkillsComponent]
 
-    private val cost get() = skillsComponent.getUpgradeCost(skill)
+    private val isMaxed get() = skillsComponent[skill] >= skill.value.levels.size
     private val canUpgrade get() = skillsComponent.canUpgrade(skill)
 
     override fun onClick(mouseX: Double, mouseY: Double) {
@@ -35,23 +36,14 @@ class SkillUpgradeButton(
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         val canUpgrade = canUpgrade // Performance
-        val cost = cost
+        val isMaxed = isMaxed
 
-        context.drawGuiTexture(if (cost == null) MAX_TEXTURE else TEXTURE.get(canUpgrade, isHovered), x, y, WIDTH, HEIGHT)
+        context.drawGuiTexture(if (isMaxed) MAX_TEXTURE else TEXTURE.get(canUpgrade, isHovered), x, y, WIDTH, HEIGHT)
 
-        if (cost == null) {
+        if (isMaxed) {
             context.drawOutlinedText(textRenderer, MAX.text, x + (WIDTH - textRenderer.getWidth(MAX.text) - 2) / 2, y + (HEIGHT - 9) / 2, 0x70DACD)
             return
         }
-
-        context.drawOutlinedText(
-            textRenderer,
-            cost.toString(),
-            x + 12,
-            y + 5,
-            if (canUpgrade) 0x70DACD else 0x8C605D, // TODO better color
-            if (canUpgrade) 0 else 0x47352F
-        )
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
@@ -66,7 +58,7 @@ class SkillUpgradeButton(
         )
         val MAX_TEXTURE = RPGSkills.id("skill/upgrade_button_maxed")
 
-        const val WIDTH = 36
+        const val WIDTH = 33
         const val HEIGHT = 18
 
         val MAX = Translation.unit("screen.rpgskills.skills.max")
