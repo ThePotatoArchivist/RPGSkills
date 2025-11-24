@@ -18,6 +18,7 @@ class BlockTagGenerator(output: FabricDataOutput, registriesFuture: CompletableF
             Blocks.SCULK_SENSOR,
             Blocks.SCULK_SHRIEKER,
             Blocks.CALIBRATED_SCULK_SENSOR,
+            Blocks.SPAWNER,
         )
     }
 }
