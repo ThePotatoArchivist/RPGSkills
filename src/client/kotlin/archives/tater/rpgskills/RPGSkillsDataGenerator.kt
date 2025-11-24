@@ -28,6 +28,7 @@ object RPGSkillsDataGenerator : DataGeneratorEntrypoint {
 			addProvider(::TestSkillsLockGenerator)
 			addProvider(::TestSkillClassGenerator)
 			addProvider(::TestItemTagsGenerator)
+            addProvider(::TestEntityTagGenerator)
 		}
 	}
 }

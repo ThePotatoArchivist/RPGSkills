@@ -95,7 +95,7 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
         if (age % EXPENSIVE_UPDATE_INTERVAL == 1)
             nearOwner = owner?.let { it.squaredDistanceTo(this) <= 64.0 } ?: false
 
-        if (owner?.let { it.isSpectator || it.isDead } == true)
+        if (owner?.let { it.isSpectator || it.isDead || it[SkillsComponent].isPointsFull } == true)
             nearOwner = false
 
         if (nearOwner) owner?.let { owner ->
@@ -177,10 +177,10 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
         private const val MAX_SIMULTANEOUS_SPAWN = 20
 
         val CODEC = recordMutationCodec(
-            Codec.INT.fieldOf("health").forAccess(SkillPointOrbEntity::health),
-            Codec.INT.fieldOf("orb_age").forAccess(SkillPointOrbEntity::orbAge),
+            Codec.INT.optionalFieldOf("health", 5).forAccess(SkillPointOrbEntity::health),
+            Codec.INT.optionalFieldOf("orb_age", 0).forAccess(SkillPointOrbEntity::orbAge),
             Uuids.CODEC.optionalFieldOf("owner").forAccess(SkillPointOrbEntity::ownerUuid),
-            Codec.INT.fieldOf("amount").forAccess(SkillPointOrbEntity::amount),
+            Codec.INT.optionalFieldOf("amount", 1).forAccess(SkillPointOrbEntity::amount),
         )
 
         val AMOUNT: TrackedData<Int> = DataTracker.registerData(SkillPointOrbEntity::class.java, TrackedDataHandlerRegistry.INTEGER)

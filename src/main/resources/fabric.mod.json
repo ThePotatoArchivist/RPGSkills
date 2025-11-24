@@ -45,7 +45,8 @@
 			"rpgskills:skills",
 			"rpgskills:defeat_source",
 			"rpgskills:skill_source",
-			"rpgskills:structures_skill_source"
+			"rpgskills:structures_skill_source",
+            "rpgskills:level_cap"
 		]
 	},
 	"mixins": [

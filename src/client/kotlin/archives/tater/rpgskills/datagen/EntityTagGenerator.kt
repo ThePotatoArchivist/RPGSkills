@@ -14,7 +14,7 @@ class EntityTagGenerator(
     completableFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
 ) : FabricTagProvider.EntityTypeTagProvider(output, completableFuture) {
     override fun configure(wrapperLookup: RegistryWrapper.WrapperLookup) {
-        getOrCreateTagBuilder(RPGSkillsTags.MINIBOSS).apply {
+        with(getOrCreateTagBuilder(RPGSkillsTags.MINIBOSS)) {
             addOptional(cataclysmId("amethyst_crab"))
             addOptional(cataclysmId("deepling_priest"))
             addOptional(cataclysmId("deepling_warlock"))
@@ -39,11 +39,11 @@ class EntityTagGenerator(
             EntityType.ENDER_DRAGON,
             EntityType.WITHER
         )
-        getOrCreateTagBuilder(RPGSkillsTags.EARLY_BOSS).apply {
+        with(getOrCreateTagBuilder(RPGSkillsTags.EARLY_BOSS)) {
             addOptional(cataclysmId("netherite_monstrosity"))
             addOptional(cataclysmId("ender_guardian"))
         }
-        getOrCreateTagBuilder(RPGSkillsTags.MID_BOSS).apply {
+        with(getOrCreateTagBuilder(RPGSkillsTags.MID_BOSS)) {
             addOptional(cataclysmId("the_leviathan"))
             addOptional(cataclysmId("the_harbinger"))
             addOptional(cataclysmId("ancient_remnant"))
@@ -51,15 +51,21 @@ class EntityTagGenerator(
             addOptional(cataclysmId("scylla"))
             addOptional(cataclysmId("maledictus"))
         }
-        getOrCreateTagBuilder(RPGSkillsTags.FINAL_BOSS).apply {
+        with(getOrCreateTagBuilder(RPGSkillsTags.FINAL_BOSS)) {
             addOptional(cataclysmId("ignis"))
         }
-        getOrCreateTagBuilder(RPGSkillsTags.DLC_BOSS).apply {
+        with(getOrCreateTagBuilder(RPGSkillsTags.DLC_BOSS)) {
             addOptional(Identifier.of("fdbossess", "chesed"))
         }
-        getOrCreateTagBuilder(RPGSkillsTags.IGNORES_SKILL_SOURCE).apply {
+        with(getOrCreateTagBuilder(RPGSkillsTags.IGNORES_SKILL_SOURCE)) {
             forceAddTag(RPGSkillsTags.MINIBOSS)
             forceAddTag(RPGSkillsTags.BASIC_BOSS)
+            forceAddTag(RPGSkillsTags.EARLY_BOSS)
+            forceAddTag(RPGSkillsTags.MID_BOSS)
+            forceAddTag(RPGSkillsTags.FINAL_BOSS)
+            forceAddTag(RPGSkillsTags.DLC_BOSS)
+        }
+        with(getOrCreateTagBuilder(RPGSkillsTags.INCREASES_LEVEL_CAP)) {
             forceAddTag(RPGSkillsTags.EARLY_BOSS)
             forceAddTag(RPGSkillsTags.MID_BOSS)
             forceAddTag(RPGSkillsTags.FINAL_BOSS)

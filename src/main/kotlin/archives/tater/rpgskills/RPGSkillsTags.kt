@@ -17,6 +17,7 @@ object RPGSkillsTags {
     val MID_BOSS = ofEntity("bosses/mid")
     val FINAL_BOSS = ofEntity("bosses/final")
     val DLC_BOSS = ofEntity("bosses/dlc")
+    val INCREASES_LEVEL_CAP = ofEntity("increases_level_cap")
     val IGNORES_SKILL_SOURCE = ofEntity("ignores_skill_source")
 
     val MID_STRUCTURES = ofStructure("skill/mid")

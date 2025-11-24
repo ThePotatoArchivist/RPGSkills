@@ -49,8 +49,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     private var _points = 0
         set(value) {
-            field = value.coerceAtMost(MAX_POINTS)
-            level = getLevelForPoints(value)
+            field = value.coerceAtMost(LEVEL_REQUIREMENTS[maxLevel])
+            level = getLevelForPoints(field)
         }
     var points by ::_points.synced(key, player)
 
@@ -68,7 +68,9 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     val levelProgress get() = getRemainingPoints(points) / getPointsForNextLevel(level).toFloat()
 
-    val isPointsFull get() = level >= MAX_LEVEL
+    val isPointsFull get() = level >= maxLevel
+
+    private val maxLevel get() = player.world[LevelCapComponent].maxLevel.coerceAtMost(MAX_LEVEL)
 
     private var modifiers: HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> =
         HashMultimap.create()
@@ -172,7 +174,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         val job = jobEntry.value
         if (job.spawnAsOrbs) {
             SkillPointOrbEntity.spawnOrbs(player.serverWorld, player, player.pos, job.rewardPoints)
-        } else {
+        } else if (!isPointsFull) {
             points += job.rewardPoints
             ServerPlayNetworking.send(player, SkillPointIncreasePayload)
         }
@@ -256,14 +258,14 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
         override val key: ComponentKey<SkillsComponent> get() = KEY
 
-        const val MAX_LEVEL = 50
+        const val MAX_LEVEL = 200
+
+        data class LevelRequirement(val level: Int, val required: Int)
 
         private val LEVEL_REQUIREMENTS = (0..<MAX_LEVEL)
-            .runningFold(0) { acc, lvl -> acc + getPointsForNextLevel(lvl) }
-        private val LEVEL_REQUIREMENTS_REVERSED = LEVEL_REQUIREMENTS.withIndex().reversed()
+            .runningFold(0) { acc, lvl -> acc + getPointsForNextLevel(lvl) }.toIntArray()
+        private val LEVEL_REQUIREMENTS_REVERSED = LEVEL_REQUIREMENTS.withIndex().map { (level, required) -> LevelRequirement(level, required) }.reversed().toTypedArray()
 
-        val MAX_POINTS = LEVEL_REQUIREMENTS[MAX_LEVEL]
-        
         const val JOB_SYNC_FREQUENCY = 20 * 60
 
         /**
@@ -277,11 +279,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         }
 
         fun getLevelForPoints(points: Int): Int =
-            LEVEL_REQUIREMENTS_REVERSED.firstNotNullOfOrNull { (level, required) -> level.takeIf { required <= points } }
-                ?: 0
+            LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required <= points }?.level ?: 0
 
         fun getRemainingPoints(points: Int) =
-            points - (LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required <= points }?.value ?: 0)
+            points - (LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required <= points }?.required ?: 0)
 
         fun registerEvents() {
             // Choose class

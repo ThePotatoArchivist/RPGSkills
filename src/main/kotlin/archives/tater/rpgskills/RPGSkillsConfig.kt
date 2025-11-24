@@ -29,9 +29,11 @@ data class RPGSkillsConfig(
         RPGSkillsTags.EARLY_BOSS to 500,
         RPGSkillsTags.MID_BOSS to 800,
         RPGSkillsTags.FINAL_BOSS to 4000,
-        RPGSkillsTags.DLC_BOSS to SkillsComponent.MAX_POINTS,
+        RPGSkillsTags.DLC_BOSS to 8000, // TODO tweak value
     ),
-    val defaultEntitySkillPointDivisor: Int = 2
+    val defaultEntitySkillPointDivisor: Int = 2,
+    val baseLevelCap: Int = 10,
+    val levelCapIncreasePerBoss: Int = 10,
 ) {
 
     fun getStructurePoints(structure: RegistryEntry<Structure>) =
@@ -49,6 +51,8 @@ data class RPGSkillsConfig(
             Codec.INT.fieldOf("default_structure_skill_points").forGetter(RPGSkillsConfig::defaultStructureSkillPoints),
             Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.ENTITY_TYPE), Codec.INT).fieldOf("entity_skill_points").forGetter(RPGSkillsConfig::entitySkillPoints),
             Codec.INT.fieldOf("default_entity_skill_point_divisor").forGetter(RPGSkillsConfig::defaultEntitySkillPointDivisor),
+            Codec.INT.fieldOf("base_level_cap").forGetter(RPGSkillsConfig::baseLevelCap),
+            Codec.INT.fieldOf("level_cap_increase_per_boss").forGetter(RPGSkillsConfig::levelCapIncreasePerBoss),
         ).apply(it, ::RPGSkillsConfig) }
 
         override val defaultConfig = RPGSkillsConfig()

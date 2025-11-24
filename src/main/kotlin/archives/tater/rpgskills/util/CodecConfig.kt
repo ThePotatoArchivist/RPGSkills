@@ -23,13 +23,13 @@ abstract class CodecConfig<T: Any>(private val unsuffixedPath: String, private v
             codec.encodeStart(JsonOps.INSTANCE, defaultConfig).ifSuccess {
                 DataProvider.writeToPath(DataWriter.UNCACHED, it, configPath)
             }.ifError {
-                logger.error("Failed to create config $unsuffixedPath", it.message())
+                logger.error("Failed to create config $unsuffixedPath: {}", it.message())
             }
         else if (!configPath.isRegularFile())
             logger.error("Failed to create config $unsuffixedPath, an incorrect file type with the same name exists")
         else {
             val result = codec.parse(JsonOps.INSTANCE, JsonParser.parseReader(configPath.bufferedReader())).ifError {
-                logger.error("Failed to read config $unsuffixedPath", it.message())
+                logger.error("Failed to read config $unsuffixedPath: {}", it.message())
             }.result()
             if (result.isPresent)
                 return result.get()

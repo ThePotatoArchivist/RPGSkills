@@ -57,7 +57,7 @@ object SkillBarRenderer : ClientPlayNetworking.PlayPayloadHandler<SkillPointIncr
         showTicks = MAX_SHOW_TICKS
     }
 
-    override fun receive(payload: SkillPointIncreasePayload?, context: ClientPlayNetworking.Context?) {
+    override fun receive(payload: SkillPointIncreasePayload?, context: ClientPlayNetworking.Context) {
         setShown()
     }
 

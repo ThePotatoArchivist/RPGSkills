@@ -80,7 +80,8 @@ object RPGSkillsClient : ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(JobCompletedPayload.ID) { payload, context ->
             val player = context.player()
-            player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 0.1f, (player.random.nextFloat() - player.random.nextFloat()) * 0.35F + 0.9F)
+            if (!player[SkillsComponent].isPointsFull)
+                player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 0.1f, (player.random.nextFloat() - player.random.nextFloat()) * 0.35F + 0.9F)
             context.client().toastManager.add(JobCompletedToast(
                 payload.job.value,
                 JOB_SKILL_CACHE[player.registryManager][payload.job]?.value
