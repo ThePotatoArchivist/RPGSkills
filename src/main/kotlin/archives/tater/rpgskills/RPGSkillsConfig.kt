@@ -36,7 +36,7 @@ data class RPGSkillsConfig(
         RPGSkillsTags.DLC_BOSS to 8000, // TODO tweak value
     ),
     val defaultEntitySkillPointDivisor: Int = 2,
-    val blockSkillPointDivisor: Int = 1,
+    val blockSkillPointDivisor: Int = 2,
     val advancementSkillPointDivisor: Int = 1,
     val fishingSkillPoints: IntProvider = UniformIntProvider.create(1, 3),
     val breedingSkillPoints: IntProvider = UniformIntProvider.create(1, 2),
