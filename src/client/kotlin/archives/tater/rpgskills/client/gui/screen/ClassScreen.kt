@@ -2,7 +2,7 @@ package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
-import archives.tater.rpgskills.client.gui.widget.NavButtonWidget
+import archives.tater.rpgskills.client.gui.widget.ClassNavButtonWidget
 import archives.tater.rpgskills.client.gui.widget.SkillDisplayWidget
 import archives.tater.rpgskills.client.gui.widget.WrappedTextWidget
 import archives.tater.rpgskills.data.SkillClass
@@ -50,8 +50,8 @@ class ClassScreen(
             )
         )
 
-        addDrawableChild(NavButtonWidget(this, x - NavButtonWidget.WIDTH - BUTTON_GAP, y + HEIGHT / 2 - NavButtonWidget.HEIGHT / 2, false))
-        addDrawableChild(NavButtonWidget(this, x + WIDTH + BUTTON_GAP, y + HEIGHT / 2 - NavButtonWidget.HEIGHT / 2, true))
+        addDrawableChild(ClassNavButtonWidget(this, x - ClassNavButtonWidget.WIDTH - BUTTON_GAP, y + HEIGHT / 2 - ClassNavButtonWidget.HEIGHT / 2, false))
+        addDrawableChild(ClassNavButtonWidget(this, x + WIDTH + BUTTON_GAP, y + HEIGHT / 2 - ClassNavButtonWidget.HEIGHT / 2, true))
         addDrawableChild(ButtonWidget.builder(SELECT.text) {
             ClientPlayNetworking.send(ClassChoicePayload(selectedClass))
             close()

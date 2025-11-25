@@ -6,9 +6,9 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.util.ceilDiv
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
-import net.minecraft.advancement.criterion.ConstructBeaconCriterion.Conditions.level
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
@@ -20,7 +20,7 @@ class SkillScreen(
     private val player: PlayerEntity,
     private val skill: RegistryEntry<Skill>,
     private val parent: Screen? = null,
-) : Screen(skill.name), Tabbed {
+) : Screen(skill.name), Tabbed, Paged {
     private var x = 0
     private var y = 0
     override var selectedTab = 0
@@ -29,14 +29,29 @@ class SkillScreen(
             clearAndInit()
         }
 
+    private val maxLevel = skill.value.levels.size
+
+    private val tabPages = maxLevel ceilDiv MAX_TABS
+    override var selectedPage: Int = 0 // Tabs
+        set(value) {
+            field = value.mod(tabPages)
+            clearAndInit()
+        }
+    private val tabOffset get() = selectedPage * MAX_TABS
+
     private inline val selectedLevel get() = selectedTab + 1
 
     override fun init() {
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
 
-        repeat(skill.value.levels.size) {
-            addDrawableChild(SkillTabWidget(x + it * 20 + 6, y, it, this))
+        repeat((maxLevel - tabOffset).coerceAtMost(MAX_TABS)) {
+            addDrawableChild(SkillTabWidget(x + it * 20 + 6, y, tabOffset + it, this))
+        }
+
+        if (maxLevel > MAX_TABS) {
+            addDrawableChild(TabNavButtonWidget(this, x - TabNavButtonWidget.WIDTH + 4, y + 3, false))
+            addDrawableChild(TabNavButtonWidget(this, x + WIDTH - 5, y + 3, true))
         }
 
         addDrawableChild(SkillUpgradeButton(x + WIDTH - SkillUpgradeButton.WIDTH - 8, y + 21, player, skill))
@@ -69,9 +84,8 @@ class SkillScreen(
         super.render(context, mouseX, mouseY, delta)
         context.drawItem(skill.value.icon, x + 8, y + 22)
         context.drawText(textRenderer, title, x + 26, y + 26, 0x404040, false)
-        val max = skill.value.levels.size
 
-        SkillWidget.SKILL_LEVEL.text(player[SkillsComponent][skill], max).let {
+        SkillWidget.SKILL_LEVEL.text(player[SkillsComponent][skill], maxLevel).let {
             context.drawText(textRenderer, it, x + WIDTH - SkillUpgradeButton.WIDTH - 8 - 4 - textRenderer.getWidth(it), y + 26, 0x00FFFF, true)
         }
     }
@@ -90,5 +104,7 @@ class SkillScreen(
 
         const val WIDTH = 252
         const val HEIGHT = 192
+
+        const val MAX_TABS = 12
     }
 }

@@ -20,7 +20,8 @@ class SkillTabWidget(x: Int, y: Int, private val level: Int, private val parent:
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         context.drawGuiTexture(if (isSelectedTab) TEXTURE_SELECTED else TEXTURE_UNSELECTED, x, y, WIDTH, HEIGHT)
         context.drawText(textRenderer, text, x + (WIDTH + 1) / 2 - textRenderer.getWidth(text) / 2, y + 7, 0x404040, false)
-        if (hovered) context.drawTooltip(textRenderer, tooltip, mouseX, mouseY)
+        if (hovered)
+            context.drawTooltip(textRenderer, tooltip, mouseX, mouseY)
     }
 
     override fun onClick(mouseX: Double, mouseY: Double) {

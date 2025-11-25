@@ -6,13 +6,12 @@ import net.minecraft.client.gui.screen.ButtonTextures
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.text.Text
-import net.minecraft.util.Identifier
 
-class NavButtonWidget(private val parent: Paged, x: Int, y: Int, private val isNext: Boolean) :
-    ClickableWidget(x, y, WIDTH, HEIGHT, Text.empty()) {
+open class NavButtonWidget(private val parent: Paged, private val textures: ButtonTextures, x: Int, y: Int, width: Int, height: Int, private val isNext: Boolean) :
+    ClickableWidget(x, y, width, height, Text.empty()) {
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        context.drawGuiTexture((if (isNext) NEXT_TEXTURES else PREV_TEXTURES).get(true, isHovered), x, y, WIDTH, HEIGHT)
+        context.drawGuiTexture(textures.get(true, isHovered), x, y, width, height)
     }
 
     override fun onClick(mouseX: Double, mouseY: Double) {
@@ -24,19 +23,5 @@ class NavButtonWidget(private val parent: Paged, x: Int, y: Int, private val isN
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
 
-    }
-
-    companion object {
-        val PREV_TEXTURES = ButtonTextures(
-            Identifier.ofVanilla("recipe_book/page_backward"),
-            Identifier.ofVanilla("recipe_book/page_backward_highlighted")
-        )
-        val NEXT_TEXTURES = ButtonTextures(
-            Identifier.ofVanilla("recipe_book/page_forward"),
-            Identifier.ofVanilla("recipe_book/page_forward_highlighted")
-        )
-
-        const val WIDTH = 12
-        const val HEIGHT = 17
     }
 }
