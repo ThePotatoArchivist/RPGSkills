@@ -37,6 +37,7 @@
   "screen.widget.rpgskills.lockgroup.entities": "Entities",
   "screen.widget.rpgskills.lockgroup.items": "Items",
   "screen.widget.rpgskills.lockgroup.recipes": "Recipes",
+  "screen.widget.rpgskills.skill.level": "%s/%s",
   "screen.widget.rpgskills.skilltab.tooltip": "Level %s",
   "toast.rpgskills.job_complete": "Job Complete!"
 }

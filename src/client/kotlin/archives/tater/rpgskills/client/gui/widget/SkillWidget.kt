@@ -1,11 +1,13 @@
 package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.description
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
 import net.minecraft.client.MinecraftClient
@@ -33,9 +35,11 @@ class SkillWidget(
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         context.drawGuiTexture(if (hovered) TEXTURE_HIGHLIGHTED else TEXTURE, x, y, WIDTH, HEIGHT)
         context.drawItem(skill.value.icon, x + 3, y + 3)
-        context.drawText(textRenderer, name, x + 21, y + 4, 0xffffff, true)
+        context.drawText(textRenderer, name, x + 21, y + 7, 0xffffff, true)
 
-        SkillBar.draw(context, x + 21, y + 14, maxLevel, level)
+        SKILL_LEVEL.text(level, maxLevel).let {
+            context.drawText(textRenderer, it, x + WIDTH - SkillUpgradeButton.WIDTH - 5 - 2 - textRenderer.getWidth(it), y + 7, 0x00FFFF, true)
+        }
 
         if (hovered)
             context.drawTooltip(textRenderer, description, mouseX, mouseY)
@@ -53,6 +57,8 @@ class SkillWidget(
     companion object {
         val TEXTURE = RPGSkills.id("skill/entry")
         val TEXTURE_HIGHLIGHTED = RPGSkills.id("skill/entry_highlighted")
+
+        val SKILL_LEVEL = Translation.arg("screen.widget.$MOD_ID.skill.level")
 
         const val WIDTH = 227
         const val HEIGHT = 22

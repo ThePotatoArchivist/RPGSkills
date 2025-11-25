@@ -28,12 +28,18 @@ class TestSkillGenerator(
         provider.accept(GRASS_SKILL)
         repeat(5) {
             provider.accept(testPackId("test$it"), Skill(
-                icon = ItemStack(Items.IRON_INGOT),
+                icon = Items.IRON_INGOT.defaultStack,
                 levels = List(5) { Skill.Level() },
                 name = "Test $it",
                 description = "Things"
             ))
         }
+        provider.accept(testPackId("test_many"), Skill(
+            icon = Items.STRING.defaultStack,
+            levels = List(30) { Skill.Level() },
+            name = "Long test",
+            description = "It's very long"
+        ))
     }
 
     companion object : BuildsRegistry<Skill> {

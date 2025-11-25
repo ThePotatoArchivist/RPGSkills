@@ -14,8 +14,10 @@ import net.minecraft.text.Text
 class SkillDisplayWidget(x: Int, y: Int, width: Int, private val skill: RegistryEntry<Skill>, private val level: Int) : ClickableWidget(x, y, width, HEIGHT, Text.empty()) {
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         context.drawItem(skill.value.icon, x + MARGIN, y + MARGIN)
-        context.drawText(textRenderer, skill.name, x + 2 * MARGIN + 16, y + MARGIN + 1, 0x404040, false)
-        SkillBar.draw(context, x + 2 * MARGIN + 16, y + MARGIN + 10, skill.value.levels.size, level)
+        context.drawText(textRenderer, skill.name, x + 2 * MARGIN + 16, y + MARGIN + 4, 0x404040, false)
+        SkillWidget.SKILL_LEVEL.text(level, skill.value.levels.size).let {
+            context.drawText(textRenderer, it, x + width - 2 * MARGIN - textRenderer.getWidth(it), y + MARGIN + 4, 0x00FFFF, true)
+        }
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {

@@ -43,6 +43,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(JobWidget.INCOMPLETE_TASK, "\u2610")
             add(JobWidget.COMPLETE_TASK, "\u2611")
             add(JobWidget.TASK_PROGRESS, "%s/%s")
+            add(SkillWidget.SKILL_LEVEL, "%s/%s")
             add(LockGroupWidget.Texts.ITEMS, "Items")
             add(LockGroupWidget.Texts.BLOCKS, "Blocks")
             add(LockGroupWidget.Texts.ENTITIES, "Entities")

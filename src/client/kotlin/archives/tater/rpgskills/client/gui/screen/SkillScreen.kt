@@ -8,6 +8,7 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value
+import net.minecraft.advancement.criterion.ConstructBeaconCriterion.Conditions.level
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
@@ -67,9 +68,12 @@ class SkillScreen(
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(context, mouseX, mouseY, delta)
         context.drawItem(skill.value.icon, x + 8, y + 22)
-        context.drawText(textRenderer, title, x + 26, y + 23, 0x404040, false)
+        context.drawText(textRenderer, title, x + 26, y + 26, 0x404040, false)
         val max = skill.value.levels.size
-        SkillBar.draw(context, x + 26, y + 32, max, player[SkillsComponent][skill])
+
+        SkillWidget.SKILL_LEVEL.text(player[SkillsComponent][skill], max).let {
+            context.drawText(textRenderer, it, x + WIDTH - SkillUpgradeButton.WIDTH - 8 - 4 - textRenderer.getWidth(it), y + 26, 0x00FFFF, true)
+        }
     }
 
     override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
