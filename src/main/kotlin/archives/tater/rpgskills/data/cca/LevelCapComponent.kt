@@ -2,31 +2,26 @@ package archives.tater.rpgskills.data.cca
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
-import archives.tater.rpgskills.util.ComponentKeyHolder
-import archives.tater.rpgskills.util.encode
-import archives.tater.rpgskills.util.fieldFor
-import archives.tater.rpgskills.util.get
-import archives.tater.rpgskills.util.logIfError
-import archives.tater.rpgskills.util.mutateCollection
-import archives.tater.rpgskills.util.recordMutationCodec
-import archives.tater.rpgskills.util.update
+import archives.tater.rpgskills.util.*
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.network.message.MessageType
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntryList
+import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.Formatting
 import net.minecraft.world.World
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
 import kotlin.jvm.optionals.getOrNull
-import kotlin.run
 
 class LevelCapComponent(private val world: World) : Component, AutoSyncedComponent {
 
@@ -47,6 +42,14 @@ class LevelCapComponent(private val world: World) : Component, AutoSyncedCompone
         defeated.add(entity.type)
         updateLevelCap()
         key.sync(world)
+
+        world.server?.playerManager?.broadcast(
+            if (maxLevel < Int.MAX_VALUE)
+                CAP_RAISE_MESSAGE.text(entity.name, maxLevel)
+            else
+                CAP_REMOVED_MESSAGE.text(entity.name),
+            false
+        )
     }
 
     private fun updateLevelCap() {
@@ -84,6 +87,13 @@ class LevelCapComponent(private val world: World) : Component, AutoSyncedCompone
         val CODEC = recordMutationCodec(
             Registries.ENTITY_TYPE.codec.mutateCollection().fieldFor("defeated_bosses", LevelCapComponent::defeated),
         )
+
+        val CAP_RAISE_MESSAGE = Translation.arg("rpgskills.levelcap.raised") {
+            formatted(Formatting.AQUA)
+        }
+        val CAP_REMOVED_MESSAGE = Translation.arg("rpgskills.levelcap.removed") {
+            formatted(Formatting.AQUA)
+        }
 
         override fun afterDeath(
             entity: LivingEntity,

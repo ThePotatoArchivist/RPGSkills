@@ -13,6 +13,8 @@
   "commands.rpgskills.skills.list.none": "There are no skills",
   "item.rpgskills.respec_item": "Respec Item",
   "key.rpgskills.screen.skills": "Open Skills",
+  "rpgskills.levelcap.raised": "%s was vanquished! Max level is now %s.",
+  "rpgskills.levelcap.removed": "%s was vanquished! There is no longer a level limit.",
   "rpgskills.lockgroup.block.message.default": "You don't know how to use this block",
   "rpgskills.lockgroup.entity.message.default": "You don't know how to interact with this mob",
   "rpgskills.lockgroup.item.message.default": "You don't know how to use this item",

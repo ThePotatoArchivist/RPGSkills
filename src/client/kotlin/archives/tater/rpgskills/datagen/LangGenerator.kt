@@ -10,6 +10,7 @@ import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
+import archives.tater.rpgskills.data.cca.LevelCapComponent
 import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -21,7 +22,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
     FabricLanguageProvider(dataOutput, registryLookup) {
 
     override fun generateTranslations(registryLookup: RegistryWrapper.WrapperLookup, translationBuilder: TranslationBuilder) {
-        val s = "\$s"
+        val s = $$"$s"
         with(translationBuilder) {
             add(RPGSkillsCommands.LIST_NONE, "There are no skills")
             add(RPGSkillsCommands.LIST, "There are %s skills: %s")
@@ -32,6 +33,8 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(RPGSkillsCommands.SET_POINTS, "Set %2$s level points on %s")
             add(RPGSkillsCommands.RESET_CLASS, "Reset class for %s")
             add(RPGSkillsCommands.SET_CLASS, "Set class for %s to %s")
+            add(LevelCapComponent.CAP_RAISE_MESSAGE, "%s was vanquished! Max level is now %s.")
+            add(LevelCapComponent.CAP_REMOVED_MESSAGE, "%s was vanquished! There is no longer a level limit.")
             add(SkillsScreen.TITLE, "Skills")
             add(SkillTabWidget.TOOLTIP, "Level %s")
             add(ClassScreen.SELECT, "Select Class")
