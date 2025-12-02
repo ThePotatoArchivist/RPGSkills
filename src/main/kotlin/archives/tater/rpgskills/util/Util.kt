@@ -8,10 +8,12 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.minecraft.advancement.criterion.ItemCriterion
+import net.minecraft.data.DataProvider
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.data.TrackedData
@@ -36,6 +38,8 @@ import org.slf4j.Logger
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
+import java.util.stream.Stream
+import kotlin.jvm.optionals.getOrNull
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KProperty
@@ -177,7 +181,7 @@ val SHORT_STACK_CODEC = AlternateCodec(
 val ONE_INDEX_CODEC: Codec<Int> = Codec.STRING.comapFlatMap(
     {
         val value = it.toIntOrNull() ?: return@comapFlatMap DataResult.error { "Not a valid int: $it" }
-        if (value <= 0) return@comapFlatMap DataResult.error { "Value wass less than 1: $it" }
+        if (value <= 0) return@comapFlatMap DataResult.error { "Value was less than 1: $it" }
         DataResult.success(value)
     },
     { it.toString() }
@@ -187,3 +191,20 @@ fun <T> Codec<T>.indexedOf(default: T): Codec<List<T>> = Codec.unboundedMap(ONE_
     { map -> List(map.keys.max()) { map[it + 1] ?: default } },
     { list -> list.withIndex().associateNotNull { (index, entry) -> if (entry != default || index + 1 >= list.size) index + 1 to entry else null } }
 )
+
+fun <T> RegistryWrapper<T>.streamEntriesOrdered(tag: TagKey<T>): Stream<RegistryEntry<T>> = Stream.concat(
+    getOptional(tag).getOrNull()?.stream() ?: Stream.empty(),
+    streamEntries().filter { !(it isIn tag) }
+)
+
+inline fun <T> tagGenerator(registryRef: RegistryKey<Registry<T>>, configure: FabricTagProvider<T>.(RegistryWrapper.WrapperLookup) -> Unit): FabricDataGenerator.Pack.RegistryDependentFactory<DataProvider> =
+    FabricDataGenerator.Pack.RegistryDependentFactory { output, future ->
+        object : FabricTagProvider<T>(output, registryRef, future) {
+            override fun configure(wrapperLookup: RegistryWrapper.WrapperLookup) {
+                configure(wrapperLookup)
+            }
+        }
+    }
+
+inline fun <T> tagGenerator(registryRef: RegistryKeyHolder<Registry<T>>, configure: FabricTagProvider<T>.(RegistryWrapper.WrapperLookup) -> Unit) =
+    tagGenerator(registryRef.key, configure)

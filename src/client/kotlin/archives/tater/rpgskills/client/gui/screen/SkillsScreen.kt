@@ -2,6 +2,7 @@ package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
+import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.client.gui.widget.SkillWidget
 import archives.tater.rpgskills.client.util.drawOutlinedText
@@ -9,6 +10,7 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.streamEntriesOrdered
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
@@ -30,12 +32,14 @@ class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(play
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
 
-        skillWidgets = player.registryManager[Skill].streamEntries().toList().mapIndexed { index, skill ->
-            Pair(
-                addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill, this)),
-                addDrawableChild(SkillUpgradeButton(x + 200, y + index * SkillWidget.HEIGHT + 19 + 2, player, skill))
-            )
-        }
+        skillWidgets = player.registryManager[Skill].streamEntriesOrdered(RPGSkillsTags.SKILL_ORDER)
+            .toList()
+            .mapIndexed { index, skill ->
+                Pair(
+                    addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill, this)),
+                    addDrawableChild(SkillUpgradeButton(x + 200, y + index * SkillWidget.HEIGHT + 19 + 2, player, skill))
+                )
+            }
 
         buttonWidget = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE) { close() }.apply {
             width(200)

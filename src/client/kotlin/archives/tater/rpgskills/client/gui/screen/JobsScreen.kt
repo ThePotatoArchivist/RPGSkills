@@ -2,16 +2,23 @@ package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
+import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.client.gui.widget.JobWidget
+import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.streamEntriesOrdered
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.predicate.entity.DistancePredicate.y
 import net.minecraft.screen.ScreenTexts
+import com.ibm.icu.impl.ValidIdentifiers
+import jdk.internal.org.jline.utils.Colors.s
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle
 
 class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
     private var x = 0
@@ -21,9 +28,13 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
 
-        addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148, player[SkillsComponent].let {
-            it.jobs.map { (job, _) -> JobWidget(it, job, 168, x + 10, 0) }
-        }))
+        val skills = player[SkillsComponent]
+        addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148,
+            player.registryManager[Job].streamEntriesOrdered(RPGSkillsTags.JOB_ORDER)
+                .filter { it in skills.jobs }
+                .map { job -> JobWidget(skills, job, 168, x + 10, 0) }
+                .toList()
+        ))
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE) { close() }.apply {
             width(200)

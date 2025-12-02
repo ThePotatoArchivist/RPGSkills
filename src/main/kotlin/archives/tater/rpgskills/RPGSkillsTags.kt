@@ -1,5 +1,10 @@
 package archives.tater.rpgskills
 
+import archives.tater.rpgskills.data.Job
+import archives.tater.rpgskills.data.LockGroup
+import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.SkillClass
+import archives.tater.rpgskills.util.RegistryKeyHolder
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
@@ -7,6 +12,8 @@ import net.minecraft.registry.tag.TagKey
 
 object RPGSkillsTags {
     private fun <T> of(registry: RegistryKey<Registry<T>>, path: String): TagKey<T> = TagKey.of(registry, RPGSkills.id(path))
+
+    private fun <T> of(registry: RegistryKeyHolder<Registry<T>>, path: String) = of(registry.key, path)
 
     private fun ofEntity(path: String) = of(RegistryKeys.ENTITY_TYPE, path)
     private fun ofStructure(path: String) = of(RegistryKeys.STRUCTURE, path)
@@ -26,4 +33,9 @@ object RPGSkillsTags {
     val BOSS_STRUCTURES = ofStructure("skill/boss")
 
     val NON_SKILL_POINT_DROP = ofBlock("non_skill_point_drop")
+
+    val SKILL_ORDER = of(Skill, "order")
+    val JOB_ORDER = of(Job, "order")
+    val CLASS_ORDER = of(SkillClass, "order")
+    val LOCK_GROUP_ORDER = of(LockGroup, "order")
 }

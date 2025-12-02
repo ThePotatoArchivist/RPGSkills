@@ -38,7 +38,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
         dispatcher.apply {
             command("skills") {
                 subExec("list") { command ->
-                    val skills = command.source.registryManager[Skill].streamEntries().toList()
+                    val skills = command.source.registryManager[Skill].streamEntriesOrdered(RPGSkillsTags.SKILL_ORDER).toList()
 
                     if (skills.isEmpty())
                         command.source.sendFeedback(LIST_NONE.text, false)

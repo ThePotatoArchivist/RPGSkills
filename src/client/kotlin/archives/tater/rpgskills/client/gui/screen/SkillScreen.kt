@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
@@ -8,6 +9,7 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.ceilDiv
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.streamEntriesOrdered
 import archives.tater.rpgskills.util.value
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
@@ -65,7 +67,7 @@ class SkillScreen(
                 add(SkillJobWidget(x + 10, 0, 224, job))
             }
 
-            player.registryManager[LockGroup].streamEntries()
+            player.registryManager[LockGroup].streamEntriesOrdered(RPGSkillsTags.LOCK_GROUP_ORDER)
                 .filter { lockEntry -> lockEntry.value.requirements.any { it[skill] == selectedLevel } }
                 .forEach {
                     add(LockGroupWidget(x + 10, 0, 224, it.value, player.registryManager, player.world.recipeManager))

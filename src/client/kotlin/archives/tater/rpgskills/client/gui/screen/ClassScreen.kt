@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.client.gui.widget.ClassNavButtonWidget
 import archives.tater.rpgskills.client.gui.widget.SkillDisplayWidget
@@ -9,6 +10,7 @@ import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.ClassChoicePayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.streamEntriesOrdered
 import archives.tater.rpgskills.util.value
 import archives.tater.rpgskills.util.withFirst
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
@@ -25,7 +27,7 @@ class ClassScreen(
     private var x = 0
     private var y = 0
 
-    private val classes = player.registryManager[SkillClass].streamEntries().toList()
+    private val classes = player.registryManager[SkillClass].streamEntriesOrdered(RPGSkillsTags.CLASS_ORDER).toList()
 
     override var selectedPage = 0
         set(value) {
