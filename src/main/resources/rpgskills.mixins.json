@@ -15,10 +15,12 @@
     "locking.ServerPlayerInteractionManagerMixin",
     "xp.AdvancementRewardsMixin",
     "xp.AnimalEntityMixin",
+    "xp.ExperienceDroppingBlockMixin",
     "xp.FishingBobberEntityMixin",
     "xp.LivingEntityMixin",
     "xp.MobEntityMixin",
-    "xp.MobSpawnerLogicMixin"
+    "xp.MobSpawnerLogicMixin",
+    "xp.RedstoneOreBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

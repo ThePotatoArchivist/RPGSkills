@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.mixin.client.xp;
+package archives.tater.rpgskills.mixin.xp;
 
 import archives.tater.rpgskills.entity.SkillPointOrbEntity;
 
