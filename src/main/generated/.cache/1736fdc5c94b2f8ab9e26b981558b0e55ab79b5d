@@ -1,10 +1,10 @@
-// 1.21.1	2025-11-24T23:53:48.252454789	rpgskills:test_pack/Skills
-e055d7f1b1aabd570a86821e9553be19a2d31627 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test1.json
-29144b9573d2727558681dbe6878fbeceeaaca64 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test_many.json
-54b28de56ac5779b1fe4918cb1abf45965b67958 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test4.json
-b2b3d6970de47c460db5bce68ae0603feb3109eb resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test2.json
-23fab73532fbe16e2df635fcb9eeab4f938e9fdc resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test3.json
-7c16c4b1f8ffa8780287c3fe21c7cf9f061d4ad9 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/potato.json
-302465951d234cf9adcfcc67ac013adbaeb28745 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test0.json
-b8136d2aa0ac89cd281321549a0a9bed3226232c resourcepacks/test_pack/data/rpg_test/rpgskills/skill/cow.json
-34552937c67234eb721c92dee0769afa845ecbc2 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/grass.json
+// 1.21.1	2025-12-02T00:30:43.371798502	rpgskills:test_pack/Skills
+368f31e7e658954bf4958b3d662edc177536892a resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test4.json
+ff5106cb8a7e119ac37eca5e48e47cc4b621a654 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test_many.json
+4ca56af39837c1b86f78731c16e848f457ac68b3 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test1.json
+f7038aeb599bc11fec0b845b79aa436c1e62af19 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test3.json
+552aff59cd46d5d6d5bce17985ade0dce269a6c5 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test2.json
+5bb0d98225a335beabef445676d8b1c2253b0333 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/potato.json
+5e8218a521a3e1f7e8ad86d548a71bbf9194c971 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test0.json
+6ab4a93952df39486c6f779c27a662d5076c7456 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/grass.json
+436f6e5f3089696e9b5340ea2ab6135b9c70eeb2 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/cow.json

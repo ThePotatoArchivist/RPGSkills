@@ -1,12 +1,8 @@
 {
   "description": "Things",
   "icon": "minecraft:iron_ingot",
-  "levels": [
-    {},
-    {},
-    {},
-    {},
-    {}
-  ],
+  "levels": {
+    "5": {}
+  },
   "name": "Test 2"
 }

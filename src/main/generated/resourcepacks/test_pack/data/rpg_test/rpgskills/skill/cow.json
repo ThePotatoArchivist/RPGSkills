@@ -1,14 +1,12 @@
 {
   "description": "Unlocks cows I guess",
   "icon": "minecraft:cow_spawn_egg",
-  "levels": [
-    {},
-    {},
-    {
+  "levels": {
+    "3": {
       "jobs": [
         "rpg_test:gather_wheat"
       ]
     }
-  ],
+  },
   "name": "Cow Skill"
 }

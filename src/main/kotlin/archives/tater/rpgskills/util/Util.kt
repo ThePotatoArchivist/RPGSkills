@@ -173,3 +173,17 @@ val SHORT_STACK_CODEC = AlternateCodec(
     ItemStack.UNCOUNTED_CODEC,
     Registries.ITEM.codec.xmap({ it.defaultStack }, { it.item })
 ) { ItemStack.areItemsAndComponentsEqual(it, it.item.defaultStack) }
+
+val ONE_INDEX_CODEC: Codec<Int> = Codec.STRING.comapFlatMap(
+    {
+        val value = it.toIntOrNull() ?: return@comapFlatMap DataResult.error { "Not a valid int: $it" }
+        if (value <= 0) return@comapFlatMap DataResult.error { "Value wass less than 1: $it" }
+        DataResult.success(value)
+    },
+    { it.toString() }
+)
+
+fun <T> Codec<T>.indexedOf(default: T): Codec<List<T>> = Codec.unboundedMap(ONE_INDEX_CODEC, this).xmap(
+    { map -> List(map.keys.max()) { map[it + 1] ?: default } },
+    { list -> list.withIndex().associateNotNull { (index, entry) -> if (entry != default || index + 1 >= list.size) index + 1 to entry else null } }
+)

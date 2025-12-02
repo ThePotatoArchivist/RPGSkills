@@ -1,13 +1,13 @@
 {
   "description": "Unlocks cows I guess",
   "icon": "minecraft:grass_block",
-  "levels": [
-    {
+  "levels": {
+    "1": {
       "attributes": {
         "rpgskills:bow_draw_time": -10.0
       }
     },
-    {
+    "2": {
       "jobs": [
         "rpg_test:job1",
         "rpg_test:job2",
@@ -21,6 +21,6 @@
         "rpg_test:job10"
       ]
     }
-  ],
+  },
   "name": "Grass Skill"
 }

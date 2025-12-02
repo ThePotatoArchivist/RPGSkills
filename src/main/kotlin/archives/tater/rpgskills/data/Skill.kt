@@ -5,6 +5,7 @@ import archives.tater.rpgskills.util.AlternateCodec
 import archives.tater.rpgskills.util.RegistryKeyHolder
 import archives.tater.rpgskills.util.SHORT_STACK_CODEC
 import archives.tater.rpgskills.util.forGetter
+import archives.tater.rpgskills.util.indexedOf
 import archives.tater.rpgskills.util.value
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -41,7 +42,7 @@ data class Skill(
         val CODEC: Codec<Skill> = RecordCodecBuilder.create {
             it.group(
                 SHORT_STACK_CODEC.fieldOf("icon").forGetter(Skill::icon),
-                Level.CODEC.listOf().fieldOf("levels").forGetter(Skill::levels),
+                Level.CODEC.indexedOf(default = Level()).fieldOf("levels").forGetter(Skill::levels),
                 Codec.STRING.fieldOf("name").forGetter(Skill::name),
                 Codec.STRING.optionalFieldOf("description").forGetter(Skill::description)
             ).apply(it, ::Skill)

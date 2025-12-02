@@ -92,10 +92,13 @@
       ]
     },
     "levels": {
-      "items": {
-        "$ref": "#/definitions/Level"
-      },
-      "type": "array"
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "\\d+": {
+          "$ref": "#/definitions/Level"
+        }
+      }
     },
     "name": {
       "type": "string"
