@@ -70,7 +70,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     val isPointsFull get() = level >= maxLevel
 
-    private val maxLevel get() = player.world[LevelCapComponent].maxLevel.coerceAtMost(MAX_LEVEL)
+    private val maxLevel get() = player.world[BossTrackerComponent].maxLevel.coerceAtMost(MAX_LEVEL)
 
     private var modifiers: HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> =
         HashMultimap.create()

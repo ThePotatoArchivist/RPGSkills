@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory
 import kotlin.io.path.bufferedReader
 import kotlin.io.path.exists
 import kotlin.io.path.isRegularFile
+import kotlin.jvm.optionals.getOrNull
+import kotlin.math.log
 
 abstract class CodecConfig<T: Any>(private val unsuffixedPath: String, private val logger: Logger = LoggerFactory.getLogger(unsuffixedPath)) {
     abstract val codec: Codec<T>
@@ -28,9 +30,18 @@ abstract class CodecConfig<T: Any>(private val unsuffixedPath: String, private v
         else if (!configPath.isRegularFile())
             logger.error("Failed to create config $unsuffixedPath, an incorrect file type with the same name exists")
         else {
-            val result = codec.parse(JsonOps.INSTANCE, JsonParser.parseReader(configPath.bufferedReader())).ifError {
-                logger.error("Failed to read config $unsuffixedPath: {}", it.message())
+            val input = JsonParser.parseReader(configPath.bufferedReader())
+            val result = codec.parse(JsonOps.INSTANCE, input).ifError { error ->
+                logger.error("Failed to read config $unsuffixedPath: {}", error.message())
+
+                logger.info("Attempting to update config $unsuffixedPath")
+                codec.encodeStart(JsonOps.INSTANCE, error.partialValue().orElse(defaultConfig)).ifSuccess {
+                    DataProvider.writeToPath(DataWriter.UNCACHED, it, configPath)
+                }.ifError {
+                    logger.error("Failed to update config: {}", it.message())
+                }
             }.result()
+
             if (result.isPresent)
                 return result.get()
         }

@@ -4,7 +4,7 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
-import archives.tater.rpgskills.data.cca.LevelCapComponent
+import archives.tater.rpgskills.data.cca.BossTrackerComponent
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.networking.ChooseClassPayload
@@ -66,7 +66,7 @@ object RPGSkills : ModInitializer {
         }
 
 		SkillsComponent.registerEvents()
-        LevelCapComponent.registerEvents()
+        BossTrackerComponent.registerEvents()
 
 		registerLockEvents()
 

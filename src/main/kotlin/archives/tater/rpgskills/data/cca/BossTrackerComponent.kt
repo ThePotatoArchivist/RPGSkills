@@ -7,14 +7,15 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.attribute.EntityAttributeModifier
+import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
+import net.minecraft.entity.mob.Monster
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.message.MessageType
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntryList
-import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.Formatting
 import net.minecraft.world.World
 import org.ladysnake.cca.api.v3.component.Component
@@ -23,9 +24,11 @@ import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
 import kotlin.jvm.optionals.getOrNull
 
-class LevelCapComponent(private val world: World) : Component, AutoSyncedComponent {
+class BossTrackerComponent(private val world: World) : Component, AutoSyncedComponent {
 
     private val defeated = mutableSetOf<EntityType<*>>()
+    val defeatedCount get() = defeated.size
+
     var maxLevel: Int = if (world.isClient) Int.MAX_VALUE else RPGSkills.CONFIG.baseLevelCap
         private set
 
@@ -53,10 +56,10 @@ class LevelCapComponent(private val world: World) : Component, AutoSyncedCompone
     }
 
     private fun updateLevelCap() {
-        maxLevel = if (defeated.size >= increasesLevelCap.size())
+        maxLevel = if (defeatedCount >= increasesLevelCap.size())
             Int.MAX_VALUE
         else
-            RPGSkills.CONFIG.baseLevelCap + RPGSkills.CONFIG.levelCapIncreasePerBoss * defeated.size
+            RPGSkills.CONFIG.baseLevelCap + RPGSkills.CONFIG.levelCapIncreasePerBoss * defeatedCount
     }
 
     override fun readFromNbt(
@@ -74,18 +77,18 @@ class LevelCapComponent(private val world: World) : Component, AutoSyncedCompone
         CODEC.encode(this, tag).logIfError()
     }
 
-    fun copy(other: LevelCapComponent) {
+    fun copy(other: BossTrackerComponent) {
         defeated.clear()
         defeated.addAll(other.defeated)
         updateLevelCap()
     }
 
-    companion object : ComponentKeyHolder<LevelCapComponent, World>, ServerLivingEntityEvents.AfterDeath {
-        override val key: ComponentKey<LevelCapComponent> =
-            ComponentRegistry.getOrCreate(RPGSkills.id("level_cap"), LevelCapComponent::class.java)
+    companion object : ComponentKeyHolder<BossTrackerComponent, World>, ServerLivingEntityEvents.AfterDeath {
+        override val key: ComponentKey<BossTrackerComponent> =
+            ComponentRegistry.getOrCreate(RPGSkills.id("level_cap"), BossTrackerComponent::class.java)
 
         val CODEC = recordMutationCodec(
-            Registries.ENTITY_TYPE.codec.mutateCollection().fieldFor("defeated_bosses", LevelCapComponent::defeated),
+            Registries.ENTITY_TYPE.codec.mutateCollection().fieldFor("defeated_bosses", BossTrackerComponent::defeated),
         )
 
         val CAP_RAISE_MESSAGE = Translation.arg("rpgskills.levelcap.raised") {
@@ -100,14 +103,22 @@ class LevelCapComponent(private val world: World) : Component, AutoSyncedCompone
             damageSource: DamageSource?
         ) {
             entity.world.server?.run {
-                val component = overworld[LevelCapComponent]
+                val component = overworld[BossTrackerComponent]
                 component.onDefeated(entity)
                 for (world in worlds) {
                     if (world == overworld) continue
-                    world[LevelCapComponent].copy(component)
+                    world[BossTrackerComponent].copy(component)
                 }
             }
+        }
 
+        fun applyBuffs(entity: LivingEntity) {
+            if (entity !is Monster) return
+
+            val defeated = entity.world[BossTrackerComponent].defeatedCount
+
+            entity.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)!!.addPersistentModifier(
+                EntityAttributeModifier(RPGSkills.id("boss_defeat_scaling"), defeated.toDouble(), EntityAttributeModifier.Operation.ADD_VALUE))
         }
 
         fun registerEvents() {

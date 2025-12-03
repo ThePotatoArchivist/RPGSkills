@@ -27,7 +27,7 @@ object RPGSkillsComponents : EntityComponentInitializer, ChunkComponentInitializ
 
     override fun registerWorldComponentFactories(registry: WorldComponentFactoryRegistry) {
         registry.register(StructuresSkillSourceComponent.key, ::StructuresSkillSourceComponent)
-        registry.register(LevelCapComponent.key, ::LevelCapComponent)
+        registry.register(BossTrackerComponent.key, ::BossTrackerComponent)
     }
 
     override fun registerBlockComponentFactories(registry: BlockComponentFactoryRegistry) {

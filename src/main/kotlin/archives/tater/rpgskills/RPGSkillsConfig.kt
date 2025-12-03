@@ -57,17 +57,17 @@ data class RPGSkillsConfig(
 
     companion object : CodecConfig<RPGSkillsConfig>(RPGSkills.MOD_ID, RPGSkills.logger) {
         override val codec: Codec<RPGSkillsConfig> = RecordCodecBuilder.create { it.group(
-            Codec.INT.fieldOf("chunk_skill_points").forGetter(RPGSkillsConfig::chunkSkillPoints),
-            Codec.INT.fieldOf("spawner_skill_points").forGetter(RPGSkillsConfig::spawnerSkillPoints),
-            Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.STRUCTURE), Codec.INT).fieldOf("structure_skill_points").forGetter(RPGSkillsConfig::structureSkillPoints),
-            Codec.INT.fieldOf("default_structure_skill_points").forGetter(RPGSkillsConfig::defaultStructureSkillPoints),
-            Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.ENTITY_TYPE), Codec.INT).fieldOf("entity_skill_points").forGetter(RPGSkillsConfig::entitySkillPoints),
-            Codec.INT.fieldOf("default_entity_skill_point_divisor").forGetter(RPGSkillsConfig::defaultEntitySkillPointDivisor),
-            Codec.INT.fieldOf("block_skill_point_divisor").forGetter(RPGSkillsConfig::blockSkillPointDivisor),
-            Codec.INT.fieldOf("advancement_skill_point_divisor").forGetter(RPGSkillsConfig::advancementSkillPointDivisor),
-            IntProvider.POSITIVE_CODEC.fieldOf("fishing_skill_points").forGetter(RPGSkillsConfig::fishingSkillPoints),
-            IntProvider.POSITIVE_CODEC.fieldOf("breeding_skill_points").forGetter(RPGSkillsConfig::breedingSkillPoints),
-            Codec.INT.fieldOf("base_level_cap").forGetter(RPGSkillsConfig::baseLevelCap),
+            Codec.INT.fieldOf("skill_points_chunk").forGetter(RPGSkillsConfig::chunkSkillPoints),
+            Codec.INT.fieldOf("skill_points_spawner").forGetter(RPGSkillsConfig::spawnerSkillPoints),
+            Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.STRUCTURE), Codec.INT).fieldOf("skill_points_structure").forGetter(RPGSkillsConfig::structureSkillPoints),
+            Codec.INT.fieldOf("skill_points_structure_default").forGetter(RPGSkillsConfig::defaultStructureSkillPoints),
+            Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.ENTITY_TYPE), Codec.INT).fieldOf("skill_points_entity").forGetter(RPGSkillsConfig::entitySkillPoints),
+            Codec.INT.fieldOf("skill_point_divisor_entity_default").forGetter(RPGSkillsConfig::defaultEntitySkillPointDivisor),
+            Codec.INT.fieldOf("skill_point_divisor_block").forGetter(RPGSkillsConfig::blockSkillPointDivisor),
+            Codec.INT.fieldOf("skill_point_divisor_advancement").forGetter(RPGSkillsConfig::advancementSkillPointDivisor),
+            IntProvider.POSITIVE_CODEC.fieldOf("skill_points_from_fishing").forGetter(RPGSkillsConfig::fishingSkillPoints),
+            IntProvider.POSITIVE_CODEC.fieldOf("skill_points_from_breeding").forGetter(RPGSkillsConfig::breedingSkillPoints),
+            Codec.INT.fieldOf("level_cap_base").forGetter(RPGSkillsConfig::baseLevelCap),
             Codec.INT.fieldOf("level_cap_increase_per_boss").forGetter(RPGSkillsConfig::levelCapIncreasePerBoss),
         ).apply(it, ::RPGSkillsConfig) }
 
