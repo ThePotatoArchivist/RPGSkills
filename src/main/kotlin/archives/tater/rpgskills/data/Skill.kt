@@ -1,7 +1,6 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.util.AlternateCodec
 import archives.tater.rpgskills.util.RegistryKeyHolder
 import archives.tater.rpgskills.util.SHORT_STACK_CODEC
 import archives.tater.rpgskills.util.forGetter
@@ -10,8 +9,6 @@ import archives.tater.rpgskills.util.value
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributeModifier.Operation
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
@@ -20,7 +17,6 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
-import net.minecraft.util.Identifier
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -69,24 +65,5 @@ data class Skill(
         }
     }
 
-    @JvmRecord
-    data class AnonymousAttributeModifier(
-        val amount: Double,
-        val operation: Operation = Operation.ADD_VALUE,
-    ) {
-        fun build(identifier: Identifier) = EntityAttributeModifier(identifier, amount, operation)
-
-        companion object {
-            val CODEC: Codec<AnonymousAttributeModifier> = RecordCodecBuilder.create { it.group(
-                Codec.DOUBLE.fieldOf("amount").forGetter(AnonymousAttributeModifier::amount),
-                Operation.CODEC.optionalFieldOf("operation", Operation.ADD_VALUE).forGetter(AnonymousAttributeModifier::operation)
-            ).apply(it, ::AnonymousAttributeModifier) }
-
-            val SHORT_CODEC: Codec<AnonymousAttributeModifier> = AlternateCodec(
-                CODEC,
-                Codec.DOUBLE.xmap({ AnonymousAttributeModifier(it) }, { it.amount })
-            ) { it.operation == Operation.ADD_VALUE }
-        }
-    }
 }
 

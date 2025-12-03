@@ -1,7 +1,7 @@
 package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.data.Skill
+import archives.tater.rpgskills.data.AnonymousAttributeModifier
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.value
 import net.minecraft.client.MinecraftClient
@@ -16,7 +16,7 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
 import kotlin.math.abs
 
-class AttributesWidget(x: Int, y: Int, width: Int, attributes: Map<RegistryEntry<EntityAttribute>, Skill.AnonymousAttributeModifier>) :
+class AttributesWidget(x: Int, y: Int, width: Int, attributes: Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier>) :
     ClickableWidget(x, y, width, textRenderer.fontHeight * (attributes.size + 1) + 2 * MARGIN, Text.empty()) {
 
     val text = attributes.mapNotNull { (attribute, modifier) ->

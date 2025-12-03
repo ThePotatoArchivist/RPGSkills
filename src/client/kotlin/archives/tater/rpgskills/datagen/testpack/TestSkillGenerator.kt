@@ -3,7 +3,7 @@ package archives.tater.rpgskills.datagen.testpack
 import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.data.BuildsRegistry
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.data.Skill.AnonymousAttributeModifier
+import archives.tater.rpgskills.data.AnonymousAttributeModifier
 import archives.tater.rpgskills.data.SkillProvider
 import archives.tater.rpgskills.data.accept
 import archives.tater.rpgskills.data.get

@@ -18,6 +18,7 @@ import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.util.Formatting
 import net.minecraft.world.World
+import net.bettercombat.api.WeaponAttributesHelper.override
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
@@ -98,6 +99,8 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             formatted(Formatting.AQUA)
         }
 
+        val BOSS_DEFEAT_SCALING = RPGSkills.id("boss_defeat_scaling")
+
         override fun afterDeath(
             entity: LivingEntity,
             damageSource: DamageSource?
@@ -116,9 +119,11 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             if (entity !is Monster) return
 
             val defeated = entity.world[BossTrackerComponent].defeatedCount
+            if (defeated <= 0) return
 
-            entity.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE)!!.addPersistentModifier(
-                EntityAttributeModifier(RPGSkills.id("boss_defeat_scaling"), defeated.toDouble(), EntityAttributeModifier.Operation.ADD_VALUE))
+            for ((attribute, modifier) in RPGSkills.CONFIG.attributeIncreases) {
+                entity.getAttributeInstance(attribute)?.addPersistentModifier(modifier.build(BOSS_DEFEAT_SCALING, defeated.toDouble()))
+            }
         }
 
         fun registerEvents() {
