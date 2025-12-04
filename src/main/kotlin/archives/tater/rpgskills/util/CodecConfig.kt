@@ -15,14 +15,15 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.math.log
 
 abstract class CodecConfig<T: Any>(private val unsuffixedPath: String, private val logger: Logger = LoggerFactory.getLogger(unsuffixedPath)) {
-    abstract val codec: Codec<T>
+    abstract val codec: MutationCodec<T>
 
-    abstract val defaultConfig: T
+    abstract fun getDefault(): T
 
     fun load(): T {
+        val config = getDefault()
         val configPath = FabricLoader.getInstance().configDir.resolve("$unsuffixedPath.json")
         if (!configPath.exists())
-            codec.encodeStart(JsonOps.INSTANCE, defaultConfig).ifSuccess {
+            codec.encodeStart(JsonOps.INSTANCE, config).ifSuccess {
                 DataProvider.writeToPath(DataWriter.UNCACHED, it, configPath)
             }.ifError {
                 logger.error("Failed to create config $unsuffixedPath: {}", it.message())
@@ -31,20 +32,17 @@ abstract class CodecConfig<T: Any>(private val unsuffixedPath: String, private v
             logger.error("Failed to create config $unsuffixedPath, an incorrect file type with the same name exists")
         else {
             val input = JsonParser.parseReader(configPath.bufferedReader())
-            val result = codec.parse(JsonOps.INSTANCE, input).ifError { error ->
+            codec.update(config, JsonOps.INSTANCE, input).ifError { error ->
                 logger.error("Failed to read config $unsuffixedPath: {}", error.message())
 
                 logger.info("Attempting to update config $unsuffixedPath")
-                codec.encodeStart(JsonOps.INSTANCE, error.partialValue().orElse(defaultConfig)).ifSuccess {
+                codec.encodeStart(JsonOps.INSTANCE, config).ifSuccess {
                     DataProvider.writeToPath(DataWriter.UNCACHED, it, configPath)
                 }.ifError {
                     logger.error("Failed to update config: {}", it.message())
                 }
-            }.result()
-
-            if (result.isPresent)
-                return result.get()
+            }
         }
-        return defaultConfig
+        return config
     }
 }
