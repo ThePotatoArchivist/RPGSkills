@@ -7,6 +7,11 @@
         "rpg_test:kill_poisoned"
       ]
     },
+    "2": {
+      "jobs": [
+        "rpg_test:breed"
+      ]
+    },
     "3": {
       "jobs": [
         "rpg_test:gather_wheat"

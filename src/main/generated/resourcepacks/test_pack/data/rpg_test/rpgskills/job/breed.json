@@ -1,0 +1,29 @@
+{
+  "cooldown_ticks": 2000,
+  "description": "breed",
+  "name": "Breed",
+  "reward_points": 20,
+  "tasks": {
+    "breed": {
+      "conditions": {
+        "parent": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": [
+                "minecraft:cow",
+                "minecraft:pig",
+                "minecraft:sheep",
+                "minecraft:chicken"
+              ]
+            }
+          }
+        ]
+      },
+      "count": 4,
+      "description": "Breed animals",
+      "trigger": "minecraft:bred_animals"
+    }
+  }
+}

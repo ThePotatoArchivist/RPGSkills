@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
+import net.minecraft.advancement.criterion.BredAnimalsCriterion
 import net.minecraft.advancement.criterion.ItemCriterion
 import net.minecraft.advancement.criterion.OnKilledCriterion
 import net.minecraft.entity.Entity
@@ -29,6 +30,7 @@ import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceReloader
@@ -185,6 +187,18 @@ fun onKilledCriterionConditions(
     Optional.ofNullable(killingBlow),
 )
 
+fun bredAnimalsCriterionConditions(
+    player: LootContextPredicate? = null,
+    parent: LootContextPredicate? = null,
+    partner: LootContextPredicate? = null,
+    child: LootContextPredicate? = null
+) = BredAnimalsCriterion.Conditions(
+    Optional.ofNullable(player),
+    Optional.ofNullable(parent),
+    Optional.ofNullable(partner),
+    Optional.ofNullable(child),
+)
+
 val SHORT_STACK_CODEC = AlternateCodec(
     ItemStack.UNCOUNTED_CODEC,
     Registries.ITEM.codec.xmap({ it.defaultStack }, { it.item })
@@ -211,7 +225,7 @@ fun <T> RegistryWrapper<T>.streamEntriesOrdered(tag: TagKey<T>): Stream<Registry
 
 fun EntityPredicate(init: EntityPredicate.Builder.() -> Unit): EntityPredicate = EntityPredicate.Builder.create().apply(init).build()
 
-fun EntityPredicate.asLootContextPredicate(): LootContextPredicate = EntityPredicate.asLootContextPredicate(this)
+fun EntityPredicate.toLootContextPredicate(): LootContextPredicate = EntityPredicate.asLootContextPredicate(this)
 
 fun <T> singleTagGenerator(tag: TagKey<T>, vararg entries: RegistryKey<T>) =
     FabricDataGenerator.Pack.RegistryDependentFactory<FabricTagProvider<T>> { output, registriesFuture ->
@@ -221,3 +235,6 @@ fun <T> singleTagGenerator(tag: TagKey<T>, vararg entries: RegistryKey<T>) =
             }
         }
     }
+
+fun <T> RegistryEntryList(registry: Registry<T>, vararg entries: T): RegistryEntryList.Direct<T> =
+    RegistryEntryList.of(entries.map { registry.getEntry(it) })
