@@ -23,6 +23,7 @@ import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
+import javax.swing.tree.TreeNode
 import kotlin.jvm.optionals.getOrNull
 
 class BossTrackerComponent(private val world: World) : Component, AutoSyncedComponent {
@@ -47,13 +48,11 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         updateLevelCap()
         key.sync(world)
 
-        world.server?.playerManager?.broadcast(
-            if (maxLevel < Int.MAX_VALUE)
-                CAP_RAISE_MESSAGE.text(entity.name, maxLevel)
-            else
-                CAP_REMOVED_MESSAGE.text(entity.name),
-            false
-        )
+        world.server?.playerManager?.apply {
+            broadcast(BOSS_DEFEAT_MESSAGE.text(entity.type.name), false)
+            broadcast(ENEMIES_STRENGTHEN_MESSAGE.text, false)
+            broadcast(if (maxLevel < Int.MAX_VALUE) CAP_RAISE_MESSAGE.text(maxLevel) else CAP_REMOVED_MESSAGE.text, false)
+        }
     }
 
     private fun updateLevelCap() {
@@ -92,14 +91,22 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             Registries.ENTITY_TYPE.codec.mutateCollection().fieldFor("defeated_bosses", BossTrackerComponent::defeated),
         )
 
-        val CAP_RAISE_MESSAGE = Translation.arg("rpgskills.levelcap.raised") {
-            formatted(Formatting.AQUA)
-        }
-        val CAP_REMOVED_MESSAGE = Translation.arg("rpgskills.levelcap.removed") {
+        val BOSS_DEFEAT_MESSAGE = Translation.arg("rpgskills.announcement.boss_defeat") {
             formatted(Formatting.AQUA)
         }
 
-        val BOSS_DEFEAT_SCALING = RPGSkills.id("boss_defeat_scaling")
+        val ENEMIES_STRENGTHEN_MESSAGE = Translation.unit("rpgskills.announcement.enemies_strengthen") {
+            formatted(Formatting.AQUA)
+        }
+
+        val CAP_RAISE_MESSAGE = Translation.arg("rpgskills.announcement.levelcap.raised") {
+            formatted(Formatting.AQUA)
+        }
+        val CAP_REMOVED_MESSAGE = Translation.unit("rpgskills.announcement.levelcap.removed") {
+            formatted(Formatting.AQUA)
+        }
+
+        val BOSS_DEFEAT_SCALING = RPGSkills.id("bosses_defeated_bonus")
 
         override fun afterDeath(
             entity: LivingEntity,
@@ -115,6 +122,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             }
         }
 
+        @JvmStatic
         fun applyBuffs(entity: LivingEntity) {
             if (entity !is Monster) return
 
@@ -124,6 +132,9 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             for ((attribute, modifier) in RPGSkills.CONFIG.attributeIncreases) {
                 entity.getAttributeInstance(attribute)?.addPersistentModifier(modifier.build(BOSS_DEFEAT_SCALING, defeated.toDouble()))
             }
+
+            if (entity.health < entity.maxHealth)
+                entity.health = entity.maxHealth
         }
 
         fun registerEvents() {
