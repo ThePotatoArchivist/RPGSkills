@@ -19,10 +19,11 @@ import net.minecraft.world.World
 import net.minecraft.world.gen.structure.Structure
 import kotlin.jvm.optionals.getOrNull
 
-sealed class SkillSource {
-    abstract fun getComponent(world: World): SkillSourceComponent?
+sealed interface SkillSource {
+    fun getComponent(world: World): SkillSourceComponent?
 
-    data class ChunkSource(val pos: ChunkPos) : SkillSource() {
+    @JvmRecord
+    data class ChunkSource(val pos: ChunkPos) : SkillSource {
         inline val x get() = pos.x
         inline val z get() = pos.z
 
@@ -39,7 +40,8 @@ sealed class SkillSource {
         }
     }
 
-    data class SpawnerSource(val pos: BlockPos): SkillSource() {
+    @JvmRecord
+    data class SpawnerSource(val pos: BlockPos): SkillSource {
         override fun getComponent(world: World): SkillSourceComponent? =
             world.getBlockEntity(pos, BlockEntityType.MOB_SPAWNER).getOrNull()?.skillSource
 
@@ -50,7 +52,8 @@ sealed class SkillSource {
         }
     }
 
-    data class StructureSource(val box: BlockBox, val structure: RegistryKey<Structure>) : SkillSource() {
+    @JvmRecord
+    data class StructureSource(val box: BlockBox, val structure: RegistryKey<Structure>) : SkillSource {
         override fun getComponent(world: World): SkillSourceComponent =
             world[StructuresSkillSourceComponent].getOrCreate(box, structure)
 
@@ -64,7 +67,7 @@ sealed class SkillSource {
         }
     }
 
-    data object EmptySource : SkillSource() {
+    data object EmptySource : SkillSource {
         override fun getComponent(world: World): SkillSourceComponent? = null
 
         val CODEC: MapCodec<EmptySource> = MapCodec.unit(this)

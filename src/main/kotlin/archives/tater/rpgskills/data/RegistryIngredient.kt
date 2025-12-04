@@ -21,6 +21,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
 
     fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>>
 
+    @JvmRecord
     data class EntryEntry<T>(private val entry: RegistryEntry<T>) : RegistryIngredient<T> {
         override fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>> = listOf(entry)
 
@@ -32,6 +33,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         }
     }
 
+    @JvmRecord
     data class TagEntry<T>(private val tag: TagKey<T>) : RegistryIngredient<T> {
         override fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>> =
             lookup.streamEntries().filter { it.isIn(tag) }.toList()

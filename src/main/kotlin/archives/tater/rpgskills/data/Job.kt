@@ -10,6 +10,7 @@ import net.minecraft.advancement.AdvancementCriterion
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 
+@JvmRecord
 data class Job(
     val name: String,
     val description: String,
@@ -18,6 +19,7 @@ data class Job(
     val cooldownTicks: Int,
     val spawnAsOrbs: Boolean = false,
 ) {
+    @JvmRecord
     data class Task(
         val description: String,
         val count: Int,

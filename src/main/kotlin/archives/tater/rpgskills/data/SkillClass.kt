@@ -12,7 +12,8 @@ import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 
-class SkillClass(
+@JvmRecord
+data class SkillClass(
     val name: String,
     val icon: ItemStack,
     val description: String,
