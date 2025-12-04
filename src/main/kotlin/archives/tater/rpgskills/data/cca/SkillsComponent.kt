@@ -22,6 +22,8 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.predicate.entity.EntityPredicate
+import net.minecraft.predicate.entity.EntityPredicate.createAdvancementEntityLootContext
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
@@ -34,6 +36,7 @@ import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
 import java.util.function.Predicate
+import kotlin.jvm.optionals.getOrNull
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent, ServerTickingComponent, ClientTickingComponent {
@@ -137,7 +140,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T: AbstractCriterion.Conditions> onCriterion(criterion: Criterion<T>, condition: Predicate<T>) {
+    fun <T: AbstractCriterion.Conditions> onCriterion(criterion: Criterion<T>, conditionChecker: Predicate<T>) {
         val player = player as? ServerPlayerEntity ?: return
         var changed = false
 
@@ -147,7 +150,11 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
             val job = jobEntry.value
             for ((name, task) in job.tasks) {
-                if (name !in tasks || task.criteria.trigger != criterion || !condition.test(task.criteria.conditions as T)) continue
+                if (name !in tasks) continue
+                if (task.criteria.trigger != criterion) continue
+                val conditions = task.criteria.conditions as T
+                if (conditions.player().getOrNull()?.test(createAdvancementEntityLootContext(player, player)) == false) continue
+                if (!conditionChecker.test(conditions)) continue
 
                 val newCount = (tasks[name] ?: 0) + 1
 

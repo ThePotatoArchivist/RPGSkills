@@ -1,16 +1,26 @@
 package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.data.*
+import archives.tater.rpgskills.util.EntityPredicate
+import archives.tater.rpgskills.util.asLootContextPredicate
 import archives.tater.rpgskills.util.itemCriterionConditions
+import archives.tater.rpgskills.util.onKilledCriterionConditions
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.advancement.AdvancementCriterion
 import net.minecraft.advancement.criterion.ConsumeItemCriterion
 import net.minecraft.advancement.criterion.Criteria
 import net.minecraft.block.Blocks
+import net.minecraft.command.argument.EntityArgumentType.player
+import net.minecraft.entity.effect.StatusEffect
+import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition
+import net.minecraft.loot.condition.EntityPropertiesLootCondition
 import net.minecraft.loot.condition.LocationCheckLootCondition
+import net.minecraft.loot.context.LootContext
 import net.minecraft.predicate.BlockPredicate
 import net.minecraft.predicate.ComponentPredicate
+import net.minecraft.predicate.entity.EntityEffectPredicate
+import net.minecraft.predicate.entity.EntityPredicate
 import net.minecraft.predicate.entity.LocationPredicate
 import net.minecraft.predicate.entity.LootContextPredicate
 import net.minecraft.predicate.item.ItemPredicate
@@ -35,6 +45,7 @@ class TestJobGenerator(
     ) {
         provider.accept(PLACE_STONE)
         provider.accept(GATHER_WHEAT)
+        provider.accept(KILL_POISONED)
         for (job in OTHERS)
             provider.accept(job)
     }
@@ -57,7 +68,10 @@ class TestJobGenerator(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())
                         )
                     )),
-                ), 20, 20 * 60 * 2, spawnAsOrbs = true
+                ),
+                rewardPoints = 20,
+                cooldownTicks = 20 * 60 * 2,
+                spawnAsOrbs = true
             )
         }
 
@@ -81,7 +95,27 @@ class TestJobGenerator(
                             ).build())
                         )
                     ))
-                ), 20, 20 * 60 * 20
+                ),
+                rewardPoints = 20,
+                cooldownTicks = 20 * 60 * 20,
+            )
+        }
+
+        val KILL_POISONED = BuildEntry(testPackId("kill_poisoned")) {
+            Job(
+                "Kill Poisoned",
+                "Kill mob while poisoned",
+                mapOf(
+                    "kill_poisoned" to Job.Task("Kill zombie while poisoned", 4, AdvancementCriterion(
+                        Criteria.PLAYER_KILLED_ENTITY, onKilledCriterionConditions(
+                            player = EntityPredicate {
+                                effects(EntityEffectPredicate.Builder.create().addEffect(StatusEffects.POISON))
+                            }.asLootContextPredicate()
+                        )
+                    ))
+                ),
+                rewardPoints = 20,
+                cooldownTicks = 20 * 60 * 20,
             )
         }
 
@@ -98,6 +132,7 @@ class TestJobGenerator(
         override fun bootstrap(registerable: Registerable<Job>) {
             registerable.register(PLACE_STONE)
             registerable.register(GATHER_WHEAT)
+            registerable.register(KILL_POISONED)
             for (job in OTHERS)
                 registerable.register(job)
         }

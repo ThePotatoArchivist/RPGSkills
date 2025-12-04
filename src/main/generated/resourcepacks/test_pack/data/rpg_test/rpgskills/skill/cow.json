@@ -2,6 +2,11 @@
   "description": "Unlocks cows I guess",
   "icon": "minecraft:cow_spawn_egg",
   "levels": {
+    "1": {
+      "jobs": [
+        "rpg_test:kill_poisoned"
+      ]
+    },
     "3": {
       "jobs": [
         "rpg_test:gather_wheat"

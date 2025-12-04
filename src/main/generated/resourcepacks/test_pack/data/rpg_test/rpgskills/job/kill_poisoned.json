@@ -1,0 +1,26 @@
+{
+  "cooldown_ticks": 24000,
+  "description": "Kill mob while poisoned",
+  "name": "Kill Poisoned",
+  "reward_points": 20,
+  "tasks": {
+    "kill_poisoned": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "effects": {
+                "minecraft:poison": {}
+              }
+            }
+          }
+        ]
+      },
+      "count": 4,
+      "description": "Kill zombie while poisoned",
+      "trigger": "minecraft:player_killed_entity"
+    }
+  }
+}

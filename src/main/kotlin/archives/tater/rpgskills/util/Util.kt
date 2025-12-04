@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.minecraft.advancement.criterion.ItemCriterion
-import net.minecraft.data.DataProvider
+import net.minecraft.advancement.criterion.OnKilledCriterion
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.data.TrackedData
@@ -21,6 +21,8 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtList
+import net.minecraft.predicate.entity.DamageSourcePredicate
+import net.minecraft.predicate.entity.EntityPredicate
 import net.minecraft.predicate.entity.LootContextPredicate
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
@@ -170,8 +172,18 @@ fun RegistryWrapper<*>.isEmpty() = streamEntries().findAny().isEmpty
 
 fun intRangeCodec(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Codec<Int> = Codec.intRange(min, max)
 
-fun itemCriterionConditions(playerPredicate: LootContextPredicate? = null, location: LootContextPredicate? = null) =
-    ItemCriterion.Conditions(Optional.ofNullable(playerPredicate), Optional.ofNullable(location))
+fun itemCriterionConditions(player: LootContextPredicate? = null, location: LootContextPredicate? = null) =
+    ItemCriterion.Conditions(Optional.ofNullable(player), Optional.ofNullable(location))
+
+fun onKilledCriterionConditions(
+    player: LootContextPredicate? = null,
+    entity: LootContextPredicate? = null,
+    killingBlow: DamageSourcePredicate? = null
+) = OnKilledCriterion.Conditions(
+    Optional.ofNullable(player),
+    Optional.ofNullable(entity),
+    Optional.ofNullable(killingBlow),
+)
 
 val SHORT_STACK_CODEC = AlternateCodec(
     ItemStack.UNCOUNTED_CODEC,
@@ -197,14 +209,15 @@ fun <T> RegistryWrapper<T>.streamEntriesOrdered(tag: TagKey<T>): Stream<Registry
     streamEntries().filter { !(it isIn tag) }
 )
 
-inline fun <T> tagGenerator(registryRef: RegistryKey<Registry<T>>, configure: FabricTagProvider<T>.(RegistryWrapper.WrapperLookup) -> Unit): FabricDataGenerator.Pack.RegistryDependentFactory<DataProvider> =
-    FabricDataGenerator.Pack.RegistryDependentFactory { output, future ->
-        object : FabricTagProvider<T>(output, registryRef, future) {
-            override fun configure(wrapperLookup: RegistryWrapper.WrapperLookup) {
-                configure(wrapperLookup)
+fun EntityPredicate(init: EntityPredicate.Builder.() -> Unit): EntityPredicate = EntityPredicate.Builder.create().apply(init).build()
+
+fun EntityPredicate.asLootContextPredicate(): LootContextPredicate = EntityPredicate.asLootContextPredicate(this)
+
+fun <T> singleTagGenerator(tag: TagKey<T>, vararg entries: RegistryKey<T>) =
+    FabricDataGenerator.Pack.RegistryDependentFactory<FabricTagProvider<T>> { output, registriesFuture ->
+        object : FabricTagProvider<T>(output, tag.registry, registriesFuture) {
+            override fun configure(wrapperLookup: RegistryWrapper.WrapperLookup?) {
+                getOrCreateTagBuilder(tag).add(*entries)
             }
         }
     }
-
-inline fun <T> tagGenerator(registryRef: RegistryKeyHolder<Registry<T>>, configure: FabricTagProvider<T>.(RegistryWrapper.WrapperLookup) -> Unit) =
-    tagGenerator(registryRef.key, configure)

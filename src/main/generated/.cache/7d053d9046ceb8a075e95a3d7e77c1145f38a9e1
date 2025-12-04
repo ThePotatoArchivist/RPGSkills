@@ -1,4 +1,4 @@
-// 1.21.1	2025-12-02T01:14:14.965210383	rpgskills:test_pack/Jobs
+// 1.21.1	2025-12-04T02:01:51.764789249	rpgskills:test_pack/Jobs
 78ae542c67986844ab129414f87887998183baf4 resourcepacks/test_pack/data/rpg_test/rpgskills/job/job7.json
 a7ef4b044c6a4a823587c607b1818c98fea7c72e resourcepacks/test_pack/data/rpg_test/rpgskills/job/job1.json
 84c1af28d4dcc0891316211505fd6f208a165350 resourcepacks/test_pack/data/rpg_test/rpgskills/job/job10.json
@@ -10,4 +10,5 @@ b03d4b3e17b57adff2ccb04551a2a35e5c6fc536 resourcepacks/test_pack/data/rpg_test/r
 07c65dc95d01b75547c83d237b7bee4f6a827d08 resourcepacks/test_pack/data/rpg_test/rpgskills/job/job2.json
 9e3b0e43349d7b02f9735424c4e139df854392e7 resourcepacks/test_pack/data/rpg_test/rpgskills/job/job6.json
 222447d786f032354a13e26cd5cdd5b22591c50f resourcepacks/test_pack/data/rpg_test/rpgskills/job/job3.json
+66bb042983038e50d682cb27660c4d8ec9508d47 resourcepacks/test_pack/data/rpg_test/rpgskills/job/kill_poisoned.json
 893099f2d229e34c590797159c1c483e47558eab resourcepacks/test_pack/data/rpg_test/rpgskills/job/job8.json

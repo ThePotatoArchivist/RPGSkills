@@ -66,7 +66,7 @@ class TestSkillGenerator(
             Skill(
                 icon = ItemStack(Items.COW_SPAWN_EGG),
                 levels = listOf(
-                    Skill.Level(),
+                    Skill.Level(jobs = listOf(registerable[TestJobGenerator.KILL_POISONED])),
                     Skill.Level(),
                     Skill.Level(jobs = listOf(registerable[TestJobGenerator.GATHER_WHEAT]))
                 ),
