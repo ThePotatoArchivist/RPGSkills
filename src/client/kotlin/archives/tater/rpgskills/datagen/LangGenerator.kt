@@ -39,7 +39,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(SkillTabWidget.TOOLTIP, "Level %s")
             add(ClassScreen.SELECT, "Select Class")
             add(JobsScreen.TITLE, "Jobs")
-            add(JobWidget.TASK, "%s %s: %s")
+            add(JobWidget.TASK, "%s %s %s")
             add(JobWidget.INCOMPLETE_TASK, "\u2610")
             add(JobWidget.COMPLETE_TASK, "\u2611")
             add(JobWidget.TASK_PROGRESS, "%s/%s")

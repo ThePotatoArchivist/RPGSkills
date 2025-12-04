@@ -40,10 +40,10 @@ class JobWidget(private val skillsComponent: SkillsComponent, private val job: R
                 textRenderer,
                 TASK.text(
                     if (name in instance.tasks) INCOMPLETE_TASK.text else COMPLETE_TASK.text,
-                    Text.literal(task.description),
                     TASK_PROGRESS.text(instance.tasks[name] ?: task.count, task.count).apply {
                         if (!onCooldown && name in instance.tasks) withColor(0x5555FF)
                     },
+                    Text.literal(task.description),
                 ).apply {
                     when {
                         onCooldown -> withColor(0x909090)
