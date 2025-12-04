@@ -115,16 +115,18 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
 
         fun <A> createCodec(registry: Registry<A>) = Composite.createCodec(registry)
 
-        fun <T> empty() = Composite(object : RegistryWrapper<T> {
-            override fun getOptional(key: RegistryKey<T>?): Optional<RegistryEntry.Reference<T>> =
+        val EMPTY = Composite<Any>(object : RegistryWrapper<Any> {
+            override fun getOptional(key: RegistryKey<Any>?): Optional<RegistryEntry.Reference<Any>> =
                 Optional.empty()
 
-            override fun getOptional(tag: TagKey<T>?): Optional<RegistryEntryList.Named<T>> = Optional.empty()
+            override fun getOptional(tag: TagKey<Any>?): Optional<RegistryEntryList.Named<Any>> = Optional.empty()
 
-            override fun streamEntries(): Stream<RegistryEntry.Reference<T>> = Stream.empty()
+            override fun streamEntries(): Stream<RegistryEntry.Reference<Any>> = Stream.empty()
 
-            override fun streamTags(): Stream<RegistryEntryList.Named<T>> = Stream.empty()
+            override fun streamTags(): Stream<RegistryEntryList.Named<Any>> = Stream.empty()
         })
 
+        @Suppress("UNCHECKED_CAST")
+        fun <T> empty() = EMPTY as Composite<T>
     }
 }
