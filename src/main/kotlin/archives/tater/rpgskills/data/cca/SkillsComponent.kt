@@ -41,7 +41,12 @@ import kotlin.jvm.optionals.getOrNull
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent, ServerTickingComponent, ClientTickingComponent {
     private var _skillClass: RegistryEntry<SkillClass>? = null
-    var skillClass by ::_skillClass.synced(key, player)
+    var skillClass
+        get() = _skillClass
+        set(value) {
+            _skillClass = value
+            resetSkillsToClass()
+        }
 
     private var _skills = mutableMapOf<RegistryEntry<Skill>, Int>()
     val skills: Map<RegistryEntry<Skill>, Int>
@@ -133,7 +138,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             for (levelIndex in 0..<maxLevel) {
                 val level = skill.value.levels[levelIndex]
                 for (job in level.jobs) {
-                    newJobs[job] = _jobs[job] ?: JobInstance(job.value)
+                    newJobs[job] = _jobs[job]?.apply { validate(job) } ?: JobInstance(job.value)
                 }
             }
         _jobs = newJobs
@@ -159,16 +164,14 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                 val newCount = (tasks[name] ?: 0) + 1
 
                 if (newCount >= task.count) {
-                    // Complete task
                     tasks.remove(name)
-                    if (tasks.isEmpty()) {
-                        completeJob(player, jobEntry, instance)
-                    }
                 } else
                     tasks[name] = newCount
 
                 changed = true
             }
+            if (tasks.isEmpty())
+                completeJob(player, jobEntry, instance)
         }
 
         if (changed) sync()
@@ -239,6 +242,20 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                 tasks[task] = 0
         }
 
+        // Handle no-longer-existent keys
+        fun validate(job: RegistryEntry<Job>) {
+            tasks.keys
+                .filter { it !in job.value.tasks }
+                .forEach {
+                    RPGSkills.logger.warn("Invalid task: {}/{}", job.idAsString, it)
+                    tasks.remove(it)
+                }
+            if (tasks.isEmpty()) {
+                RPGSkills.logger.warn("Job {} had no valid tasks, resetting", job.idAsString)
+                resetTasks(job.value)
+            }
+        }
+
         companion object {
             val CODEC: Codec<JobInstance> = RecordCodecBuilder.create { it.group(
                 Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("tasks").forGetter(JobInstance::tasks),
@@ -298,7 +315,6 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                     return@registerGlobalReceiver
                 }
                 skillsComponent.skillClass = payload.skillClass
-                skillsComponent.resetSkillsToClass()
 
                 player.interactionManager.gameMode.setAbilities(player.abilities)
                 player.sendAbilitiesUpdate()
