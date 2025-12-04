@@ -7,8 +7,6 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.mob.Monster
 import net.minecraft.nbt.NbtCompound
@@ -18,12 +16,10 @@ import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.util.Formatting
 import net.minecraft.world.World
-import net.bettercombat.api.WeaponAttributesHelper.override
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
-import javax.swing.tree.TreeNode
 import kotlin.jvm.optionals.getOrNull
 
 class BossTrackerComponent(private val world: World) : Component, AutoSyncedComponent {
@@ -41,9 +37,9 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             ?: RegistryEntryList.empty()
     }
 
-    fun onDefeated(entity: Entity) {
-        if (Registries.ENTITY_TYPE.getEntry(entity.type) !in increasesLevelCap) return
-        if (entity.type in defeated) return
+    fun onDefeated(entity: Entity): Boolean {
+        if (Registries.ENTITY_TYPE.getEntry(entity.type) !in increasesLevelCap) return false
+        if (entity.type in defeated) return false
         defeated.add(entity.type)
         updateLevelCap()
         key.sync(world)
@@ -53,6 +49,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             broadcast(ENEMIES_STRENGTHEN_MESSAGE.text, false)
             broadcast(if (maxLevel < Int.MAX_VALUE) CAP_RAISE_MESSAGE.text(maxLevel) else CAP_REMOVED_MESSAGE.text, false)
         }
+        return true
     }
 
     private fun updateLevelCap() {
@@ -114,7 +111,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         ) {
             entity.world.server?.run {
                 val component = overworld[BossTrackerComponent]
-                component.onDefeated(entity)
+                if (!component.onDefeated(entity)) return
                 for (world in worlds) {
                     if (world == overworld) continue
                     world[BossTrackerComponent].copy(component)
@@ -124,7 +121,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
 
         @JvmStatic
         fun applyBuffs(entity: LivingEntity) {
-            if (entity !is Monster) return
+            if (entity !is Monster || entity.type isIn RPGSkillsTags.NOT_BUFFED) return
 
             val defeated = entity.world[BossTrackerComponent].defeatedCount
             if (defeated <= 0) return
