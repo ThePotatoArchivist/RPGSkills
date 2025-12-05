@@ -1,19 +1,11 @@
 package archives.tater.rpgskills
 
-import archives.tater.rpgskills.data.Job
-import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.datagen.BlockTagGenerator
-import archives.tater.rpgskills.datagen.EntityTagGenerator
-import archives.tater.rpgskills.datagen.LangGenerator
-import archives.tater.rpgskills.datagen.ModelGenerator
-import archives.tater.rpgskills.datagen.StructureTagGenerator
+import archives.tater.rpgskills.datagen.*
 import archives.tater.rpgskills.datagen.testpack.*
 import archives.tater.rpgskills.util.singleTagGenerator
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.registry.RegistryBuilder
-import net.minecraft.registry.RegistryWrapper
 
 object RPGSkillsDataGenerator : DataGeneratorEntrypoint {
 	override fun buildRegistry(registryBuilder: RegistryBuilder) {
@@ -42,7 +34,9 @@ object RPGSkillsDataGenerator : DataGeneratorEntrypoint {
             ))
             addProvider(singleTagGenerator(RPGSkillsTags.JOB_ORDER,
                 TestJobGenerator.GATHER_WHEAT.key,
-                *(2..5).map { TestJobGenerator.OTHERS[it].key }.toTypedArray()
+                TestJobGenerator.STAND_ON_IRON.key,
+                TestJobGenerator.PLACE_STONE.key,
+                TestJobGenerator.KILL_POISONED.key,
             ))
 		}
 	}

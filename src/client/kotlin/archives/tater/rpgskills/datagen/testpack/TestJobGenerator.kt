@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.advancement.AdvancementCriterion
 import net.minecraft.advancement.criterion.ConsumeItemCriterion
 import net.minecraft.advancement.criterion.Criteria
+import net.minecraft.advancement.criterion.TickCriterion
 import net.minecraft.block.Blocks
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.effect.StatusEffects
@@ -42,8 +43,7 @@ class TestJobGenerator(
         provider.accept(GATHER_WHEAT)
         provider.accept(KILL_POISONED)
         provider.accept(BREED)
-        for (job in OTHERS)
-            provider.accept(job)
+        provider.accept(STAND_ON_IRON)
     }
 
     companion object : BuildsRegistry<Job> {
@@ -139,14 +139,24 @@ class TestJobGenerator(
             )
         }
 
-        val OTHERS = (1..10).map {
-            BuildEntry(testPackId("job$it")) {
-                Job("Job $it", "EEEEE", mapOf("task" to Job.Task("Place Granite", 10, AdvancementCriterion(
-                    Criteria.PLACED_BLOCK, itemCriterionConditions(
-                        location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())
-                    )
-                ))), 1, 20)
-            }
+        val STAND_ON_IRON = BuildEntry(testPackId("stand_on_iron")) {
+            Job(
+                "Stand on iron",
+                "Stand on iron",
+                mapOf(
+                    "stand" to Job.Task("Stand on iron", 30 * 20, AdvancementCriterion(
+                        Criteria.TICK, TickCriterion.Conditions(Optional.of(EntityPredicate {
+                            steppingOn(LocationPredicate.Builder.create().apply {
+                                block(BlockPredicate.Builder.create().apply {
+                                    blocks(Blocks.IRON_BLOCK)
+                                })
+                            })
+                        }.toLootContextPredicate()))
+                    ))
+                ),
+                rewardPoints = 200,
+                cooldownTicks = 20 * 30,
+            )
         }
 
         override fun bootstrap(registerable: Registerable<Job>) {
@@ -154,8 +164,7 @@ class TestJobGenerator(
             registerable.register(GATHER_WHEAT)
             registerable.register(KILL_POISONED)
             registerable.register(BREED)
-            for (job in OTHERS)
-                registerable.register(job)
+            registerable.register(STAND_ON_IRON)
         }
     }
 }

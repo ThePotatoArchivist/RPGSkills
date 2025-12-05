@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 public abstract class AbstractCriterionMixin<T extends AbstractCriterion.Conditions> implements Criterion<T> {
     @Inject(
             method = "trigger",
-            at = @At("TAIL")
+            at = @At("HEAD")
     )
     private void triggerJobs(ServerPlayerEntity player, Predicate<T> predicate, CallbackInfo ci) {
         SkillsComponent.KEY.get(player).onCriterion(this, predicate);

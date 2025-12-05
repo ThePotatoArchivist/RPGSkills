@@ -9,16 +9,7 @@
     },
     "2": {
       "jobs": [
-        "rpg_test:job1",
-        "rpg_test:job2",
-        "rpg_test:job3",
-        "rpg_test:job4",
-        "rpg_test:job5",
-        "rpg_test:job6",
-        "rpg_test:job7",
-        "rpg_test:job8",
-        "rpg_test:job9",
-        "rpg_test:job10"
+        "rpg_test:stand_on_iron"
       ]
     }
   },

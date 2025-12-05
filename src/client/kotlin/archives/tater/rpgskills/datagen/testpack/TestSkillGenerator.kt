@@ -1,12 +1,7 @@
 package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.RPGSkillsAttributes
-import archives.tater.rpgskills.data.BuildsRegistry
-import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.data.AnonymousAttributeModifier
-import archives.tater.rpgskills.data.SkillProvider
-import archives.tater.rpgskills.data.accept
-import archives.tater.rpgskills.data.get
+import archives.tater.rpgskills.data.*
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation
 import net.minecraft.entity.attribute.EntityAttributes
@@ -82,7 +77,7 @@ class TestSkillGenerator(
                     Skill.Level(mapOf(
                         RPGSkillsAttributes.BOW_DRAW_TIME to AnonymousAttributeModifier(-10.0, Operation.ADD_VALUE)
                     )),
-                    Skill.Level(jobs = TestJobGenerator.OTHERS.map { registerable[it] }),
+                    Skill.Level(jobs = listOf(registerable[TestJobGenerator.STAND_ON_IRON])),
                 ),
                 name = "Grass Skill",
                 description = "Unlocks cows I guess"

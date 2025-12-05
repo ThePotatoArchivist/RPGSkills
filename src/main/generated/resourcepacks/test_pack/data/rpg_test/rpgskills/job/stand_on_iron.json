@@ -1,0 +1,28 @@
+{
+  "cooldown_ticks": 600,
+  "description": "Stand on iron",
+  "name": "Stand on iron",
+  "reward_points": 200,
+  "tasks": {
+    "stand": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "stepping_on": {
+                "block": {
+                  "blocks": "minecraft:iron_block"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "count": 600,
+      "description": "Stand on iron",
+      "trigger": "minecraft:tick"
+    }
+  }
+}
