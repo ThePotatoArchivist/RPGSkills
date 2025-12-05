@@ -5,16 +5,12 @@ import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.client.gui.widget.SkillWidget
-import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.streamEntriesOrdered
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
-import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
 import net.minecraft.util.math.MathHelper.clamp

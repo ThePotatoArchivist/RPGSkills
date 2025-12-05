@@ -31,7 +31,6 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
-import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.sound.SoundEvents
 import org.lwjgl.glfw.GLFW
 import kotlin.jvm.optionals.getOrNull

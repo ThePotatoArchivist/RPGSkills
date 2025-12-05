@@ -1,12 +1,11 @@
 package archives.tater.rpgskills.datagen.testpack
 
-import archives.tater.rpgskills.data.*
-import archives.tater.rpgskills.util.EntityPredicate
-import archives.tater.rpgskills.util.RegistryEntryList
-import archives.tater.rpgskills.util.toLootContextPredicate
-import archives.tater.rpgskills.util.bredAnimalsCriterionConditions
-import archives.tater.rpgskills.util.itemCriterionConditions
-import archives.tater.rpgskills.util.onKilledCriterionConditions
+import archives.tater.rpgskills.condition.IsMonsterLootCondition
+import archives.tater.rpgskills.data.BuildsRegistry
+import archives.tater.rpgskills.data.Job
+import archives.tater.rpgskills.data.JobProvider
+import archives.tater.rpgskills.data.accept
+import archives.tater.rpgskills.util.*
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.advancement.AdvancementCriterion
 import net.minecraft.advancement.criterion.ConsumeItemCriterion
@@ -16,6 +15,7 @@ import net.minecraft.entity.EntityType
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition
 import net.minecraft.loot.condition.LocationCheckLootCondition
+import net.minecraft.loot.context.LootContext
 import net.minecraft.predicate.BlockPredicate
 import net.minecraft.predicate.entity.EntityEffectPredicate
 import net.minecraft.predicate.entity.EntityTypePredicate
@@ -24,10 +24,9 @@ import net.minecraft.predicate.entity.LootContextPredicate
 import net.minecraft.registry.Registerable
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryWrapper
-import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.Identifier
-import java.util.Optional
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
@@ -101,13 +100,14 @@ class TestJobGenerator(
         val KILL_POISONED = BuildEntry(testPackId("kill_poisoned")) {
             Job(
                 "Kill Poisoned",
-                "Kill mob while poisoned",
+                "Kill monster while poisoned",
                 mapOf(
                     "kill_poisoned" to Job.Task("Kill zombie while poisoned", 4, AdvancementCriterion(
                         Criteria.PLAYER_KILLED_ENTITY, onKilledCriterionConditions(
                             player = EntityPredicate {
                                 effects(EntityEffectPredicate.Builder.create().addEffect(StatusEffects.POISON))
-                            }.toLootContextPredicate()
+                            }.toLootContextPredicate(),
+                            entity = LootContextPredicate.create(IsMonsterLootCondition(LootContext.EntityTarget.THIS))
                         )
                     ))
                 ),

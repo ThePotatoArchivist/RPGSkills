@@ -1,6 +1,5 @@
 package archives.tater.rpgskills.mixin.job;
 
-import archives.tater.rpgskills.data.cca.RPGSkillsComponents;
 import archives.tater.rpgskills.data.cca.SkillsComponent;
 
 import org.spongepowered.asm.mixin.Mixin;

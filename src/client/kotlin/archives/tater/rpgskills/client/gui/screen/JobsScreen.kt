@@ -11,14 +11,9 @@ import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.streamEntriesOrdered
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.predicate.entity.DistancePredicate.y
 import net.minecraft.screen.ScreenTexts
-import com.ibm.icu.impl.ValidIdentifiers
-import jdk.internal.org.jline.utils.Colors.s
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle
 
 class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
     private var x = 0

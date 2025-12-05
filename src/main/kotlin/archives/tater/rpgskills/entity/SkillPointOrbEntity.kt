@@ -7,7 +7,6 @@ import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.*
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import com.mojang.serialization.Codec
-import net.minecraft.advancement.Advancement
 import net.minecraft.advancement.AdvancementRewards
 import net.minecraft.block.BlockState
 import net.minecraft.enchantment.EnchantmentHelper

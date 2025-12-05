@@ -3,6 +3,7 @@ package archives.tater.rpgskills.data.cca
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.util.*
+import archives.tater.rpgskills.util.get
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
@@ -20,6 +21,7 @@ import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
+import kotlin.collections.iterator
 import kotlin.jvm.optionals.getOrNull
 
 class BossTrackerComponent(private val world: World) : Component, AutoSyncedComponent {

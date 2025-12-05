@@ -13,7 +13,9 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.recipe.RecipeEntry
-import net.minecraft.registry.*
+import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
+import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.Text

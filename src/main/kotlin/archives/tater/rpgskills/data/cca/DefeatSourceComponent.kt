@@ -5,6 +5,7 @@ import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.data.SkillSource
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.util.*
+import archives.tater.rpgskills.util.get
 import com.mojang.serialization.Codec
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttributes
@@ -23,6 +24,7 @@ import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import java.util.*
+import kotlin.collections.iterator
 
 class DefeatSourceComponent(val entity: MobEntity) : Component {
     private var _attackers = mutableMapOf<UUID, Float>()

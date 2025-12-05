@@ -11,6 +11,7 @@ import archives.tater.rpgskills.networking.JobCompletedPayload
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.*
+import archives.tater.rpgskills.util.get
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -22,7 +23,6 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.predicate.entity.EntityPredicate
 import net.minecraft.predicate.entity.EntityPredicate.createAdvancementEntityLootContext
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
@@ -36,6 +36,7 @@ import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
 import java.util.function.Predicate
+import kotlin.collections.iterator
 import kotlin.jvm.optionals.getOrNull
 
 @Suppress("UnstableApiUsage")

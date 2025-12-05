@@ -1,19 +1,14 @@
 package archives.tater.rpgskills
 
-import archives.tater.rpgskills.data.LockGroup
+import archives.tater.rpgskills.condition.RPGSkillsConditions
 import archives.tater.rpgskills.data.Job
+import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.data.cca.BossTrackerComponent
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.item.RPGSkillsItems
-import archives.tater.rpgskills.networking.ChooseClassPayload
-import archives.tater.rpgskills.networking.ClassChoicePayload
-import archives.tater.rpgskills.networking.JobCompletedPayload
-import archives.tater.rpgskills.networking.RecipeBlockedPayload
-import archives.tater.rpgskills.networking.SkillPointIncreasePayload
-import archives.tater.rpgskills.networking.SkillUpgradePayload
-import archives.tater.rpgskills.networking.register
+import archives.tater.rpgskills.networking.*
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries
@@ -40,6 +35,7 @@ object RPGSkills : ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		RPGSkillsItems.register()
+        RPGSkillsConditions.register()
 
 		DynamicRegistries.registerSynced(Skill.key, Skill.CODEC)
 		DynamicRegistries.registerSynced(LockGroup.key, LockGroup.CODEC)

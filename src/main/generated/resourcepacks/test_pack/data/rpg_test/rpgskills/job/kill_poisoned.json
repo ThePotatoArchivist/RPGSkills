@@ -1,11 +1,17 @@
 {
   "cooldown_ticks": 24000,
-  "description": "Kill mob while poisoned",
+  "description": "Kill monster while poisoned",
   "name": "Kill Poisoned",
   "reward_points": 20,
   "tasks": {
     "kill_poisoned": {
       "conditions": {
+        "entity": [
+          {
+            "condition": "rpgskills:is_monster",
+            "entity": "this"
+          }
+        ],
         "player": [
           {
             "condition": "minecraft:entity_properties",
