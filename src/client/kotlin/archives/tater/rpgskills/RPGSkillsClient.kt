@@ -13,10 +13,7 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.entity.RPGSkillsEntities
-import archives.tater.rpgskills.networking.ChooseClassPayload
-import archives.tater.rpgskills.networking.JobCompletedPayload
-import archives.tater.rpgskills.networking.RecipeBlockedPayload
-import archives.tater.rpgskills.networking.SkillPointIncreasePayload
+import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.RegistryCache
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.isEmpty
@@ -94,6 +91,7 @@ object RPGSkillsClient : ClientModInitializer {
 				}
             if (jobsKey.wasPressed)
                 client.player?.let {
+                    ClientPlayNetworking.send(RequestSkillSyncPayload)
                     client.setScreen(JobsScreen(it))
                 }
 		}

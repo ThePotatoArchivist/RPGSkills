@@ -59,6 +59,7 @@ object RPGSkills : ModInitializer {
         with (PayloadTypeRegistry.playC2S()) {
             register(ClassChoicePayload.ID, ClassChoicePayload.CODEC)
             register(SkillUpgradePayload.ID, SkillUpgradePayload.CODEC)
+            register(RequestSkillSyncPayload)
         }
 
 		SkillsComponent.registerEvents()

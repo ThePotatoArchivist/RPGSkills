@@ -5,13 +5,8 @@ import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
-import archives.tater.rpgskills.networking.ChooseClassPayload
-import archives.tater.rpgskills.networking.ClassChoicePayload
-import archives.tater.rpgskills.networking.JobCompletedPayload
-import archives.tater.rpgskills.networking.SkillPointIncreasePayload
-import archives.tater.rpgskills.networking.SkillUpgradePayload
+import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.*
-import archives.tater.rpgskills.util.get
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -36,7 +31,6 @@ import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
 import java.util.function.Predicate
-import kotlin.collections.iterator
 import kotlin.jvm.optionals.getOrNull
 
 @Suppress("UnstableApiUsage")
@@ -148,7 +142,6 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     @Suppress("UNCHECKED_CAST")
     fun <T: AbstractCriterion.Conditions> onCriterion(criterion: Criterion<T>, conditionChecker: Predicate<T>) {
         val player = player as? ServerPlayerEntity ?: return
-        var changed = false
 
         for ((jobEntry, instance) in _jobs) {
             val (tasks, cooldown) = instance
@@ -168,14 +161,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                     tasks.remove(name)
                 } else
                     tasks[name] = newCount
-
-                changed = true
             }
             if (tasks.isEmpty())
                 completeJob(player, jobEntry, instance)
         }
-
-        if (changed) sync()
     }
 
     private fun completeJob(player: ServerPlayerEntity, jobEntry: RegistryEntry<Job>, instance: JobInstance) {
@@ -223,6 +212,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         CODEC.update(this, tag, registryLookup).logIfError()
         updateAttributes()
         updateJobs()
+        if (player.world.isClient)
+            RPGSkills.logger.info("Synced!")
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
@@ -288,7 +279,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             .runningFold(0) { acc, lvl -> acc + getPointsForNextLevel(lvl) }.toIntArray()
         private val LEVEL_REQUIREMENTS_REVERSED = LEVEL_REQUIREMENTS.withIndex().map { (level, required) -> LevelRequirement(level, required) }.reversed().toTypedArray()
 
-        const val JOB_SYNC_FREQUENCY = 20 * 60
+        const val JOB_SYNC_FREQUENCY = 20 * 60 // 1 minute
 
         /**
          * Matches vanilla XP
@@ -334,6 +325,11 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                         SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f
                     )
                 }
+            }
+
+            // Request skill sync
+            ServerPlayNetworking.registerGlobalReceiver(RequestSkillSyncPayload.id) { _, context ->
+                context.player()[SkillsComponent].sync()
             }
 
             // Join without class

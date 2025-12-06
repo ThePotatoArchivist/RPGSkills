@@ -7,9 +7,11 @@ import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.client.gui.widget.JobWidget
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.networking.RequestSkillSyncPayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.streamEntriesOrdered
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
@@ -48,6 +50,12 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         drawXpBar(context, x + 188, y + 6)
     }
 
+    override fun tick() {
+        super.tick()
+        if (player.age % REQUEST_UPDATE_INTERVAL == 0)
+            ClientPlayNetworking.send(RequestSkillSyncPayload)
+    }
+
     companion object {
         val TITLE = Translation.unit("screen.$MOD_ID.jobs")
 
@@ -55,5 +63,6 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
 
         const val WIDTH = 196
         const val HEIGHT = 176
+        const val REQUEST_UPDATE_INTERVAL = 2 * 20
     }
 }
