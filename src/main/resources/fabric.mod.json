@@ -43,6 +43,7 @@
 	"custom": {
 		"cardinal-components": [
 			"rpgskills:skills",
+            "rpgskills:jobs",
 			"rpgskills:defeat_source",
 			"rpgskills:skill_source",
 			"rpgskills:structures_skill_source",

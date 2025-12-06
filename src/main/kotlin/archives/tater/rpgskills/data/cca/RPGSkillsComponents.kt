@@ -16,6 +16,7 @@ import org.ladysnake.cca.api.v3.world.WorldComponentInitializer
 object RPGSkillsComponents : EntityComponentInitializer, ChunkComponentInitializer, WorldComponentInitializer, BlockComponentInitializer {
     override fun registerEntityComponentFactories(registry: EntityComponentFactoryRegistry) {
         registry.registerForPlayers(SkillsComponent.key, ::SkillsComponent)
+        registry.registerForPlayers(JobsComponent.key, ::JobsComponent)
         registry.registerFor(MobEntity::class.java, DefeatSourceComponent.key, ::DefeatSourceComponent)
     }
 

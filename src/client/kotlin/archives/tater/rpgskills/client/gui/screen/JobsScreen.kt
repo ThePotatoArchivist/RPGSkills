@@ -6,7 +6,7 @@ import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.client.gui.widget.JobWidget
 import archives.tater.rpgskills.data.Job
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.data.cca.JobsComponent
 import archives.tater.rpgskills.networking.CloseJobScreenPayload
 import archives.tater.rpgskills.networking.OpenJobScreenPayload
 import archives.tater.rpgskills.util.Translation
@@ -34,11 +34,11 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
 
-        val skills = player[SkillsComponent]
+        val jobs = player[JobsComponent]
         addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148,
             player.registryManager[Job].streamEntriesOrdered(RPGSkillsTags.JOB_ORDER)
-                .filter { it in skills.jobs }
-                .map { job -> JobWidget(skills, job, 168, x + 10, 0) }
+                .filter { it in jobs.jobs }
+                .map { job -> JobWidget(jobs, job, 168, x + 10, 0) }
                 .toList()
         ))
 

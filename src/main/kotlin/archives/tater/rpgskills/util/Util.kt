@@ -104,7 +104,7 @@ operator fun <T> AttachmentTarget.get(attachmentType: AttachmentType<T>): T = ge
 @Suppress("UnstableApiUsage")
 operator fun <T> AttachmentTarget.get(holder: AttachmentTypeHolder<T>): T = this[holder.attachmentType]
 
-interface ComponentKeyHolder<C : Component, T> {
+interface ComponentKeyHolder<C : Component, in T> {
     val key: ComponentKey<C>
 }
 

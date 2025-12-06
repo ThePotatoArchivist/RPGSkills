@@ -4,6 +4,7 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Job
+import archives.tater.rpgskills.data.cca.JobsComponent
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.value
@@ -15,7 +16,7 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
-class JobWidget(private val skillsComponent: SkillsComponent, private val job: RegistryEntry<Job>, width: Int, x: Int, y: Int) :
+class JobWidget(private val jobsComponent: JobsComponent, private val job: RegistryEntry<Job>, width: Int, x: Int, y: Int) :
     ClickableWidget(x, y, width, (textRenderer.fontHeight + 1) * (job.value.tasks.size + 1) + 2 * MARGIN + 2, Text.empty()) {
 
     val tasks = job.value.tasks.toList()
@@ -26,7 +27,7 @@ class JobWidget(private val skillsComponent: SkillsComponent, private val job: R
         mouseY: Int,
         delta: Float
     ) {
-        val instance = skillsComponent[job] ?: run {
+        val instance = jobsComponent[job] ?: run {
             context.drawText(textRenderer, Text.literal("ERROR Missing Job Instance"), x, y, 0xff0000, false)
             return
         }
