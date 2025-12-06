@@ -37,7 +37,7 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         val jobs = player[JobsComponent]
         addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148,
             player.registryManager[Job].streamEntriesOrdered(RPGSkillsTags.JOB_ORDER)
-                .filter { it in jobs.jobs }
+                .filter { it in jobs.active }
                 .map { job -> JobWidget(jobs, job, 168, x + 10, 0) }
                 .toList()
         ))

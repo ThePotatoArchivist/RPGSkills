@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.*
@@ -113,6 +114,12 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     private fun updateJobs() {
         player[JobsComponent].updateJobs(skills)
+    }
+
+    fun isJobUnlocked(job: RegistryEntry<Job>) = skills.any { (skill, level) ->
+        (0..<level).any {
+            job in skill.value.levels[it].jobs
+        }
     }
 
     override fun shouldCopyForRespawn(lossless: Boolean, keepInventory: Boolean, sameCharacter: Boolean): Boolean =

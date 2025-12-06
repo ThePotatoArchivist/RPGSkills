@@ -4,14 +4,15 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
+import archives.tater.rpgskills.networking.AddJobPayload
 import archives.tater.rpgskills.networking.CloseJobScreenPayload
 import archives.tater.rpgskills.networking.JobCompletedPayload
 import archives.tater.rpgskills.networking.OpenJobScreenPayload
+import archives.tater.rpgskills.networking.RemoveJobPayload
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.get
 import com.mojang.serialization.Codec
-import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.advancement.criterion.AbstractCriterion
 import net.minecraft.advancement.criterion.Criterion
@@ -35,15 +36,17 @@ import kotlin.jvm.optionals.getOrNull
 @Suppress("UnstableApiUsage")
 class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<JobsComponent>, AutoSyncedComponent, ServerTickingComponent, ClientTickingComponent {
 
-    private var _jobs = mutableMapOf<RegistryEntry<Job>, JobInstance>()
-    val jobs: Map<RegistryEntry<Job>, JobInstance>
-        get() = _jobs
+    private var _active = mutableMapOf<RegistryEntry<Job>, JobInstance>()
+    val active: Map<RegistryEntry<Job>, JobInstance>
+        get() = _active
+
+    private var _cooldowns = mutableMapOf<RegistryEntry<Job>, Int>()
+    val cooldowns: Map<RegistryEntry<Job>, Int>
+        get() = _cooldowns
 
     // Runtime values, not saved or synced
     private var jobScreenOpen = false
     private var jobsUpdated = false
-
-    operator fun get(job: RegistryEntry<Job>) = _jobs[job]
 
     private fun sync() {
         key.sync(player)
@@ -57,10 +60,10 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
             for (levelIndex in 0..<maxLevel) {
                 val level = skill.value.levels[levelIndex]
                 for (job in level.jobs) {
-                    newJobs[job] = _jobs[job] ?: JobInstance(job.value)
+                    newJobs[job] = _active[job] ?: JobInstance(job.value)
                 }
             }
-        _jobs = newJobs
+        _active = newJobs
         sync()
     }
 
@@ -68,9 +71,8 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     fun <T: AbstractCriterion.Conditions> onCriterion(criterion: Criterion<T>, conditionChecker: Predicate<T>) {
         val player = player as? ServerPlayerEntity ?: return
 
-        for ((jobEntry, instance) in _jobs) {
-            val (tasks, cooldown) = instance
-            if (cooldown > 0) continue
+        for ((jobEntry, instance) in _active) {
+            val (tasks) = instance
 
             val job = jobEntry.value
             for ((name, task) in job.tasks) {
@@ -104,21 +106,25 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
                 ServerPlayNetworking.send(player, SkillPointIncreasePayload)
             }
         }
-        instance.cooldown = job.cooldownTicks
+        _cooldowns[jobEntry] = job.cooldownTicks
         instance.resetTasks(job)
         ServerPlayNetworking.send(player, JobCompletedPayload(jobEntry))
     }
 
     fun tickCooldowns() {
-        for ((_, instance) in _jobs)
-            if (instance.cooldown > 0)
-                instance.cooldown--
+        for ((job, cooldown) in _cooldowns) {
+            val newCooldown = cooldown - 1
+            if (newCooldown <= 0)
+                _cooldowns.remove(job)
+            else
+                _cooldowns[job] = newCooldown
+        }
     }
 
     override fun serverTick() {
+        val syncCooldowns = _cooldowns.any { (_, cooldown) -> cooldown > 0 } && player.age % JOB_SYNC_FREQUENCY == 0
         tickCooldowns()
-        if (_jobs.any { (_, instance) -> instance.cooldown > 0 } && player.age % JOB_SYNC_FREQUENCY == 0 ||
-            jobScreenOpen && jobsUpdated && player.age % JOB_SCREEN_SYNC_FREQUENCY == 0)
+        if (syncCooldowns || jobScreenOpen && jobsUpdated && player.age % JOB_SCREEN_SYNC_FREQUENCY == 0)
             sync()
     }
 
@@ -127,13 +133,14 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     }
 
     override fun copyFrom(other: JobsComponent, registryLookup: RegistryWrapper.WrapperLookup) {
-        _jobs = other._jobs
+        _active = other._active
+        _cooldowns = other._cooldowns
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         CODEC.update(this, tag, registryLookup).logIfError()
         if (!player.world.isClient)
-            for ((job, instance) in jobs)
+            for ((job, instance) in active)
                 instance.validate(job)
     }
 
@@ -141,9 +148,9 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         CODEC.encode(this, tag, registryLookup).logIfError()
     }
 
+    @JvmRecord
     data class JobInstance(
         val tasks: MutableMap<String, Int> = mutableMapOf(),
-        var cooldown: Int = 0,
     ) {
         constructor(job: Job) : this() {
             resetTasks(job)
@@ -170,16 +177,15 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         }
 
         companion object {
-            val CODEC: Codec<JobInstance> = RecordCodecBuilder.create { it.group(
-                Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("tasks").forGetter(JobInstance::tasks),
-                Codec.INT.fieldOf("cooldown").forGetter(JobInstance::cooldown),
-            ).apply(it) { tasks, cooldown -> JobInstance(tasks.toMutableMap(), cooldown) } }
+            val CODEC: Codec<JobInstance> =
+                Codec.unboundedMap(Codec.STRING, Codec.INT).xmap({ JobInstance(it.toMutableMap()) }, JobInstance::tasks)
         }
     }
 
     companion object : ComponentKeyHolder<JobsComponent, PlayerEntity> {
         val CODEC = recordMutationCodec(
-            Codec.unboundedMap(RegistryFixedCodec.of(Job.key), JobInstance.CODEC).mutate().fieldFor("jobs", JobsComponent::_jobs),
+            Codec.unboundedMap(RegistryFixedCodec.of(Job.key), JobInstance.CODEC).mutate().fieldFor("active_jobs", JobsComponent::_active),
+            Codec.unboundedMap(RegistryFixedCodec.of(Job.key), intRangeCodec(min = 1)).mutate().fieldFor("cooldowns", JobsComponent::_cooldowns),
         )
 
         @JvmField
@@ -190,17 +196,33 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         const val JOB_SYNC_FREQUENCY = 20 * 60 // 1 minute
         const val JOB_SCREEN_SYNC_FREQUENCY = 20 * 2 // 2 seconds
 
+        const val MAX_JOBS = 10
+
         fun registerEvents() {
             ServerPlayNetworking.registerGlobalReceiver(OpenJobScreenPayload.id) { _, context ->
-                with (context.player()[JobsComponent]) {
+                with(context.player()[JobsComponent]) {
                     jobScreenOpen = true
                     sync()
                 }
             }
 
             ServerPlayNetworking.registerGlobalReceiver(CloseJobScreenPayload.id) { _, context ->
-                with (context.player()[JobsComponent]) {
+                with(context.player()[JobsComponent]) {
                     jobScreenOpen = false
+                }
+            }
+
+            ServerPlayNetworking.registerGlobalReceiver(AddJobPayload.ID) { (job), context ->
+                if (!context.player()[SkillsComponent].isJobUnlocked(job)) return@registerGlobalReceiver
+
+                with(context.player()[JobsComponent]) {
+                    _active[job] = JobInstance(job.value)
+                }
+            }
+
+            ServerPlayNetworking.registerGlobalReceiver(RemoveJobPayload.ID) { (job), context ->
+                with(context.player()[JobsComponent]) {
+                    _active.remove(job)
                 }
             }
         }

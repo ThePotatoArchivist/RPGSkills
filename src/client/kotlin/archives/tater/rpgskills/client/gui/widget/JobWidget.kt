@@ -26,14 +26,13 @@ class JobWidget(private val jobsComponent: JobsComponent, private val job: Regis
         mouseY: Int,
         delta: Float
     ) {
-        val instance = jobsComponent[job] ?: run {
+        val instance = jobsComponent.active[job] ?: run {
             context.drawText(textRenderer, Text.literal("ERROR Missing Job Instance"), x, y, 0xff0000, false)
             return
         }
-        val onCooldown = instance.cooldown > 0
 
         context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
-        context.drawText(textRenderer, Text.literal(job.value.name), x + MARGIN, y + MARGIN, if (onCooldown) 0x909090 else 0x404040, false)
+        context.drawText(textRenderer, Text.literal(job.value.name), x + MARGIN, y + MARGIN, /*if (onCooldown) 0x909090 else*/ 0x404040, false)
 
         tasks.forEachIndexed { i, (name, task) ->
             context.drawText(
@@ -41,12 +40,12 @@ class JobWidget(private val jobsComponent: JobsComponent, private val job: Regis
                 TASK.text(
                     if (name in instance.tasks) INCOMPLETE_TASK.text else COMPLETE_TASK.text,
                     TASK_PROGRESS.text(instance.tasks[name] ?: task.count, task.count).apply {
-                        if (!onCooldown && name in instance.tasks) withColor(0x5555FF)
+                        if (name in instance.tasks) withColor(0x5555FF)
                     },
                     Text.literal(task.description),
                 ).apply {
                     when {
-                        onCooldown -> withColor(0x909090)
+//                        onCooldown -> withColor(0x909090)
                         name !in instance.tasks -> formatted(Formatting.DARK_GREEN)
                     }
                 },
@@ -56,17 +55,17 @@ class JobWidget(private val jobsComponent: JobsComponent, private val job: Regis
                 false
             )
         }
-        if (onCooldown) {
-            val timerString = "%d:%02d".format(instance.cooldown / 20 / 60, instance.cooldown / 20 % 60)
-            context.drawText(
-                textRenderer,
-                timerString,
-                x + width - MARGIN - textRenderer.getWidth(timerString),
-                y + MARGIN,
-                0x404040,
-                false
-            )
-        } else {
+//        if (onCooldown) {
+//            val timerString = "%d:%02d".format(instance.cooldown / 20 / 60, instance.cooldown / 20 % 60)
+//            context.drawText(
+//                textRenderer,
+//                timerString,
+//                x + width - MARGIN - textRenderer.getWidth(timerString),
+//                y + MARGIN,
+//                0x404040,
+//                false
+//            )
+//        } else {
             val rewardString = job.value.rewardPoints.toString()
             context.drawGuiTexture(
                 ORB_ICON,
@@ -82,7 +81,7 @@ class JobWidget(private val jobsComponent: JobsComponent, private val job: Regis
                 y + MARGIN,
                 0x70DACD
             )
-        }
+//        }
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
