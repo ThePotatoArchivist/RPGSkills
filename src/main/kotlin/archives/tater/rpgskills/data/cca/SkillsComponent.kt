@@ -138,7 +138,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             for (levelIndex in 0..<maxLevel) {
                 val level = skill.value.levels[levelIndex]
                 for (job in level.jobs) {
-                    newJobs[job] = _jobs[job]?.apply { validate(job) } ?: JobInstance(job.value)
+                    newJobs[job] = _jobs[job] ?: JobInstance(job.value)
                 }
             }
         _jobs = newJobs
@@ -220,8 +220,9 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         CODEC.update(this, tag, registryLookup).logIfError()
         updateAttributes()
         updateJobs()
-        if (player.world.isClient)
-            RPGSkills.logger.info("Synced!")
+        if (!player.world.isClient)
+            for ((job, instance) in jobs)
+                instance.validate(job)
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
