@@ -24,8 +24,8 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
     override fun generateTranslations(registryLookup: RegistryWrapper.WrapperLookup, translationBuilder: TranslationBuilder) {
         val s = $$"$s"
         with(translationBuilder) {
-            add(RPGSkillsCommands.LIST_NONE, "There are no skills")
-            add(RPGSkillsCommands.LIST, "There are %s skills: %s")
+            add(RPGSkillsCommands.LIST_SKILLS_NONE, "There are no skills")
+            add(RPGSkillsCommands.LIST_SKILLS, "There are %s skills: %s")
             add(RPGSkillsCommands.GET_LEVEL, "%s has %3$s levels in skill %2$s")
             add(RPGSkillsCommands.SET_LEVEL, "Set %3$s levels in skill %2$s on %1$s")
             add(RPGSkillsCommands.ADD_LEVEL, "Gave %3$s levels in skill %2$s to %1$s")
@@ -33,6 +33,9 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(RPGSkillsCommands.SET_POINTS, "Set %2$s level points on %s")
             add(RPGSkillsCommands.RESET_CLASS, "Reset class for %s")
             add(RPGSkillsCommands.SET_CLASS, "Set class for %s to %s")
+            add(RPGSkillsCommands.LIST_BOSSES, "%s/%s bosses have been defeated: %s")
+            add(RPGSkillsCommands.RESET_BOSSES, "Reset defeated bosses")
+            add(BossTrackerComponent.BOSS_DEFEAT_TITLE, "%s was vanquished")
             add(BossTrackerComponent.BOSS_DEFEAT_MESSAGE, "%s was vanquished!")
             add(BossTrackerComponent.ENEMIES_STRENGTHEN_MESSAGE, "Enemies became stronger")
             add(BossTrackerComponent.CAP_RAISE_MESSAGE, "Max level is now %s")

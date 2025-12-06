@@ -3,31 +3,32 @@ package archives.tater.rpgskills.data.cca
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.util.*
-import archives.tater.rpgskills.util.get
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
+import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.Monster
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.network.packet.s2c.play.TitleS2CPacket
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntryList
+import net.minecraft.server.MinecraftServer
 import net.minecraft.util.Formatting
 import net.minecraft.world.World
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
-import kotlin.collections.iterator
 import kotlin.jvm.optionals.getOrNull
 
 class BossTrackerComponent(private val world: World) : Component, AutoSyncedComponent {
 
-    private val defeated = mutableSetOf<EntityType<*>>()
-    val defeatedCount get() = defeated.size
+    private val _defeated = mutableSetOf<EntityType<*>>()
+    val defeated: Set<EntityType<*>> get() = _defeated
+    val defeatedCount get() = _defeated.size
 
     var maxLevel: Int = if (world.isClient) Int.MAX_VALUE else RPGSkills.CONFIG.baseLevelCap
         private set
@@ -38,13 +39,19 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             .getOrNull()
             ?: RegistryEntryList.empty()
     }
+    val totalCount get() = increasesLevelCap.size()
 
-    fun onDefeated(entity: Entity): Boolean {
+    fun onDefeated(entity: LivingEntity): Boolean {
         if (Registries.ENTITY_TYPE.getEntry(entity.type) !in increasesLevelCap) return false
-        if (entity.type in defeated) return false
-        defeated.add(entity.type)
+        if (entity.type in _defeated) return false
+        _defeated.add(entity.type)
         updateLevelCap()
         key.sync(world)
+
+        if (entity is MobEntity)
+            for (uuid in entity[DefeatSourceComponent].attackers.keys)
+                world.server?.playerManager?.getPlayer(uuid)?.networkHandler
+                    ?.sendPacket(TitleS2CPacket(BOSS_DEFEAT_TITLE.text(entity.type.name)))
 
         world.server?.playerManager?.apply {
             broadcast(BOSS_DEFEAT_MESSAGE.text(entity.type.name), false)
@@ -59,6 +66,12 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             Int.MAX_VALUE
         else
             RPGSkills.CONFIG.baseLevelCap + RPGSkills.CONFIG.levelCapIncreasePerBoss * defeatedCount
+    }
+
+    fun reset() {
+        _defeated.clear()
+        updateLevelCap()
+        key.sync(world)
     }
 
     override fun readFromNbt(
@@ -76,9 +89,9 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         CODEC.encode(this, tag).logIfError()
     }
 
-    fun copy(other: BossTrackerComponent) {
-        defeated.clear()
-        defeated.addAll(other.defeated)
+    private fun copy(other: BossTrackerComponent) {
+        _defeated.clear()
+        _defeated.addAll(other._defeated)
         updateLevelCap()
     }
 
@@ -87,8 +100,12 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             ComponentRegistry.getOrCreate(RPGSkills.id("level_cap"), BossTrackerComponent::class.java)
 
         val CODEC = recordMutationCodec(
-            Registries.ENTITY_TYPE.codec.mutateCollection().fieldFor("defeated_bosses", BossTrackerComponent::defeated),
+            Registries.ENTITY_TYPE.codec.mutateCollection().fieldFor("defeated_bosses", BossTrackerComponent::_defeated),
         )
+
+        val BOSS_DEFEAT_TITLE = Translation.arg("rpgskills.title.boss_defeat") {
+            formatted(Formatting.AQUA)
+        }
 
         val BOSS_DEFEAT_MESSAGE = Translation.arg("rpgskills.announcement.boss_defeat") {
             formatted(Formatting.AQUA)
@@ -107,17 +124,22 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
 
         val BOSS_DEFEAT_SCALING = RPGSkills.id("bosses_defeated_bonus")
 
+        fun update(server: MinecraftServer, action: BossTrackerComponent.() -> Boolean) {
+            val component = server.overworld[BossTrackerComponent]
+            if (!component.action()) return
+            for (world in server.worlds) {
+                if (world == server.overworld) continue
+                world[BossTrackerComponent].copy(component)
+                key.sync(world)
+            }
+        }
+
         override fun afterDeath(
             entity: LivingEntity,
             damageSource: DamageSource?
         ) {
-            entity.world.server?.run {
-                val component = overworld[BossTrackerComponent]
-                if (!component.onDefeated(entity)) return
-                for (world in worlds) {
-                    if (world == overworld) continue
-                    world[BossTrackerComponent].copy(component)
-                }
+            update(entity.world.server!!) {
+                onDefeated(entity)
             }
         }
 

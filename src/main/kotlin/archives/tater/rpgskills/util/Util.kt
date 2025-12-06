@@ -34,6 +34,8 @@ import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceReloader
+import net.minecraft.text.MutableText
+import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
 import org.ladysnake.cca.api.v3.component.Component
@@ -238,3 +240,12 @@ fun <T> singleTagGenerator(tag: TagKey<T>, vararg entries: RegistryKey<T>) =
 
 fun <T> RegistryEntryList(registry: Registry<T>, vararg entries: T): RegistryEntryList.Direct<T> =
     RegistryEntryList.of(entries.map { registry.getEntry(it) })
+
+fun <T> Iterable<T>.joinToText(separator: String = ", ", transform: (T) -> Text): MutableText = Text.empty().apply {
+    var first = true
+    for (value in this@joinToText) {
+        if (!first) append(separator)
+        append(transform(value))
+        first = false
+    }
+}

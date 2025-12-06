@@ -4,6 +4,7 @@ import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.SkillClass
+import archives.tater.rpgskills.data.cca.BossTrackerComponent
 import archives.tater.rpgskills.data.cca.SkillsComponent
 import archives.tater.rpgskills.util.*
 import com.mojang.brigadier.CommandDispatcher
@@ -17,11 +18,10 @@ import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.getRegi
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.registryEntry
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.Text
 
 object RPGSkillsCommands : CommandRegistrationCallback {
-    val LIST_NONE = Translation.unit("commands.$MOD_ID.skills.list.none")
-    val LIST = Translation.arg("commands.$MOD_ID.skills.list")
+    val LIST_SKILLS_NONE = Translation.unit("commands.$MOD_ID.skills.list.none")
+    val LIST_SKILLS = Translation.arg("commands.$MOD_ID.skills.list")
     val GET_LEVEL = Translation.arg("commands.$MOD_ID.skills.level.get")
     val ADD_LEVEL = Translation.arg("commands.$MOD_ID.skills.level.add")
     val SET_LEVEL = Translation.arg("commands.$MOD_ID.skills.level.set")
@@ -29,6 +29,8 @@ object RPGSkillsCommands : CommandRegistrationCallback {
     val ADD_POINTS = Translation.arg("commands.$MOD_ID.skills.levelpoints.add")
     val RESET_CLASS = Translation.arg("commands.$MOD_ID.skills.class.reset")
     val SET_CLASS = Translation.arg("commands.$MOD_ID.skills.class.set")
+    val LIST_BOSSES = Translation.arg("commands.$MOD_ID.skills.bosses.list")
+    val RESET_BOSSES = Translation.unit("commands.$MOD_ID.skills.bosses.reset")
 
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
@@ -41,14 +43,9 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                     val skills = command.source.registryManager[Skill].streamEntriesOrdered(RPGSkillsTags.SKILL_ORDER).toList()
 
                     if (skills.isEmpty())
-                        command.source.sendFeedback(LIST_NONE.text, false)
+                        command.source.sendFeedback(LIST_SKILLS_NONE.text, false)
                     else
-                        command.source.sendFeedback(LIST.text(skills.size, Text.empty().apply {
-                            skills.forEachIndexed { index, entry ->
-                                if (index > 0) append(Text.literal(", "))
-                                append(entry.name)
-                            }
-                        }), false)
+                        command.source.sendFeedback(LIST_SKILLS.text(skills.size, skills.joinToText { it.name }), false)
 
                     skills.size
                 }
@@ -161,6 +158,22 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                                 0
                             }
                         }
+                    }
+                }
+                sub("bosses") {
+                    subExec("list") { command ->
+                        val component = command.source.server.overworld[BossTrackerComponent]
+                        val defeated = component.defeated
+                        command.source.sendFeedback(LIST_BOSSES.text(component.defeatedCount, component.totalCount, defeated.joinToText { it.name }), false)
+                        defeated.size
+                    }
+                    subExec("reset") {
+                        BossTrackerComponent.update(it.source.server) {
+                            reset()
+                            true
+                        }
+                        it.source.sendFeedback(RESET_BOSSES.text, false)
+                        0
                     }
                 }
             }
