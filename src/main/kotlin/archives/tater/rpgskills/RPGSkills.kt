@@ -62,6 +62,8 @@ object RPGSkills : ModInitializer {
             register(SkillUpgradePayload.ID, SkillUpgradePayload.CODEC)
             register(OpenJobScreenPayload)
             register(CloseJobScreenPayload)
+            register(AddJobPayload.ID, AddJobPayload.CODEC)
+            register(RemoveJobPayload.ID, RemoveJobPayload.CODEC)
         }
 
 		SkillsComponent.registerEvents()

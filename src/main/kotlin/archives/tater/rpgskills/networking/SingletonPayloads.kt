@@ -22,7 +22,7 @@ fun <T: SingletonPayload<T>> PayloadTypeRegistry<out PacketByteBuf>.register(pay
     register(payload.id, payload.codec)
 }
 
-object ChooseClassPayload : SingletonPayload<ChooseClassPayload>(RPGSkills.id("choose_class"))
-object SkillPointIncreasePayload : SingletonPayload<SkillPointIncreasePayload>(RPGSkills.id("skill_point_increase"))
-object OpenJobScreenPayload : SingletonPayload<OpenJobScreenPayload>(RPGSkills.id("open_job_screen"))
-object CloseJobScreenPayload : SingletonPayload<CloseJobScreenPayload>(RPGSkills.id("close_job_screen"))
+data object ChooseClassPayload : SingletonPayload<ChooseClassPayload>(RPGSkills.id("choose_class"))
+data object SkillPointIncreasePayload : SingletonPayload<SkillPointIncreasePayload>(RPGSkills.id("skill_point_increase"))
+data object OpenJobScreenPayload : SingletonPayload<OpenJobScreenPayload>(RPGSkills.id("open_job_screen"))
+data object CloseJobScreenPayload : SingletonPayload<CloseJobScreenPayload>(RPGSkills.id("close_job_screen"))

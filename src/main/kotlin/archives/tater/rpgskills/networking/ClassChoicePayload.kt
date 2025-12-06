@@ -9,7 +9,8 @@ import net.minecraft.network.packet.CustomPayload
 import net.minecraft.network.packet.CustomPayload.Id
 import net.minecraft.registry.entry.RegistryEntry
 
-class ClassChoicePayload(val skillClass: RegistryEntry<SkillClass>) : CustomPayload {
+@JvmRecord
+data class ClassChoicePayload(val skillClass: RegistryEntry<SkillClass>) : CustomPayload {
     override fun getId(): Id<out CustomPayload> = ID
 
     companion object {
