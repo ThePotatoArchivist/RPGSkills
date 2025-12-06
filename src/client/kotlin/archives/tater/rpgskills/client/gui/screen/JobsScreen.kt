@@ -7,7 +7,8 @@ import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.client.gui.widget.JobWidget
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.cca.SkillsComponent
-import archives.tater.rpgskills.networking.RequestSkillSyncPayload
+import archives.tater.rpgskills.networking.CloseJobScreenPayload
+import archives.tater.rpgskills.networking.OpenJobScreenPayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.streamEntriesOrdered
@@ -20,6 +21,14 @@ import net.minecraft.screen.ScreenTexts
 class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
     private var x = 0
     private var y = 0
+
+    override fun onDisplayed() {
+        ClientPlayNetworking.send(OpenJobScreenPayload)
+    }
+
+    override fun removed() {
+        ClientPlayNetworking.send(CloseJobScreenPayload)
+    }
 
     override fun init() {
         x = (width - WIDTH) / 2
@@ -50,12 +59,6 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         drawXpBar(context, x + 188, y + 6)
     }
 
-    override fun tick() {
-        super.tick()
-        if (player.age % REQUEST_UPDATE_INTERVAL == 0)
-            ClientPlayNetworking.send(RequestSkillSyncPayload)
-    }
-
     companion object {
         val TITLE = Translation.unit("screen.$MOD_ID.jobs")
 
@@ -63,6 +66,5 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
 
         const val WIDTH = 196
         const val HEIGHT = 176
-        const val REQUEST_UPDATE_INTERVAL = 2 * 20
     }
 }

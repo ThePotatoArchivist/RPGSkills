@@ -69,6 +69,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     val jobs: Map<RegistryEntry<Job>, JobInstance>
         get() = _jobs
 
+    // Runtime values, not saved or synced
+    private var jobScreenOpen = false
+    private var jobsUpdated = false
+
     val levelProgress get() = getRemainingPoints(points) / getPointsForNextLevel(level).toFloat()
 
     val isPointsFull get() = level >= maxLevel
@@ -80,6 +84,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     private fun sync() {
         key.sync(player)
+        jobsUpdated = false
     }
 
     operator fun get(skill: RegistryEntry<Skill>) = _skills.getOrDefault(skill, 0)
@@ -161,6 +166,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                     tasks.remove(name)
                 } else
                     tasks[name] = newCount
+
+                jobsUpdated = true
             }
             if (tasks.isEmpty())
                 completeJob(player, jobEntry, instance)
@@ -188,7 +195,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     override fun serverTick() {
         tickCooldowns()
-        if (_jobs.any { (_, instance) -> instance.cooldown > 0 } && player.age % JOB_SYNC_FREQUENCY == 0)
+        if (_jobs.any { (_, instance) -> instance.cooldown > 0 } && player.age % JOB_SYNC_FREQUENCY == 0 ||
+            jobScreenOpen && jobsUpdated && player.age % JOB_SCREEN_SYNC_FREQUENCY == 0)
             sync()
     }
 
@@ -280,6 +288,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         private val LEVEL_REQUIREMENTS_REVERSED = LEVEL_REQUIREMENTS.withIndex().map { (level, required) -> LevelRequirement(level, required) }.reversed().toTypedArray()
 
         const val JOB_SYNC_FREQUENCY = 20 * 60 // 1 minute
+        const val JOB_SCREEN_SYNC_FREQUENCY = 20 * 2 // 2 seconds
 
         /**
          * Matches vanilla XP
@@ -327,9 +336,17 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                 }
             }
 
-            // Request skill sync
-            ServerPlayNetworking.registerGlobalReceiver(RequestSkillSyncPayload.id) { _, context ->
-                context.player()[SkillsComponent].sync()
+            ServerPlayNetworking.registerGlobalReceiver(OpenJobScreenPayload.id) { _, context ->
+                with (context.player()[SkillsComponent]) {
+                    jobScreenOpen = true
+                    sync()
+                }
+            }
+
+            ServerPlayNetworking.registerGlobalReceiver(CloseJobScreenPayload.id) { _, context ->
+                with (context.player()[SkillsComponent]) {
+                    jobScreenOpen = false
+                }
             }
 
             // Join without class

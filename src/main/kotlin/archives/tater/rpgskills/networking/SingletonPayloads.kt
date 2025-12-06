@@ -1,12 +1,12 @@
 package archives.tater.rpgskills.networking
 
+import archives.tater.rpgskills.RPGSkills
+import io.netty.buffer.ByteBuf
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
-import com.mojang.serialization.Codec
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.codec.PacketCodec
 import net.minecraft.network.packet.CustomPayload
 import net.minecraft.util.Identifier
-import io.netty.buffer.ByteBuf
 
 abstract class SingletonPayload<T: SingletonPayload<T>>(id: Identifier) : CustomPayload {
     @JvmField
@@ -21,3 +21,8 @@ abstract class SingletonPayload<T: SingletonPayload<T>>(id: Identifier) : Custom
 fun <T: SingletonPayload<T>> PayloadTypeRegistry<out PacketByteBuf>.register(payload: T) {
     register(payload.id, payload.codec)
 }
+
+object ChooseClassPayload : SingletonPayload<ChooseClassPayload>(RPGSkills.id("choose_class"))
+object SkillPointIncreasePayload : SingletonPayload<SkillPointIncreasePayload>(RPGSkills.id("skill_point_increase"))
+object OpenJobScreenPayload : SingletonPayload<OpenJobScreenPayload>(RPGSkills.id("open_job_screen"))
+object CloseJobScreenPayload : SingletonPayload<CloseJobScreenPayload>(RPGSkills.id("close_job_screen"))
