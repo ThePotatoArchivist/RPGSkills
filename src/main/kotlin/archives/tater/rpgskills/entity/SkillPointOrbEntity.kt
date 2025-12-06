@@ -2,7 +2,7 @@ package archives.tater.rpgskills.entity
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.*
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking

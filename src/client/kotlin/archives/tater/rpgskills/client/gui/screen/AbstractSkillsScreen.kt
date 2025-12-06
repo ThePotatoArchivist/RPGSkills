@@ -2,7 +2,7 @@ package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.client.util.drawOutlinedText
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.util.get
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen

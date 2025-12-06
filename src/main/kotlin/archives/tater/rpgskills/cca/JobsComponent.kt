@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.data.cca
+package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.data.Job
@@ -9,6 +9,7 @@ import archives.tater.rpgskills.networking.JobCompletedPayload
 import archives.tater.rpgskills.networking.OpenJobScreenPayload
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.*
+import archives.tater.rpgskills.util.get
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -28,6 +29,7 @@ import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
 import java.util.function.Predicate
+import kotlin.collections.iterator
 import kotlin.jvm.optionals.getOrNull
 
 @Suppress("UnstableApiUsage")

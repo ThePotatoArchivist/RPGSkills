@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.mixin.xp;
 
-import archives.tater.rpgskills.data.cca.DefeatSourceComponent;
+import archives.tater.rpgskills.cca.DefeatSourceComponent;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;

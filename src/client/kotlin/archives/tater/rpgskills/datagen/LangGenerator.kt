@@ -10,7 +10,7 @@ import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
-import archives.tater.rpgskills.data.cca.BossTrackerComponent
+import archives.tater.rpgskills.cca.BossTrackerComponent
 import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput

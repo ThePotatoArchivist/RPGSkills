@@ -6,7 +6,7 @@ import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.util.ceilDiv
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.streamEntriesOrdered

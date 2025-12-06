@@ -5,9 +5,9 @@ import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
-import archives.tater.rpgskills.data.cca.BossTrackerComponent
-import archives.tater.rpgskills.data.cca.JobsComponent
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.cca.BossTrackerComponent
+import archives.tater.rpgskills.cca.JobsComponent
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.networking.*
 import net.fabricmc.api.ModInitializer

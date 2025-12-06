@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.mixin.xp;
 
-import archives.tater.rpgskills.data.cca.DefeatSourceComponent;
+import archives.tater.rpgskills.cca.DefeatSourceComponent;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.MobEntity;

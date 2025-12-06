@@ -35,7 +35,7 @@
 		],
 		"cardinal-components": [
 			{
-				"value": "archives.tater.rpgskills.data.cca.RPGSkillsComponents",
+				"value": "archives.tater.rpgskills.cca.RPGSkillsComponents",
 				"adapter": "kotlin"
 			}
 		]

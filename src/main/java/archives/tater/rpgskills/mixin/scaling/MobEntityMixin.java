@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.mixin.scaling;
 
-import archives.tater.rpgskills.data.cca.BossTrackerComponent;
+import archives.tater.rpgskills.cca.BossTrackerComponent;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

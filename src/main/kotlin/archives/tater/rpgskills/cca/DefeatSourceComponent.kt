@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.data.cca
+package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags

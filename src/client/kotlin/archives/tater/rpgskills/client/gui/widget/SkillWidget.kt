@@ -6,7 +6,7 @@ import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.description
 import archives.tater.rpgskills.data.Skill.Companion.name
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.value

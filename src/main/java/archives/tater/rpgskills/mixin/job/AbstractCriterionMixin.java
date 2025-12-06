@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.mixin.job;
 
-import archives.tater.rpgskills.data.cca.JobsComponent;
+import archives.tater.rpgskills.cca.JobsComponent;
 import net.minecraft.advancement.criterion.AbstractCriterion;
 import net.minecraft.advancement.criterion.Criterion;
 import net.minecraft.server.network.ServerPlayerEntity;

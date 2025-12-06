@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.item
 
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.util.get
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item

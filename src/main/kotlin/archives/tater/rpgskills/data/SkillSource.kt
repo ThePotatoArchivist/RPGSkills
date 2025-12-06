@@ -1,8 +1,8 @@
 package archives.tater.rpgskills.data
 
-import archives.tater.rpgskills.data.cca.SkillSourceComponent
-import archives.tater.rpgskills.data.cca.StructuresSkillSourceComponent
-import archives.tater.rpgskills.data.cca.skillSource
+import archives.tater.rpgskills.cca.SkillSourceComponent
+import archives.tater.rpgskills.cca.StructuresSkillSourceComponent
+import archives.tater.rpgskills.cca.skillSource
 import archives.tater.rpgskills.util.get
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult

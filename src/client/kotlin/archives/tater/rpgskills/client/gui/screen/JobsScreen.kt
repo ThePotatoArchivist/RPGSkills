@@ -6,7 +6,7 @@ import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.client.gui.widget.JobWidget
 import archives.tater.rpgskills.data.Job
-import archives.tater.rpgskills.data.cca.JobsComponent
+import archives.tater.rpgskills.cca.JobsComponent
 import archives.tater.rpgskills.networking.CloseJobScreenPayload
 import archives.tater.rpgskills.networking.OpenJobScreenPayload
 import archives.tater.rpgskills.util.Translation

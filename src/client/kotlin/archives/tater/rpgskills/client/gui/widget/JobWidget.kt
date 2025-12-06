@@ -4,8 +4,7 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Job
-import archives.tater.rpgskills.data.cca.JobsComponent
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.cca.JobsComponent
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.value
 import net.minecraft.client.MinecraftClient

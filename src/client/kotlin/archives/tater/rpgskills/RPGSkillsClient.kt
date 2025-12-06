@@ -11,7 +11,7 @@ import archives.tater.rpgskills.client.util.wasPressed
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.entity.RPGSkillsEntities
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.JobCompletedPayload

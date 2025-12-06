@@ -1,7 +1,7 @@
 package archives.tater.rpgskills.client.render
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.data.cca.SkillsComponent
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.get
 import com.mojang.blaze3d.systems.RenderSystem

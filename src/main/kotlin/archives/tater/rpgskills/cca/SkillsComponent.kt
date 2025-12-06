@@ -1,10 +1,11 @@
-package archives.tater.rpgskills.data.cca
+package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.*
+import archives.tater.rpgskills.util.get
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -21,6 +22,7 @@ import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
+import kotlin.collections.iterator
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
