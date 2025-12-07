@@ -33,7 +33,7 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
         delta: Float
     ) {
         val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
-        hovered = tMouseX in x..<(x + width) && tMouseY in y..<(y + height)
+        hovered = context.scissorContains(mouseX, mouseY) && tMouseX in x..<(x + width) && tMouseY in y..<(y + height)
 
         context.drawGuiTexture(TEXTURE[true, !onCooldown && isHovered], x, y, width, height)
         context.drawText(textRenderer, job.value.name, x + MARGIN, y + MARGIN + 1, 0x404040, false)
@@ -63,6 +63,9 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
 
     }
+
+    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean =
+        hovered && super.mouseClicked(mouseX, mouseY, button)
 
     override fun onClick(mouseX: Double, mouseY: Double) {
         if (!onCooldown)

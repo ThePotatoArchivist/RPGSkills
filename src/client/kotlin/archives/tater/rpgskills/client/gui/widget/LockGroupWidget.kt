@@ -79,7 +79,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
                 context.drawGuiTexture(SLOT_TEXTURE, slotX, slotY, 0, 18, 18)
                 context.drawItem(stack, slotX + 1, slotY + 1)
                 context.drawItemInSlot(textRenderer, stack, slotX + 1, slotY + 1)
-                if (tMouseX in slotX..<(slotX + 18) && tMouseY in slotY..<(slotY + 18)) {
+                if (context.scissorContains(mouseX, mouseY) && tMouseX in slotX..<(slotX + 18) && tMouseY in slotY..<(slotY + 18)) {
                     tooltipStack = stack
                     HandledScreen.drawSlotHighlight(context, slotX + 1, slotY + 1, 0)
                 }

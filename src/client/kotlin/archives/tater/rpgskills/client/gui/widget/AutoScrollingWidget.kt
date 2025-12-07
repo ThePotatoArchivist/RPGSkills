@@ -36,6 +36,10 @@ class AutoScrollingWidget<T>(
             drawable.render(context, mouseX, mouseY, delta)
     }
 
+    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+        return super.mouseClicked(mouseX, mouseY, button) && !isWithinBounds(mouseX, mouseY)
+    }
+
     companion object {
         const val SCROLLER_WIDTH = 8
     }
