@@ -38,6 +38,8 @@ import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
+import org.joml.Vector2i
+import org.joml.Vector3f
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.slf4j.Logger
@@ -259,3 +261,6 @@ inline fun <T> MutableIterator<T>.removeIf(condition: (T) -> Boolean) {
 inline fun <K, V> MutableMap<K, V>.removeIf(condition: (Map.Entry<K, V>) -> Boolean) {
     iterator().removeIf(condition)
 }
+
+operator fun Vector2i.component1() = x
+operator fun Vector2i.component2() = y

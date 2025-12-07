@@ -2,9 +2,12 @@ package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.ItemLockTooltip
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.client.util.getMousePosScrolled
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.ceilDiv
+import archives.tater.rpgskills.util.component1
+import archives.tater.rpgskills.util.component2
 import net.fabricmc.loader.impl.lib.sat4j.core.Vec
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -23,6 +26,7 @@ import net.minecraft.recipe.RecipeManager
 import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import org.joml.Vector2i
 import org.joml.Vector3f
 import org.joml.Vector4f
 import kotlin.jvm.optionals.getOrNull
@@ -57,9 +61,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
     }
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        val mouseTransformed = context.matrices.peek().transformNormal(Vector3f(mouseX.toFloat(), mouseY.toFloat(), 0f), Vector3f())
-        val tMouseX = mouseTransformed.x.toInt()
-        val tMouseY = mouseTransformed.y.toInt()
+        val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
 
         context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
         requireText.forEachIndexed { index, line ->
@@ -77,7 +79,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
                 context.drawGuiTexture(SLOT_TEXTURE, slotX, slotY, 0, 18, 18)
                 context.drawItem(stack, slotX + 1, slotY + 1)
                 context.drawItemInSlot(textRenderer, stack, slotX + 1, slotY + 1)
-                if (tMouseX in slotX..<(slotX + 18) && tMouseY - context.matrices.peek().positionMatrix[3, 1].toInt() in slotY..<(slotY + 18)) {
+                if (tMouseX in slotX..<(slotX + 18) && tMouseY in slotY..<(slotY + 18)) {
                     tooltipStack = stack
                     HandledScreen.drawSlotHighlight(context, slotX + 1, slotY + 1, 0)
                 }

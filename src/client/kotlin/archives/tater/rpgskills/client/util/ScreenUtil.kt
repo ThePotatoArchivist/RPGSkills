@@ -9,6 +9,8 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.text.Text
+import org.joml.Vector2i
+import org.joml.Vector3f
 
 fun button(
     message: Text,
@@ -71,4 +73,12 @@ fun DrawContext.drawCenteredText(
     color: Int,
 ) {
     drawText(textRenderer, text, centerX - textRenderer.getWidth(text) / 2, y, color, false)
+}
+
+fun getMousePosScrolled(context: DrawContext, mouseX: Int, mouseY: Int): Vector2i {
+    val transformed = context.matrices.peek().positionMatrix.transformPosition(Vector3f(1f, 1f, 0f))
+    return Vector2i(
+        mouseX - transformed.x.toInt(),
+        mouseY - transformed.y.toInt()
+    )
 }

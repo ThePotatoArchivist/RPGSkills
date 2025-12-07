@@ -2,10 +2,13 @@ package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.cca.JobsComponent
+import archives.tater.rpgskills.client.util.getMousePosScrolled
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.networking.AddJobPayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.ceilDiv
+import archives.tater.rpgskills.util.component1
+import archives.tater.rpgskills.util.component2
 import archives.tater.rpgskills.util.value
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.MinecraftClient
@@ -29,6 +32,9 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
         mouseY: Int,
         delta: Float
     ) {
+        val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
+        hovered = tMouseX in x..<(x + width) && tMouseY in y..<(y + height)
+
         context.drawGuiTexture(TEXTURE[true, !onCooldown && isHovered], x, y, width, height)
         context.drawText(textRenderer, job.value.name, x + MARGIN, y + MARGIN + 1, 0x404040, false)
         jobs.cooldowns[job]?.let { cooldown ->
