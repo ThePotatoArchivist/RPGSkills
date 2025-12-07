@@ -55,7 +55,6 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     // Runtime values, not saved or synced
     private var jobScreenOpen = false
     private var jobsUpdated = false
-    var wasSynced = false
 
     operator fun get(job: RegistryEntry<Job>) = _active.find { it.job == job }
 
@@ -172,7 +171,6 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
 
     override fun applySyncPacket(buf: RegistryByteBuf?) {
         super.applySyncPacket(buf)
-        wasSynced = true
     }
 
     @JvmRecord

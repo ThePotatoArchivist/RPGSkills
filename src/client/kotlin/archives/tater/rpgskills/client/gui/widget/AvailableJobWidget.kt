@@ -16,6 +16,7 @@ import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 
 class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: JobsComponent, x: Int, y: Int) :
     ClickableWidget(x, y, WIDTH, HEIGHT, Text.empty()), AbstractJobWidget {
@@ -72,7 +73,9 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
             RPGSkills.id("skill/job_option_highlighted"),
         )
 
-        val TOOLTIP_HINT = Translation.unit("screen.widget.rpgskills.available_job.tooltip_hint")
+        val TOOLTIP_HINT = Translation.unit("screen.widget.rpgskills.available_job.tooltip_hint") {
+            formatted(Formatting.GRAY)
+        }
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
     }

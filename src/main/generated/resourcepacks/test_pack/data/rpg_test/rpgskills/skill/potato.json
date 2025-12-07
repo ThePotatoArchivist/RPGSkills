@@ -21,7 +21,30 @@
         "rpg_test:place_stone"
       ]
     },
-    "3": {}
+    "3": {
+      "jobs": [
+        "rpg_test:other_1",
+        "rpg_test:other_2",
+        "rpg_test:other_3",
+        "rpg_test:other_4",
+        "rpg_test:other_5",
+        "rpg_test:other_6",
+        "rpg_test:other_7",
+        "rpg_test:other_8",
+        "rpg_test:other_9",
+        "rpg_test:other_10",
+        "rpg_test:other_11",
+        "rpg_test:other_12",
+        "rpg_test:other_13",
+        "rpg_test:other_14",
+        "rpg_test:other_15",
+        "rpg_test:other_16",
+        "rpg_test:other_17",
+        "rpg_test:other_18",
+        "rpg_test:other_19",
+        "rpg_test:other_20"
+      ]
+    }
   },
   "name": "Potato Skill"
 }

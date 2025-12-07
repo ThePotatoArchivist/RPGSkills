@@ -50,7 +50,7 @@ class TestSkillGenerator(
                     Skill.Level(mapOf(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
                     ), listOf(registerable[TestJobGenerator.PLACE_STONE])),
-                    Skill.Level(),
+                    Skill.Level(jobs = TestJobGenerator.OTHERS.map { registerable[it] }),
                 ),
                 name = "Potato Skill",
                 description = "Unlocks potatoes & other stuff"

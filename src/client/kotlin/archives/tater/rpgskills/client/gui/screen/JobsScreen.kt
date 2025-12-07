@@ -25,6 +25,9 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
     private var x = 0
     private var y = 0
 
+    private var activeCount = 0
+    private var availableCount = 0
+
     private val totalJobs = player.registryManager[Job].streamKeys().count()
 
     override fun onDisplayed() {
@@ -59,7 +62,8 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
             position(width / 2 - 100, height - 25)
         }.build())
 
-        jobs.wasSynced = false
+        availableCount = jobs.available.size
+        activeCount = jobs.active.size
     }
 
     override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
@@ -68,13 +72,14 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        super.render(context, mouseX, mouseY, delta)
         val jobs = player[JobsComponent]
+
+        if (activeCount != jobs.active.size || availableCount != jobs.available.size)
+            clearAndInit()
+
+        super.render(context, mouseX, mouseY, delta)
         context.drawCenteredText(textRenderer, ACTIVE.text(jobs.active.size, JobsComponent.MAX_JOBS), x + 97, y + 7, 0x404040)
         context.drawCenteredText(textRenderer, AVAILABLE.text(jobs.available.size, totalJobs), x + 262, y + 7, 0x404040)
-
-        if (player[JobsComponent].wasSynced)
-            clearAndInit()
     }
 
     override fun shouldPause(): Boolean = false // TODO remove, for testing only
