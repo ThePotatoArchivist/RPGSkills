@@ -37,7 +37,7 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
         val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
         hovered = context.scissorContains(mouseX, mouseY) && tMouseX in x..<(x + width) && tMouseY in y..<(y + height)
 
-        context.drawGuiTexture(TEXTURE[true, !onCooldown && isHovered], x, y, width, height)
+        context.drawGuiTexture(TEXTURE[true, isHovered && canAdd], x, y, width, height)
         context.drawText(textRenderer, job.value.name, x + MARGIN, y + MARGIN + 1, 0x404040, false)
         jobs.cooldowns[job]?.let { cooldown ->
             val seconds = cooldown ceilDiv 20

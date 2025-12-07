@@ -83,7 +83,7 @@ fun getMousePosScrolled(context: DrawContext, mouseX: Int, mouseY: Int): Vector2
     )
 }
 
-fun inRange(value: Int, a: Int, b: Int) = if (a < b) value in a..<b else value in b-1..<a
+fun inRange(value: Int, a: Int, b: Int) = if (a < b) value in a-1..<b else value in b-1..<a
 
 fun mouseIn(mouseX: Int, mouseY: Int, startX: Int, startY: Int, width: Int, height: Int): Boolean {
     return inRange(mouseX, startX, startX + width) && inRange(mouseY, startY, startY + height)

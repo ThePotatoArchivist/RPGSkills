@@ -62,7 +62,7 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
 
     fun isCloseHovered(context: DrawContext, mouseX: Int, mouseY: Int): Boolean {
         val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
-        return mouseIn(tMouseX, tMouseY, x + width - MARGIN, y + height - MARGIN, -CLOSE_SIZE, -CLOSE_SIZE)
+        return mouseIn(tMouseX, tMouseY, x + width - MARGIN, y + MARGIN, -CLOSE_SIZE, CLOSE_SIZE)
     }
 
     override fun renderWidget(
@@ -92,9 +92,9 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
         context.drawItemWithoutEntity(RPGSkillsClient.JOB_SKILL_CACHE[registryManager][job]?.value?.icon ?: ItemStack.EMPTY, x + MARGIN, currentY)
 
         closeHovered = isCloseHovered(context, mouseX, mouseY)
-        context.drawGuiTexture(CLOSE_TEXTURE[true, closeHovered], x + width - MARGIN - CLOSE_SIZE, y + height - MARGIN - CLOSE_SIZE, CLOSE_SIZE, CLOSE_SIZE)
+        context.drawGuiTexture(CLOSE_TEXTURE[true, closeHovered], x + width - MARGIN - CLOSE_SIZE, y + MARGIN, CLOSE_SIZE, CLOSE_SIZE)
 
-        drawReward(context, textRenderer, job, MARGIN)
+        drawReward(context, textRenderer, job, width - MARGIN, height - MARGIN - textRenderer.fontHeight)
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
