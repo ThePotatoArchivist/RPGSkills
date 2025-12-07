@@ -14,7 +14,7 @@
         ]
       },
       "count": 10,
-      "description": "Place Granite",
+      "description": "Place Granite. It's the pink rock.",
       "trigger": "minecraft:placed_block"
     },
     "place_stone": {
@@ -27,7 +27,7 @@
         ]
       },
       "count": 20,
-      "description": "Place Stone",
+      "description": "Place Stone! you know it's like the gray material the ground is made of",
       "trigger": "minecraft:placed_block"
     }
   }

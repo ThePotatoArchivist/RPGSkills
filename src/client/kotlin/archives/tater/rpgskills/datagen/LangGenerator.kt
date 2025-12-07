@@ -45,7 +45,6 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(ClassScreen.SELECT, "Select Class")
             add(JobsScreen.ACTIVE, "Active Jobs %s/%s")
             add(JobsScreen.AVAILABLE, "Available Jobs %s/%s")
-            add(ActiveJobWidget.TASK, "%s %s %s")
             add(ActiveJobWidget.INCOMPLETE_TASK, "\u2610")
             add(ActiveJobWidget.COMPLETE_TASK, "\u2611")
             add(ActiveJobWidget.TASK_PROGRESS, "%s/%s")

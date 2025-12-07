@@ -58,12 +58,12 @@ class TestJobGenerator(
             Job(
                 "Stone Placer",
                 mapOf(
-                    "place_stone" to Job.Task("Place Stone", 20, AdvancementCriterion(
+                    "place_stone" to Job.Task("Place Stone! you know it's like the gray material the ground is made of", 20, AdvancementCriterion(
                         Criteria.PLACED_BLOCK, itemCriterionConditions(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.STONE).build())
                         )
                     )),
-                    "place_granite" to Job.Task("Place Granite", 10, AdvancementCriterion(
+                    "place_granite" to Job.Task("Place Granite. It's the pink rock.", 10, AdvancementCriterion(
                         Criteria.PLACED_BLOCK, itemCriterionConditions(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())
                         )

@@ -37,7 +37,6 @@
   "screen.widget.rpgskills.available_job.tooltip_hint": "Click to assign",
   "screen.widget.rpgskills.job.complete_task": "☑",
   "screen.widget.rpgskills.job.incomplete_task": "☐",
-  "screen.widget.rpgskills.job.task": "%s %s %s",
   "screen.widget.rpgskills.job.task_progress": "%s/%s",
   "screen.widget.rpgskills.job_unlock.task": "%s %s",
   "screen.widget.rpgskills.job_unlock.task_count": "%sx",
