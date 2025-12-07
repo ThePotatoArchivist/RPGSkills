@@ -26,6 +26,8 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
 
     private val onCooldown get() = job in jobs.cooldowns
 
+    private val canAdd get() = !onCooldown && !jobs.isFull
+
     override fun renderWidget(
         context: DrawContext,
         mouseX: Int,
@@ -53,7 +55,7 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
 
         if (isHovered) MinecraftClient.getInstance().currentScreen?.run {
             setTooltip(buildList {
-                if (!onCooldown)
+                if (canAdd)
                     add(TOOLTIP_HINT.text.asOrderedText())
                 for ((_, task) in job.value.tasks) add(getTaskText(task).asOrderedText())
             })
@@ -67,8 +69,10 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean =
         hovered && super.mouseClicked(mouseX, mouseY, button)
 
+    override fun clicked(mouseX: Double, mouseY: Double): Boolean = active && visible && hovered
+
     override fun onClick(mouseX: Double, mouseY: Double) {
-        if (!onCooldown)
+        if (canAdd)
             ClientPlayNetworking.send(AddJobPayload(job))
     }
 

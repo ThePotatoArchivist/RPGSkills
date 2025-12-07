@@ -52,6 +52,8 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     var available = setOf<RegistryEntry<Job>>()
         private set
 
+    val isFull get() = active.size >= MAX_JOBS
+
     // Runtime values, not saved or synced
     private var jobScreenOpen = false
     private var jobsUpdated = false
@@ -243,16 +245,27 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
                 }
 
                 with(context.player()[JobsComponent]) {
-                    if (job in _cooldowns) {
-                        RPGSkills.logger.warn("{} tried to add a job that was on cooldown: {}", context.player().gameProfile.name, job.key.orElseThrow().value)
-                        return@registerGlobalReceiver
+                    when {
+                        isFull -> RPGSkills.logger.warn(
+                            "{} tried to add a job but was full: {}",
+                            context.player().gameProfile.name,
+                            job.key.orElseThrow().value
+                        )
+                        job in _cooldowns -> RPGSkills.logger.warn(
+                            "{} tried to add a job that was on cooldown: {}",
+                            context.player().gameProfile.name,
+                            job.key.orElseThrow().value
+                        )
+                        _active.any { it.job == job } -> RPGSkills.logger.warn(
+                            "{} tried to add a job they already have active: {}",
+                            context.player().gameProfile.name,
+                            job.key.orElseThrow().value
+                        )
+                        else -> {
+                            _active.addFirst(JobInstance(job))
+                            sync()
+                        }
                     }
-                    if (_active.any { it.job == job }) {
-                        RPGSkills.logger.warn("{} tried to add a job they already have active: {}", context.player().gameProfile.name, job.key.orElseThrow().value)
-                        return@registerGlobalReceiver
-                    }
-                    _active.addFirst(JobInstance(job))
-                    sync()
                 }
             }
 
