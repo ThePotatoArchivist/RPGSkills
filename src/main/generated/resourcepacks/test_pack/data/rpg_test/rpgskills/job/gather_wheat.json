@@ -1,6 +1,5 @@
 {
   "cooldown_ticks": 24000,
-  "description": "Tend the farm",
   "name": "Farmin'",
   "reward_points": 20,
   "tasks": {

@@ -15,8 +15,8 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
-class JobWidget(private val jobsComponent: JobsComponent, private val job: RegistryEntry<Job>, width: Int, x: Int, y: Int) :
-    ClickableWidget(x, y, width, (textRenderer.fontHeight + 1) * (job.value.tasks.size + 1) + 2 * MARGIN + 2, Text.empty()) {
+class ActiveJobWidget(private val jobsComponent: JobsComponent, private val job: RegistryEntry<Job>, width: Int, x: Int, y: Int) :
+    ClickableWidget(x, y, width, (textRenderer.fontHeight + 1) * (job.value.tasks.size + 1) + 2 * MARGIN + 2, Text.empty()), AbstractJobWidget {
 
     val tasks = job.value.tasks.toList()
 
@@ -66,21 +66,7 @@ class JobWidget(private val jobsComponent: JobsComponent, private val job: Regis
 //                false
 //            )
 //        } else {
-            val rewardString = job.value.rewardPoints.toString()
-            context.drawGuiTexture(
-                ORB_ICON,
-                x + width - MARGIN - textRenderer.getWidth(rewardString) - 2 - ORB_ICON_SIZE - 1,
-                y + MARGIN,
-                ORB_ICON_SIZE,
-                ORB_ICON_SIZE
-            )
-            context.drawOutlinedText(
-                textRenderer,
-                rewardString,
-                x + width - MARGIN - textRenderer.getWidth(rewardString) - 2,
-                y + MARGIN,
-                0x70DACD
-            )
+            drawReward(context, textRenderer, job, MARGIN)
 //        }
     }
 
@@ -89,9 +75,6 @@ class JobWidget(private val jobsComponent: JobsComponent, private val job: Regis
 
     companion object {
         val BACKGROUND_TEXTURE = RPGSkills.id("border9")
-        val ORB_ICON = RPGSkills.id("skill/skill_orb_small")
-
-        const val ORB_ICON_SIZE = 9
 
         const val MARGIN = 6
 

@@ -12,12 +12,15 @@ class AutoScrollingWidget<T>(
     y: Int,
     width: Int,
     height: Int,
-    private val contents: List<T>
+    private val gap: Int,
+    private val contents: List<T>,
 ) : ScrollableWidget(x, y, width - SCROLLER_WIDTH, height, Text.empty()) where T: Widget, T: Drawable {
+
+    constructor(x: Int, y: Int, width: Int, height: Int, contents: List<T>) : this(x, y, width, height, 2, contents)
 
     private val contentsHeight = contents.fold(1) { currentY, widget ->
         widget.y = y + currentY
-        currentY + widget.height + GAP
+        currentY + widget.height + gap
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {}
@@ -34,8 +37,6 @@ class AutoScrollingWidget<T>(
     }
 
     companion object {
-        const val GAP = 2
-
         const val SCROLLER_WIDTH = 8
     }
 }

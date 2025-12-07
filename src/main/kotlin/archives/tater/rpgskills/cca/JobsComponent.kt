@@ -46,6 +46,9 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     val cooldowns: Map<RegistryEntry<Job>, Int>
         get() = _cooldowns
 
+    var available = setOf<RegistryEntry<Job>>()
+        private set
+
     // Runtime values, not saved or synced
     private var jobScreenOpen = false
     private var jobsUpdated = false
@@ -57,15 +60,19 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
 
     // Remove invalid jobs
     fun updateJobs(skills: Map<RegistryEntry<Skill>, Int>) {
-        if (player.world.isClient) return
-
-        val validJobs = skills.entries.stream().flatMap { (skill, maxLevel) ->
+        available = skills.entries.stream().flatMap { (skill, maxLevel) ->
             IntStream.range(0, maxLevel)
                 .mapToObj { skill.value.levels[it] }
                 .flatMap { it.jobs.stream() }
         }.collect(Collectors.toSet())
 
-        _active.removeIf { (job, _) -> job !in validJobs }
+        if (player.world.isClient) return
+
+        _active.removeIf { (job, _) -> job !in available }
+        // TODO remove this it's for testing
+        for (job in available)
+            if (job !in _active)
+                _active[job] = JobInstance(job.value)
 
         sync()
     }
@@ -216,7 +223,10 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
             }
 
             ServerPlayNetworking.registerGlobalReceiver(AddJobPayload.ID) { (job), context ->
-                if (!context.player()[SkillsComponent].isJobUnlocked(job)) return@registerGlobalReceiver
+                if (!context.player()[SkillsComponent].isJobUnlocked(job)) {
+                    RPGSkills.logger.info("{} tried to add a job they didn't have: {}", context.player().gameProfile.name, job.key.orElseThrow().value)
+                    return@registerGlobalReceiver
+                }
 
                 with(context.player()[JobsComponent]) {
                     _active[job] = JobInstance(job.value)

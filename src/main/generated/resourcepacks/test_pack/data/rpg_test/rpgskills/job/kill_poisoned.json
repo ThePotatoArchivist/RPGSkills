@@ -1,6 +1,5 @@
 {
   "cooldown_ticks": 24000,
-  "description": "Kill monster while poisoned",
   "name": "Kill Poisoned",
   "reward_points": 20,
   "tasks": {

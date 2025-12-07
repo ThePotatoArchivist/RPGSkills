@@ -3,10 +3,11 @@ package archives.tater.rpgskills.client.gui.screen
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.RPGSkillsTags
-import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
-import archives.tater.rpgskills.client.gui.widget.JobWidget
-import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.cca.JobsComponent
+import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
+import archives.tater.rpgskills.data.Job
+import archives.tater.rpgskills.client.gui.widget.InactiveJobWidget
+import archives.tater.rpgskills.client.util.drawCenteredText
 import archives.tater.rpgskills.networking.CloseJobScreenPayload
 import archives.tater.rpgskills.networking.OpenJobScreenPayload
 import archives.tater.rpgskills.util.Translation
@@ -17,10 +18,13 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
+import net.minecraft.text.Text
 
-class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
+class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, Text.empty()) {
     private var x = 0
     private var y = 0
+
+    private val totalJobs = player.registryManager[Job].streamKeys().count()
 
     override fun onDisplayed() {
         ClientPlayNetworking.send(OpenJobScreenPayload)
@@ -34,11 +38,10 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
 
-        val jobs = player[JobsComponent]
-        addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148,
+        addDrawableChild(AutoScrollingWidget(x + 193, y + 18, 178, 148, 0,
             player.registryManager[Job].streamEntriesOrdered(RPGSkillsTags.JOB_ORDER)
-                .filter { it in jobs.active }
-                .map { job -> JobWidget(jobs, job, 168, x + 10, 0) }
+                .filter { it in player[JobsComponent].available }
+                .map { job -> InactiveJobWidget(job, x + 194, 0) }
                 .toList()
         ))
 
@@ -50,21 +53,23 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
 
     override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.renderBackground(context, mouseX, mouseY, delta)
-        context.drawTexture(TEXTURE, x, y, 0, 0, WIDTH, HEIGHT)
+        context.drawTexture(TEXTURE, x, y, 0f, 0f, WIDTH, HEIGHT, 512, 256)
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(context, mouseX, mouseY, delta)
-        context.drawText(textRenderer, title, x + 8, y + 7, 0x404040, false)
-        drawXpBar(context, x + 188, y + 6)
+        val jobs = player[JobsComponent]
+        context.drawCenteredText(textRenderer, ACTIVE.text(jobs.active.size, JobsComponent.MAX_JOBS), x + 97, y + 7, 0x404040)
+        context.drawCenteredText(textRenderer, AVAILABLE.text(jobs.available.size, totalJobs), x + 262, y + 7, 0x404040)
     }
 
     companion object {
-        val TITLE = Translation.unit("screen.$MOD_ID.jobs")
+        val ACTIVE = Translation.arg("screen.$MOD_ID.jobs.active")
+        val AVAILABLE = Translation.arg("screen.$MOD_ID.jobs.available")
 
         val TEXTURE = RPGSkills.id("textures/gui/jobs.png")
 
-        const val WIDTH = 196
+        const val WIDTH = 341
         const val HEIGHT = 176
     }
 }

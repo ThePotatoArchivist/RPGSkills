@@ -52,7 +52,6 @@ class TestJobGenerator(
         val PLACE_STONE = BuildEntry(testPackId("place_stone")) {
             Job(
                 "Stone Placer",
-                "Place stone and granite",
                 mapOf(
                     "place_stone" to Job.Task("Place Stone", 20, AdvancementCriterion(
                         Criteria.PLACED_BLOCK, itemCriterionConditions(
@@ -74,7 +73,6 @@ class TestJobGenerator(
         val GATHER_WHEAT = BuildEntry(testPackId("gather_wheat")) {
             Job(
                 "Farmin'",
-                "Tend the farm",
                 mapOf(
                     "harvest_crops" to Job.Task("Eat anything", 20, AdvancementCriterion(
                         Criteria.CONSUME_ITEM, ConsumeItemCriterion.Conditions(
@@ -100,7 +98,6 @@ class TestJobGenerator(
         val KILL_POISONED = BuildEntry(testPackId("kill_poisoned")) {
             Job(
                 "Kill Poisoned",
-                "Kill monster while poisoned",
                 mapOf(
                     "kill_poisoned" to Job.Task("Kill zombie while poisoned", 4, AdvancementCriterion(
                         Criteria.PLAYER_KILLED_ENTITY, onKilledCriterionConditions(
@@ -119,7 +116,6 @@ class TestJobGenerator(
         val BREED = BuildEntry(testPackId("breed")) {
             Job(
                 "Breed",
-                "breed",
                 mapOf(
                     "breed" to Job.Task("Breed animals", 4, AdvancementCriterion(
                         Criteria.BRED_ANIMALS, bredAnimalsCriterionConditions(
@@ -141,7 +137,6 @@ class TestJobGenerator(
 
         val STAND_ON_IRON = BuildEntry(testPackId("stand_on_iron")) {
             Job(
-                "Stand on iron",
                 "Stand on iron",
                 mapOf(
                     "stand" to Job.Task("Stand on iron", 30 * 20, AdvancementCriterion(

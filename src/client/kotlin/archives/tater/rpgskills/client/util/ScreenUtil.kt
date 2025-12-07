@@ -63,3 +63,12 @@ fun DrawContext.drawOutlinedText(
     drawText(textRenderer, text, x + 1, y + 1, textColor, false)
 }
 
+fun DrawContext.drawCenteredText(
+    textRenderer: TextRenderer,
+    text: Text,
+    centerX: Int,
+    y: Int,
+    color: Int,
+) {
+    drawText(textRenderer, text, centerX - textRenderer.getWidth(text) / 2, y, color, false)
+}

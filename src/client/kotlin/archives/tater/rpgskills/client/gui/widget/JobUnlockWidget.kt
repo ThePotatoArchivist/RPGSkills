@@ -12,19 +12,27 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
-class SkillJobWidget(x: Int, y: Int, width: Int, job: RegistryEntry<Job>) :
-    ClickableWidget(x, y, width, textRenderer.fontHeight * 2 + 2 * MARGIN, Text.empty()) {
+class JobUnlockWidget(x: Int, y: Int, width: Int, private val job: RegistryEntry<Job>) :
+    ClickableWidget(x, y, width, 0, Text.empty()), AbstractJobWidget {
 
-    val text = listOf(
-        TITLE.text(job.value.name),
-        Text.literal(job.value.description).withColor(0x707070),
-    )
+    val text = buildList {
+        val textWidth = width - 2 * MARGIN
+
+        addAll(textRenderer.wrapLines(TITLE.text(job.value.name), textWidth))
+        for ((_, task) in job.value.tasks)
+            addAll(textRenderer.wrapLines(getTaskText(task), textWidth))
+    }
+
+    init {
+        height = text.size * textRenderer.fontHeight + 2 * MARGIN
+    }
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
         text.forEachIndexed { index, text ->
             context.drawText(textRenderer, text, x + MARGIN, y + MARGIN + index * textRenderer.fontHeight, 0x404040, false)
         }
+        drawReward(context, textRenderer, job, MARGIN)
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
@@ -32,7 +40,9 @@ class SkillJobWidget(x: Int, y: Int, width: Int, job: RegistryEntry<Job>) :
     }
 
     companion object {
-        val TITLE = Translation.arg("screen.widget.rpgskills.jobs.title")
+        val TITLE = Translation.arg("screen.widget.rpgskills.job_unlock.title") {
+            formatted(Formatting.BLACK)
+        }
 
         val BACKGROUND_TEXTURE = RPGSkills.id("border9")
 

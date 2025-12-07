@@ -64,7 +64,7 @@ class SkillScreen(
             }
 
             for (job in skill.value.levels[selectedTab].jobs) {
-                add(SkillJobWidget(x + 10, 0, 224, job))
+                add(JobUnlockWidget(x + 10, 0, 224, job))
             }
 
             player.registryManager[LockGroup].streamEntriesOrdered(RPGSkillsTags.LOCK_GROUP_ORDER)

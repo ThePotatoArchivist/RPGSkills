@@ -1,6 +1,5 @@
 {
   "cooldown_ticks": 600,
-  "description": "Stand on iron",
   "name": "Stand on iron",
   "reward_points": 200,
   "tasks": {

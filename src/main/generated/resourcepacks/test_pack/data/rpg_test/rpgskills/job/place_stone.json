@@ -1,6 +1,5 @@
 {
   "cooldown_ticks": 2400,
-  "description": "Place stone and granite",
   "name": "Stone Placer",
   "reward_points": 20,
   "spawn_as_orbs": true,

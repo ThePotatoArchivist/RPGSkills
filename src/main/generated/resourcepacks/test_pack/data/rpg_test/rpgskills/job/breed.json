@@ -1,6 +1,5 @@
 {
   "cooldown_ticks": 2000,
-  "description": "breed",
   "name": "Breed",
   "reward_points": 20,
   "tasks": {
