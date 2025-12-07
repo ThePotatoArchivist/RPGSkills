@@ -135,12 +135,14 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     }
 
     fun tickCooldowns() {
-        for ((job, cooldown) in _cooldowns) {
+        _cooldowns.removeIf { (job, cooldown) ->
             val newCooldown = cooldown - 1
-            if (newCooldown <= 0)
-                _cooldowns.remove(job)
-            else
+            if (newCooldown <= 0) {
+                true
+            } else {
                 _cooldowns[job] = newCooldown
+                false
+            }
         }
     }
 
