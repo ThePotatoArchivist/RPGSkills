@@ -249,3 +249,13 @@ fun <T> Iterable<T>.joinToText(separator: String = ", ", transform: (T) -> Text)
         first = false
     }
 }
+
+inline fun <T> MutableIterator<T>.removeIf(condition: (T) -> Boolean) {
+    for (value in this)
+        if (condition(value))
+            remove()
+}
+
+inline fun <K, V> MutableMap<K, V>.removeIf(condition: (Map.Entry<K, V>) -> Boolean) {
+    iterator().removeIf(condition)
+}

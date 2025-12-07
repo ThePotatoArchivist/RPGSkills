@@ -30,6 +30,8 @@ import org.ladysnake.cca.api.v3.component.tick.ClientTickingComponent
 import org.ladysnake.cca.api.v3.component.tick.ServerTickingComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
 import java.util.function.Predicate
+import java.util.stream.Collectors
+import java.util.stream.IntStream
 import kotlin.collections.iterator
 import kotlin.jvm.optionals.getOrNull
 
@@ -53,17 +55,18 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         jobsUpdated = false
     }
 
+    // Remove invalid jobs
     fun updateJobs(skills: Map<RegistryEntry<Skill>, Int>) {
         if (player.world.isClient) return
-        val newJobs = mutableMapOf<RegistryEntry<Job>, JobInstance>()
-        for ((skill, maxLevel) in skills)
-            for (levelIndex in 0..<maxLevel) {
-                val level = skill.value.levels[levelIndex]
-                for (job in level.jobs) {
-                    newJobs[job] = _active[job] ?: JobInstance(job.value)
-                }
-            }
-        _active = newJobs
+
+        val validJobs = skills.entries.stream().flatMap { (skill, maxLevel) ->
+            IntStream.range(0, maxLevel)
+                .mapToObj { skill.value.levels[it] }
+                .flatMap { it.jobs.stream() }
+        }.collect(Collectors.toSet())
+
+        _active.removeIf { (job, _) -> job !in validJobs }
+
         sync()
     }
 

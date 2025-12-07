@@ -5,11 +5,17 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.ceilDiv
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
+import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner
+import net.minecraft.client.gui.tooltip.Tooltip
+import net.minecraft.client.gui.tooltip.TooltipState
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.SpawnEggItem
@@ -17,6 +23,8 @@ import net.minecraft.recipe.RecipeManager
 import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import org.joml.Vector3f
+import org.joml.Vector4f
 import kotlin.jvm.optionals.getOrNull
 
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registryLookup: WrapperLookup?, recipeManager: RecipeManager?) :
@@ -49,11 +57,16 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
     }
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+        val mouseTransformed = context.matrices.peek().transformNormal(Vector3f(mouseX.toFloat(), mouseY.toFloat(), 0f), Vector3f())
+        val tMouseX = mouseTransformed.x.toInt()
+        val tMouseY = mouseTransformed.y.toInt()
+
         context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
         requireText.forEachIndexed { index, line ->
             context.drawText(textRenderer, line, x + MARGIN, y + MARGIN + index * textRenderer.fontHeight, 0x404040, false)
         }
         var currentY = MARGIN + y + requireTextHeight
+        var tooltipStack: ItemStack? = null
         for ((title, stacks) in groups) {
             if (stacks.isEmpty()) continue
             context.drawText(textRenderer, title.text, x + MARGIN, currentY, 0x404040, false)
@@ -64,9 +77,19 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
                 context.drawGuiTexture(SLOT_TEXTURE, slotX, slotY, 0, 18, 18)
                 context.drawItem(stack, slotX + 1, slotY + 1)
                 context.drawItemInSlot(textRenderer, stack, slotX + 1, slotY + 1)
+                if (tMouseX in slotX..<(slotX + 18) && tMouseY - context.matrices.peek().positionMatrix[3, 1].toInt() in slotY..<(slotY + 18)) {
+                    tooltipStack = stack
+                    HandledScreen.drawSlotHighlight(context, slotX + 1, slotY + 1, 0)
+                }
             }
 
             currentY += getHeight(columns, stacks)
+        }
+        if (tooltipStack != null) MinecraftClient.getInstance().currentScreen?.run {
+            setTooltip(
+                HandledScreen.getTooltipFromItem(MinecraftClient.getInstance(), tooltipStack)
+                    .map { it.asOrderedText() },
+            )
         }
     }
 

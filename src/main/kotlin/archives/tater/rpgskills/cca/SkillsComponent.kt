@@ -72,9 +72,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     operator fun get(skill: RegistryEntry<Skill>) = _skills.getOrDefault(skill, 0)
     operator fun set(skill: RegistryEntry<Skill>, level: Int) {
+        val prev = _skills[skill] ?: 0
         _skills[skill] = level.coerceIn(0, skill.value.levels.size)
         updateAttributes()
-        updateJobs()
+        if (level < prev) updateJobs()
         sync()
     }
 
