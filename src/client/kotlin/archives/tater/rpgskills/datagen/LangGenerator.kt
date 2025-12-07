@@ -56,6 +56,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(LockGroupWidget.Texts.RECIPES, "Recipes")
             add(AttributesWidget.TITLE, "Attributes")
             add(JobUnlockWidget.TITLE, "Unlocks Job: %s")
+            add(AvailableJobWidget.TOOLTIP_HINT, "Click to assign")
             add(AbstractJobWidget.TASK_COUNT, "%sx")
             add(AbstractJobWidget.TASK, "%s %s")
             add(JobCompletedToast.TITLE, "Job Complete!")

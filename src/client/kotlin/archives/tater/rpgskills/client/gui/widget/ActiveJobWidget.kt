@@ -2,7 +2,6 @@ package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
-import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.cca.JobsComponent
 import archives.tater.rpgskills.util.Translation
@@ -11,14 +10,38 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
+import net.minecraft.entity.ai.brain.task.TaskTriggerer.task
 import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import net.bettercombat.api.WeaponAttributesHelper.override
 
-class ActiveJobWidget(private val jobsComponent: JobsComponent, private val job: RegistryEntry<Job>, width: Int, x: Int, y: Int) :
+class ActiveJobWidget(private val job: RegistryEntry<Job>, private val jobsComponent: JobsComponent, width: Int, x: Int, y: Int) :
     ClickableWidget(x, y, width, (textRenderer.fontHeight + 1) * (job.value.tasks.size + 1) + 2 * MARGIN + 2, Text.empty()), AbstractJobWidget {
 
+    val textWidth = width - MARGIN * 2
+
     val tasks = job.value.tasks.toList()
+
+    init {
+        height = getText().sumOf { textRenderer.getWrappedLinesHeight(it, textWidth) } + textRenderer.fontHeight + 2 + 2 * MARGIN
+    }
+
+    private fun getText(): List<Text> {
+        val instance = jobsComponent[job] ?: return listOf()
+        return tasks.map { (name, task) ->
+            TASK.text(
+                if (name in instance.tasks) INCOMPLETE_TASK.text else COMPLETE_TASK.text,
+                TASK_PROGRESS.text(instance.tasks[name] ?: task.count, task.count).apply {
+                    if (name in instance.tasks) withColor(0x5555FF)
+                },
+                Text.literal(task.description),
+            ).apply {
+                if (name !in instance.tasks) formatted(Formatting.DARK_GREEN)
+            }
+        }
+    }
 
     override fun renderWidget(
         context: DrawContext,
@@ -26,48 +49,24 @@ class ActiveJobWidget(private val jobsComponent: JobsComponent, private val job:
         mouseY: Int,
         delta: Float
     ) {
-        val instance = jobsComponent.active[job] ?: run {
-            context.drawText(textRenderer, Text.literal("ERROR Missing Job Instance"), x, y, 0xff0000, false)
-            return
-        }
-
         context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
         context.drawText(textRenderer, Text.literal(job.value.name), x + MARGIN, y + MARGIN, /*if (onCooldown) 0x909090 else*/ 0x404040, false)
 
-        tasks.forEachIndexed { i, (name, task) ->
-            context.drawText(
+        var currentY = y + textRenderer.fontHeight + 2 + MARGIN
+
+        for (text in getText()) {
+            context.drawTextWrapped(
                 textRenderer,
-                TASK.text(
-                    if (name in instance.tasks) INCOMPLETE_TASK.text else COMPLETE_TASK.text,
-                    TASK_PROGRESS.text(instance.tasks[name] ?: task.count, task.count).apply {
-                        if (name in instance.tasks) withColor(0x5555FF)
-                    },
-                    Text.literal(task.description),
-                ).apply {
-                    when {
-//                        onCooldown -> withColor(0x909090)
-                        name !in instance.tasks -> formatted(Formatting.DARK_GREEN)
-                    }
-                },
+                text,
                 x + MARGIN,
-                y + MARGIN + (i + 1) * (textRenderer.fontHeight + 1) + 2,
+                currentY,
+                textWidth,
                 0x404040,
-                false
             )
+            currentY += textRenderer.getWrappedLinesHeight(text, textWidth)
         }
-//        if (onCooldown) {
-//            val timerString = "%d:%02d".format(instance.cooldown / 20 / 60, instance.cooldown / 20 % 60)
-//            context.drawText(
-//                textRenderer,
-//                timerString,
-//                x + width - MARGIN - textRenderer.getWidth(timerString),
-//                y + MARGIN,
-//                0x404040,
-//                false
-//            )
-//        } else {
-            drawReward(context, textRenderer, job, MARGIN)
-//        }
+
+        drawReward(context, textRenderer, job, MARGIN)
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {

@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.cca.JobsComponent.JobInstance
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
@@ -14,10 +15,12 @@ import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.get
 import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.advancement.criterion.AbstractCriterion
 import net.minecraft.advancement.criterion.Criterion
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.network.RegistryByteBuf
 import net.minecraft.predicate.entity.EntityPredicate.createAdvancementEntityLootContext
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
@@ -38,8 +41,8 @@ import kotlin.jvm.optionals.getOrNull
 @Suppress("UnstableApiUsage")
 class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<JobsComponent>, AutoSyncedComponent, ServerTickingComponent, ClientTickingComponent {
 
-    private var _active = mutableMapOf<RegistryEntry<Job>, JobInstance>()
-    val active: Map<RegistryEntry<Job>, JobInstance>
+    private var _active = mutableListOf<JobInstance>()
+    val active: List<JobInstance>
         get() = _active
 
     private var _cooldowns = mutableMapOf<RegistryEntry<Job>, Int>()
@@ -52,6 +55,11 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     // Runtime values, not saved or synced
     private var jobScreenOpen = false
     private var jobsUpdated = false
+    var wasSynced = false
+
+    operator fun get(job: RegistryEntry<Job>) = _active.find { it.job == job }
+
+    operator fun contains(job: RegistryEntry<Job>) = _active.any { it.job == job }
 
     private fun sync() {
         key.sync(player)
@@ -69,10 +77,6 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         if (player.world.isClient) return
 
         _active.removeIf { (job, _) -> job !in available }
-        // TODO remove this it's for testing
-        for (job in available)
-            if (job !in _active)
-                _active[job] = JobInstance(job.value)
 
         sync()
     }
@@ -81,10 +85,12 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     fun <T: AbstractCriterion.Conditions> onCriterion(criterion: Criterion<T>, conditionChecker: Predicate<T>) {
         val player = player as? ServerPlayerEntity ?: return
 
-        for ((jobEntry, instance) in _active) {
-            val (tasks) = instance
+        val completed = mutableSetOf<JobInstance>()
 
+        for (instance in _active) {
+            val (jobEntry, tasks) = instance
             val job = jobEntry.value
+
             for ((name, task) in job.tasks) {
                 if (name !in tasks) continue
                 if (task.criteria.trigger != criterion) continue
@@ -101,13 +107,20 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
 
                 jobsUpdated = true
             }
-            if (tasks.isEmpty())
-                completeJob(player, jobEntry, instance)
+            if (tasks.isEmpty()) {
+                completeJob(player, instance)
+                completed.add(instance)
+            }
+        }
+
+        if (!completed.isEmpty()) {
+            _active.removeAll(completed)
+            sync()
         }
     }
 
-    private fun completeJob(player: ServerPlayerEntity, jobEntry: RegistryEntry<Job>, instance: JobInstance) {
-        val job = jobEntry.value
+    private fun completeJob(player: ServerPlayerEntity, instance: JobInstance) {
+        val job = instance.job.value
         if (job.spawnAsOrbs) {
             SkillPointOrbEntity.spawnOrbs(player.serverWorld, player, player.pos, job.rewardPoints)
         } else with (player[SkillsComponent]) {
@@ -116,9 +129,8 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
                 ServerPlayNetworking.send(player, SkillPointIncreasePayload)
             }
         }
-        _cooldowns[jobEntry] = job.cooldownTicks
-        instance.resetTasks(job)
-        ServerPlayNetworking.send(player, JobCompletedPayload(jobEntry))
+        _cooldowns[instance.job] = job.cooldownTicks
+        ServerPlayNetworking.send(player, JobCompletedPayload(instance.job))
     }
 
     fun tickCooldowns() {
@@ -150,30 +162,32 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         CODEC.update(this, tag, registryLookup).logIfError()
         if (!player.world.isClient)
-            for ((job, instance) in active)
-                instance.validate(job)
+            for (instance in active)
+                instance.validate()
     }
 
     override fun writeToNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
         CODEC.encode(this, tag, registryLookup).logIfError()
     }
 
+    override fun applySyncPacket(buf: RegistryByteBuf?) {
+        super.applySyncPacket(buf)
+        wasSynced = true
+    }
+
     @JvmRecord
     data class JobInstance(
-        val tasks: MutableMap<String, Int> = mutableMapOf(),
+        val job: RegistryEntry<Job>,
+        val tasks: MutableMap<String, Int> = job.value.tasks.mapValuesTo(mutableMapOf()) { 0 },
     ) {
-        constructor(job: Job) : this() {
-            resetTasks(job)
-        }
-
-        fun resetTasks(job: Job) {
+        fun resetTasks() {
             tasks.clear()
-            for ((task, _) in job.tasks)
+            for ((task, _) in job.value.tasks)
                 tasks[task] = 0
         }
 
         // Handle no-longer-existent keys
-        fun validate(job: RegistryEntry<Job>) {
+        fun validate() {
             tasks.keys
                 .filter { it !in job.value.tasks }
                 .forEach {
@@ -182,19 +196,21 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
                 }
             if (tasks.isEmpty()) {
                 RPGSkills.logger.warn("Job {} had no valid tasks, resetting", job.idAsString)
-                resetTasks(job.value)
+                resetTasks()
             }
         }
 
         companion object {
-            val CODEC: Codec<JobInstance> =
-                Codec.unboundedMap(Codec.STRING, Codec.INT).xmap({ JobInstance(it.toMutableMap()) }, JobInstance::tasks)
+            val CODEC: Codec<JobInstance> = RecordCodecBuilder.create { it.group(
+                RegistryFixedCodec.of(Job.key).fieldOf("job").forGetter(JobInstance::job),
+                Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("tasks").forGetter(JobInstance::tasks)
+            ).apply(it) { job, tasks -> JobInstance(job, tasks.toMutableMap()) } }
         }
     }
 
     companion object : ComponentKeyHolder<JobsComponent, PlayerEntity> {
         val CODEC = recordMutationCodec(
-            Codec.unboundedMap(RegistryFixedCodec.of(Job.key), JobInstance.CODEC).mutate().fieldFor("active_jobs", JobsComponent::_active),
+            JobInstance.CODEC.mutateCollection().fieldFor("active_jobs", JobsComponent::_active),
             Codec.unboundedMap(RegistryFixedCodec.of(Job.key), intRangeCodec(min = 1)).mutate().fieldFor("cooldowns", JobsComponent::_cooldowns),
         )
 
@@ -224,18 +240,29 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
 
             ServerPlayNetworking.registerGlobalReceiver(AddJobPayload.ID) { (job), context ->
                 if (!context.player()[SkillsComponent].isJobUnlocked(job)) {
-                    RPGSkills.logger.info("{} tried to add a job they didn't have: {}", context.player().gameProfile.name, job.key.orElseThrow().value)
+                    RPGSkills.logger.warn("{} tried to add a job they didn't have: {}", context.player().gameProfile.name, job.key.orElseThrow().value)
                     return@registerGlobalReceiver
                 }
 
                 with(context.player()[JobsComponent]) {
-                    _active[job] = JobInstance(job.value)
+                    if (job in _cooldowns) {
+                        RPGSkills.logger.warn("{} tried to add a job that was on cooldown: {}", context.player().gameProfile.name, job.key.orElseThrow().value)
+                        return@registerGlobalReceiver
+                    }
+                    if (_active.any { it.job == job }) {
+                        RPGSkills.logger.warn("{} tried to add a job they already have active: {}", context.player().gameProfile.name, job.key.orElseThrow().value)
+                        return@registerGlobalReceiver
+                    }
+                    _active.addFirst(JobInstance(job))
+                    sync()
                 }
             }
 
             ServerPlayNetworking.registerGlobalReceiver(RemoveJobPayload.ID) { (job), context ->
                 with(context.player()[JobsComponent]) {
-                    _active.remove(job)
+                    if (!_active.removeIf { it.job == job }) {
+                        RPGSkills.logger.warn("{} tried to remove a job they did not have: {}", context.player().gameProfile.name, job.key.orElseThrow().value)
+                    }
                 }
             }
         }

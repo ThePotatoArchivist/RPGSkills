@@ -34,6 +34,7 @@
   "screen.rpgskills.skills": "Skills",
   "screen.rpgskills.skills.max": "MAX",
   "screen.widget.rpgskills.attributes.title": "Attributes",
+  "screen.widget.rpgskills.available_job.tooltip_hint": "Click to assign",
   "screen.widget.rpgskills.job.complete_task": "☑",
   "screen.widget.rpgskills.job.incomplete_task": "☐",
   "screen.widget.rpgskills.job.task": "%s %s %s",
