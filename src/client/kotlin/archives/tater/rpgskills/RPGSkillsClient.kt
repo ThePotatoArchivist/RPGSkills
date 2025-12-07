@@ -57,7 +57,7 @@ object RPGSkillsClient : ClientModInitializer {
         RPG_SKILLS_CATEGORY,
     ))
 
-    private val JOB_SKILL_CACHE = RegistryCache(Skill.key) { skill -> skill.value.levels.flatMap { level -> level.jobs } }
+    val JOB_SKILL_CACHE = RegistryCache(Skill.key) { skill -> skill.value.levels.flatMap { level -> level.jobs } }
 
 	override fun onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.

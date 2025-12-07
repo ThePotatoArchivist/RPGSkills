@@ -44,11 +44,10 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
 
         val jobs = player[JobsComponent]
 
-        addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148,
-            jobs.active
-                .map { instance -> ActiveJobWidget(instance.job, jobs, 168, x + 10, 0) }
-                .toList()
-        ))
+        val active = jobs.active
+            .map { instance -> ActiveJobWidget(instance.job, player, 168, x + 10, 0) }
+        addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148, active))
+        for (widget in active) addSelectableChild(widget)
 
         val availables = player.registryManager[Job].streamEntriesOrdered(RPGSkillsTags.JOB_ORDER)
                 .filter { it in jobs.available && it !in jobs }

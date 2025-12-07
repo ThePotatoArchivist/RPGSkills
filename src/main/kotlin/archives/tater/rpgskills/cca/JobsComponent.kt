@@ -273,9 +273,10 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
 
             ServerPlayNetworking.registerGlobalReceiver(RemoveJobPayload.ID) { (job), context ->
                 with(context.player()[JobsComponent]) {
-                    if (!_active.removeIf { it.job == job }) {
+                    if (_active.removeIf { it.job == job })
+                        sync()
+                    else
                         RPGSkills.logger.warn("{} tried to remove a job they did not have: {}", context.player().gameProfile.name, job.key.orElseThrow().value)
-                    }
                 }
             }
         }
