@@ -35,7 +35,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
     var maxLevel: Int = if (world.isClient) Int.MAX_VALUE else RPGSkills.CONFIG.baseLevelCap
         private set
 
-    private val increasesLevelCap by lazy {
+    val increasesLevelCap by lazy {
         world.registryManager[RegistryKeys.ENTITY_TYPE]
             .getEntryList(RPGSkillsTags.INCREASES_LEVEL_CAP)
             .getOrNull()
@@ -53,7 +53,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         if (entity is MobEntity)
             for (uuid in entity[DefeatSourceComponent].attackers.keys)
                 world.server?.playerManager?.getPlayer(uuid)?.networkHandler
-                    ?.sendPacket(TitleS2CPacket(BOSS_DEFEAT_TITLE.text(entity.type.name)))
+                    ?.sendPacket(TitleS2CPacket(BOSS_DEFEAT_TITLE.text))
 
         world.server?.playerManager?.apply {
             broadcast(BOSS_DEFEAT_MESSAGE.text(entity.type.name), false)
@@ -97,7 +97,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         updateLevelCap()
     }
 
-    companion object : ComponentKeyHolder<BossTrackerComponent, World>, ServerLivingEntityEvents.AfterDeath {
+    companion object : ComponentKeyHolder<BossTrackerComponent, World> {
         override val key: ComponentKey<BossTrackerComponent> =
             ComponentRegistry.getOrCreate(RPGSkills.id("level_cap"), BossTrackerComponent::class.java)
 
@@ -105,7 +105,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             Registries.ENTITY_TYPE.codec.mutateCollection().fieldFor("defeated_bosses", BossTrackerComponent::_defeated),
         )
 
-        val BOSS_DEFEAT_TITLE = Translation.arg("rpgskills.title.boss_defeat") {
+        val BOSS_DEFEAT_TITLE = Translation.unit("rpgskills.title.boss_defeat") {
             formatted(Formatting.AQUA)
         }
 
@@ -136,10 +136,8 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
             }
         }
 
-        override fun afterDeath(
-            entity: LivingEntity,
-            damageSource: DamageSource?
-        ) {
+        @JvmStatic
+        fun onDeath(entity: LivingEntity) {
             update(entity.world.server!!) {
                 onDefeated(entity)
             }
@@ -158,10 +156,6 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
 
             if (entity.health < entity.maxHealth)
                 entity.health = entity.maxHealth
-        }
-
-        fun registerEvents() {
-            ServerLivingEntityEvents.AFTER_DEATH.register(this)
         }
     }
 }

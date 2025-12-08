@@ -6,6 +6,7 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.cca.BossTrackerComponent
 import archives.tater.rpgskills.cca.SkillsComponent
+import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.*
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType.getInteger
@@ -30,6 +31,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
     val RESET_CLASS = Translation.arg("commands.$MOD_ID.skills.class.reset")
     val SET_CLASS = Translation.arg("commands.$MOD_ID.skills.class.set")
     val LIST_BOSSES = Translation.arg("commands.$MOD_ID.skills.bosses.list")
+    val LIST_BOSSES_ALL = Translation.arg("commands.$MOD_ID.skills.bosses.list.all")
     val RESET_BOSSES = Translation.unit("commands.$MOD_ID.skills.bosses.reset")
 
     override fun register(
@@ -161,11 +163,19 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                     }
                 }
                 sub("bosses") {
-                    subExec("list") { command ->
-                        val component = command.source.server.overworld[BossTrackerComponent]
-                        val defeated = component.defeated
-                        command.source.sendFeedback(LIST_BOSSES.text(component.defeatedCount, component.totalCount, defeated.joinToText { it.name }), false)
-                        defeated.size
+                    sub("list") {
+                        executes { command ->
+                            val component = command.source.server.overworld[BossTrackerComponent]
+                            val defeated = component.defeated
+                            command.source.sendFeedback(LIST_BOSSES.text(component.defeatedCount, component.totalCount, defeated.joinToText { it.name }), false)
+                            defeated.size
+                        }
+                        subExec("all") { command ->
+                            val component = command.source.server.overworld[BossTrackerComponent]
+                            val all = component.increasesLevelCap
+                            command.source.sendFeedback(LIST_BOSSES_ALL.text(component.totalCount, all.joinToText { it.value.name }), false)
+                            all.size()
+                        }
                     }
                     subExec("reset") {
                         BossTrackerComponent.update(it.source.server) {

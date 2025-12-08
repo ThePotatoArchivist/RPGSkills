@@ -70,7 +70,6 @@ object RPGSkills : ModInitializer {
 
 		SkillsComponent.registerEvents()
         JobsComponent.registerEvents()
-        BossTrackerComponent.registerEvents()
 
 		registerLockEvents()
 
