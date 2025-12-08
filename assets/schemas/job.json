@@ -12,9 +12,6 @@
     "name": {
       "type": "string"
     },
-    "description": {
-      "type": "string"
-    },
     "cooldown_ticks": {
       "type": "integer",
       "minimum": 0
@@ -60,7 +57,6 @@
   "additionalProperties": false,
   "required": [
     "name",
-    "description",
     "cooldown_ticks",
     "reward_points",
     "tasks"
