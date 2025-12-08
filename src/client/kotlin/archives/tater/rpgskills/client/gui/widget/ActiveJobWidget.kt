@@ -3,12 +3,10 @@ package archives.tater.rpgskills.client.gui.widget
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.RPGSkillsClient
-import archives.tater.rpgskills.RPGSkillsConfig
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.cca.JobsComponent
 import archives.tater.rpgskills.client.util.getMousePosScrolled
 import archives.tater.rpgskills.client.util.mouseIn
-import archives.tater.rpgskills.networking.AddJobPayload
 import archives.tater.rpgskills.networking.RemoveJobPayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.component1
@@ -21,9 +19,7 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ButtonTextures
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
-import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
@@ -60,10 +56,6 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
         }
     }
 
-    fun isCloseHovered(mouseX: Int, mouseY: Int): Boolean {
-        return mouseIn(mouseX, mouseY, x + width - MARGIN, y + MARGIN, -CLOSE_SIZE, CLOSE_SIZE)
-    }
-
     override fun renderWidget(
         context: DrawContext,
         mouseX: Int,
@@ -96,8 +88,10 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
                 MinecraftClient.getInstance().currentScreen?.setTooltip(Text.literal(skill.value.name))
         }
 
-        closeHovered = isCloseHovered(tMouseX, tMouseY)
+        closeHovered = mouseIn(tMouseX, tMouseY, this.x + this.width - MARGIN, this.y + MARGIN, -CLOSE_SIZE, CLOSE_SIZE)
         context.drawGuiTexture(CLOSE_TEXTURE[true, closeHovered], x + width - MARGIN - CLOSE_SIZE, y + MARGIN, CLOSE_SIZE, CLOSE_SIZE)
+        if (closeHovered)
+            MinecraftClient.getInstance().currentScreen?.setTooltip(CANCEL.text)
 
         drawReward(context, textRenderer, job, width - MARGIN, height - MARGIN - textRenderer.fontHeight)
 
@@ -132,7 +126,7 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
         val INCOMPLETE_TASK = Translation.unit("screen.widget.$MOD_ID.job.incomplete_task")
         val COMPLETE_TASK = Translation.unit("screen.widget.$MOD_ID.job.complete_task")
         val TASK_PROGRESS = Translation.arg("screen.widget.$MOD_ID.job.task_progress")
-        val JOB_TOOLTIP = Translation.arg("screen.widget.$MOD_ID.job.task_progress")
+        val CANCEL = Translation.unit("screen.widget.$MOD_ID.job.cancel")
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
     }
