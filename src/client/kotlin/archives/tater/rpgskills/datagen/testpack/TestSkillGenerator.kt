@@ -42,7 +42,7 @@ class TestSkillGenerator(
 
         val POTATO_SKILL = depBuildEntry(testPackId("potato")) { registerable ->
             Skill(
-                icon = ItemStack(Items.POTATO),
+                icon = ItemStack(Items.IRON_SWORD),
                 levels = listOf(
                     Skill.Level(mapOf(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
@@ -52,7 +52,7 @@ class TestSkillGenerator(
                     ), listOf(registerable[TestJobGenerator.PLACE_STONE])),
                     Skill.Level(jobs = TestJobGenerator.OTHERS.map { registerable[it] }),
                 ),
-                name = "Potato Skill",
+                name = "Affinity",
                 description = "Unlocks potatoes & other stuff"
             ) 
         }

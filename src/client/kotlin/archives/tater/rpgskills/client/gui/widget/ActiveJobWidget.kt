@@ -34,12 +34,12 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
     private val jobsComponent = player[JobsComponent]
     private val registryManager = player.registryManager
 
-    private val textWidth = width - MARGIN * 2 - CHECKBOX_WIDTH
+    private val textWidth = width - MARGIN * 2 - CHECKBOX_WIDTH - TASK_MARGIN * 2
 
     private var closeHovered = false
 
     init {
-        height = getTaskText().sumOf { (text, _) -> textRenderer.getWrappedLinesHeight(text, textWidth) + 2 } + textRenderer.fontHeight + 4 + 16 + 2 * MARGIN
+        height = getTaskText().sumOf { (text, _) -> textRenderer.getWrappedLinesHeight(text, textWidth) + TASK_MARGIN } + textRenderer.fontHeight + TASK_MARGIN + 16 + 2 * MARGIN
     }
 
     private fun getTaskText(): List<Pair<Text, Boolean>> {
@@ -60,9 +60,8 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
         }
     }
 
-    fun isCloseHovered(context: DrawContext, mouseX: Int, mouseY: Int): Boolean {
-        val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
-        return mouseIn(tMouseX, tMouseY, x + width - MARGIN, y + MARGIN, -CLOSE_SIZE, CLOSE_SIZE)
+    fun isCloseHovered(mouseX: Int, mouseY: Int): Boolean {
+        return mouseIn(mouseX, mouseY, x + width - MARGIN, y + MARGIN, -CLOSE_SIZE, CLOSE_SIZE)
     }
 
     override fun renderWidget(
@@ -71,30 +70,37 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
         mouseY: Int,
         delta: Float
     ) {
+        val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
+
         context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
         context.drawText(textRenderer, Text.literal(job.value.name), x + MARGIN, y + MARGIN, /*if (onCooldown) 0x909090 else*/ 0x404040, false)
 
-        var currentY = y + textRenderer.fontHeight + 4 + MARGIN
+        var currentY = y + textRenderer.fontHeight + TASK_MARGIN + MARGIN
 
         for ((text, pending) in getTaskText()) {
-            context.drawText(textRenderer, if (pending) INCOMPLETE_TASK.text else COMPLETE_TASK.text, x + MARGIN, currentY, if (pending) 0x404040 else 0x00aa00, false)
+            context.drawText(textRenderer, if (pending) INCOMPLETE_TASK.text else COMPLETE_TASK.text, x + MARGIN + TASK_MARGIN, currentY, if (pending) 0x404040 else 0x00aa00, false)
             context.drawTextWrapped(
                 textRenderer,
                 text,
-                x + MARGIN + CHECKBOX_WIDTH,
+                x + MARGIN + TASK_MARGIN + CHECKBOX_WIDTH,
                 currentY,
                 textWidth,
                 0x404040,
             )
-            currentY += textRenderer.getWrappedLinesHeight(text, textWidth) + 2
+            currentY += textRenderer.getWrappedLinesHeight(text, textWidth) + TASK_MARGIN
         }
 
-        context.drawItemWithoutEntity(RPGSkillsClient.JOB_SKILL_CACHE[registryManager][job]?.value?.icon ?: ItemStack.EMPTY, x + MARGIN, currentY)
+        RPGSkillsClient.JOB_SKILL_CACHE[registryManager][job]?.let { skill ->
+            context.drawItemWithoutEntity(skill.value.icon, x + MARGIN, currentY)
+            if (mouseIn(tMouseX, tMouseY, x + MARGIN, currentY, 16, 16))
+                MinecraftClient.getInstance().currentScreen?.setTooltip(Text.literal(skill.value.name))
+        }
 
-        closeHovered = isCloseHovered(context, mouseX, mouseY)
+        closeHovered = isCloseHovered(tMouseX, tMouseY)
         context.drawGuiTexture(CLOSE_TEXTURE[true, closeHovered], x + width - MARGIN - CLOSE_SIZE, y + MARGIN, CLOSE_SIZE, CLOSE_SIZE)
 
         drawReward(context, textRenderer, job, width - MARGIN, height - MARGIN - textRenderer.fontHeight)
+
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
@@ -119,12 +125,14 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
         )
 
         const val MARGIN = 6
+        const val TASK_MARGIN = 6
         const val CHECKBOX_WIDTH = 13
         const val CLOSE_SIZE = 11
 
         val INCOMPLETE_TASK = Translation.unit("screen.widget.$MOD_ID.job.incomplete_task")
         val COMPLETE_TASK = Translation.unit("screen.widget.$MOD_ID.job.complete_task")
         val TASK_PROGRESS = Translation.arg("screen.widget.$MOD_ID.job.task_progress")
+        val JOB_TOOLTIP = Translation.arg("screen.widget.$MOD_ID.job.task_progress")
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
     }
