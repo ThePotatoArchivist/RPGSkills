@@ -47,7 +47,6 @@ class EntityTagGenerator(
             addOptional(cataclysmId("the_leviathan"))
             addOptional(cataclysmId("the_harbinger"))
             addOptional(cataclysmId("ancient_remnant"))
-            addOptional(cataclysmId("ancient_ancient_remnant"))
             addOptional(cataclysmId("scylla"))
             addOptional(cataclysmId("maledictus"))
         }
