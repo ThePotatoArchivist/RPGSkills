@@ -8,6 +8,7 @@ import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.cca.BossTrackerComponent
 import archives.tater.rpgskills.cca.JobsComponent
 import archives.tater.rpgskills.cca.SkillsComponent
+import archives.tater.rpgskills.criteria.RPGSkillsCriteria
 import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.networking.*
 import net.fabricmc.api.ModInitializer
@@ -37,6 +38,7 @@ object RPGSkills : ModInitializer {
 		// Proceed with mild caution.
 		RPGSkillsItems.register()
         RPGSkillsConditions.register()
+        RPGSkillsCriteria.register()
 
 		DynamicRegistries.registerSynced(Skill.key, Skill.CODEC)
 		DynamicRegistries.registerSynced(LockGroup.key, LockGroup.CODEC)

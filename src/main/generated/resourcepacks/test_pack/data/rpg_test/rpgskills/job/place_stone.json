@@ -14,8 +14,8 @@
         ]
       },
       "count": 10,
-      "description": "Place Granite. It's the pink rock.",
-      "trigger": "minecraft:placed_block"
+      "description": "Break Granite. It's the pink rock.",
+      "trigger": "rpgskills:break_block"
     },
     "place_stone": {
       "conditions": {

@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.condition.IsMonsterLootCondition
+import archives.tater.rpgskills.criteria.RPGSkillsCriteria
 import archives.tater.rpgskills.data.BuildEntry
 import archives.tater.rpgskills.data.BuildsRegistry
 import archives.tater.rpgskills.data.Job
@@ -63,8 +64,8 @@ class TestJobGenerator(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.STONE).build())
                         )
                     )),
-                    "place_granite" to Job.Task("Place Granite. It's the pink rock.", 10, AdvancementCriterion(
-                        Criteria.PLACED_BLOCK, itemCriterionConditions(
+                    "place_granite" to Job.Task("Break Granite. It's the pink rock.", 10, AdvancementCriterion(
+                        RPGSkillsCriteria.BREAK_BLOCK, itemCriterionConditions(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())
                         )
                     )),
