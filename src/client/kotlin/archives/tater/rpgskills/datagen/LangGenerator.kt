@@ -11,6 +11,7 @@ import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.cca.BossTrackerComponent
+import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -51,6 +52,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(ActiveJobWidget.TASK_PROGRESS, "%s/%s")
             add(ActiveJobWidget.CANCEL, "Cancel Job")
             add(SkillWidget.SKILL_LEVEL, "%s/%s")
+            add(SkillScreen.LEVEL, "Level %s")
             add(LockGroupWidget.Texts.ITEMS, "Items")
             add(LockGroupWidget.Texts.BLOCKS, "Blocks")
             add(LockGroupWidget.Texts.ENTITIES, "Entities")

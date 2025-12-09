@@ -29,6 +29,7 @@
   "rpgskills.tooltip.stack.requirement": "- %s",
   "rpgskills.tooltip.stack.requires": "Requires:",
   "rpgskills.tooltip.stack.requires.any": "Requires either:",
+  "screen.rgpskills.skill.level": "Level %s",
   "screen.rpgskills.class.select": "Select Class",
   "screen.rpgskills.jobs.active": "Active Jobs %s/%s",
   "screen.rpgskills.jobs.available": "Available Jobs %s/%s",
