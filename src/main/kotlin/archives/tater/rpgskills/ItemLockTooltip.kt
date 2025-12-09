@@ -5,8 +5,10 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import java.util.function.Consumer
 
 object ItemLockTooltip {
     val REQUIRES = Translation.unit("rpgskills.tooltip.stack.requires")
@@ -15,12 +17,12 @@ object ItemLockTooltip {
 
     @JvmStatic
     @JvmOverloads
-    fun appendRequirements(lockGroup: LockGroup, text: MutableList<Text>, tooltip: Boolean = true) {
-        text.add((if (lockGroup.requirements.size == 1) REQUIRES.text() else { REQUIRES_ANY.text() })
+    fun appendRequirements(lockGroup: LockGroup, text: Consumer<Text>, tooltip: Boolean = true) {
+        text.accept((if (lockGroup.requirements.size == 1) REQUIRES.text() else { REQUIRES_ANY.text() })
             .formatted(if (tooltip) Formatting.RED else Formatting.BLACK))
 
         for (requirement in lockGroup.requirements) {
-            text.add(REQUIREMENT.text(Text.empty().apply {
+            text.accept(REQUIREMENT.text(Text.empty().apply {
                 requirement.entries.forEachIndexed { index, (skill, level) ->
                     if (index != 0)
                         append(Text.literal(" + ").formatted(Formatting.DARK_GRAY))
@@ -29,6 +31,10 @@ object ItemLockTooltip {
                 }
             }))
         }
+    }
+
+    fun appendRequirements(lockGroup: LockGroup, text: MutableList<Text>, tooltip: Boolean = true) {
+        appendRequirements(lockGroup, text::add, tooltip)
     }
 
     @JvmStatic
