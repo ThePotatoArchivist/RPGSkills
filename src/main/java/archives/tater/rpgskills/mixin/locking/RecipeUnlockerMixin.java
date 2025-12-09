@@ -1,7 +1,7 @@
 package archives.tater.rpgskills.mixin.locking;
 
 import archives.tater.rpgskills.data.LockGroup;
-import archives.tater.rpgskills.networking.RecipeBlockedPayload;
+import archives.tater.rpgskills.networking.UiActionBlockedPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeUnlocker;
@@ -21,10 +21,10 @@ public interface RecipeUnlockerMixin {
     private void alsoCheckSkills(World world, ServerPlayerEntity player, RecipeEntry<?> recipe, CallbackInfoReturnable<Boolean> cir) {
         var lockGroup = LockGroup.findLocked(player, recipe);
         if (lockGroup == null) {
-            ServerPlayNetworking.send(player, RecipeBlockedPayload.EMPTY);
+            ServerPlayNetworking.send(player, UiActionBlockedPayload.EMPTY);
             return;
         }
         cir.setReturnValue(false);
-        ServerPlayNetworking.send(player, new RecipeBlockedPayload(lockGroup));
+        ServerPlayNetworking.send(player, new UiActionBlockedPayload(lockGroup));
     }
 }

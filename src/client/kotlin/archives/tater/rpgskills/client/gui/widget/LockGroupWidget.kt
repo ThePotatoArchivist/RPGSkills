@@ -8,6 +8,7 @@ import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.ceilDiv
 import archives.tater.rpgskills.util.component1
 import archives.tater.rpgskills.util.component2
+import archives.tater.rpgskills.util.value
 import net.fabricmc.loader.impl.lib.sat4j.core.Vec
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -18,6 +19,9 @@ import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.tooltip.TooltipState
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.enchantment.EnchantmentHelper
+import net.minecraft.enchantment.EnchantmentLevelEntry
+import net.minecraft.item.EnchantedBookItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
@@ -46,6 +50,9 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
     private val entities = lockGroup.entities.entries.matchingValues.map { entity ->
         (SpawnEggItem.forEntity(entity) ?: Items.BARRIER).defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = entity.name }
     }
+    private val enchantments = lockGroup.enchantments.entries.matchingEntries.map { enchantment ->
+        Items.ENCHANTED_BOOK.defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = enchantment.value.description }
+    }
     private val recipes = if (recipeManager == null || registryLookup == null) listOf() else
         lockGroup.recipes.entries.mapNotNull { recipeManager.get(it).getOrNull()?.value?.getResult(registryLookup) }
 
@@ -53,6 +60,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
         Texts.ITEMS to items,
         Texts.BLOCKS to blocks,
         Texts.ENTITIES to entities,
+        Texts.ENCHANTMENTS to enchantments,
         Texts.RECIPES to recipes,
     )
 
@@ -121,6 +129,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
         val ITEMS = of("items")
         val BLOCKS = of("blocks")
         val ENTITIES = of("entities")
+        val ENCHANTMENTS = of("enchantments")
         val RECIPES = of("recipes")
     }
 }

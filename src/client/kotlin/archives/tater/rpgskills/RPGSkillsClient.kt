@@ -15,7 +15,7 @@ import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.entity.RPGSkillsEntities
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.JobCompletedPayload
-import archives.tater.rpgskills.networking.RecipeBlockedPayload
+import archives.tater.rpgskills.networking.UiActionBlockedPayload
 import archives.tater.rpgskills.networking.SkillPointIncreasePayload
 import archives.tater.rpgskills.util.RegistryCache
 import archives.tater.rpgskills.util.get
@@ -37,7 +37,7 @@ import kotlin.jvm.optionals.getOrNull
 
 object RPGSkillsClient : ClientModInitializer {
 	@JvmField
-	var blockedRecipeGroup: LockGroup? = null
+	var uiActionLockGroup: LockGroup? = null
 
 	const val RPG_SKILLS_CATEGORY = "category.$MOD_ID.$MOD_ID"
 	const val SKILLS_KEY_TRANSLATION = "key.$MOD_ID.screen.skills"
@@ -65,8 +65,8 @@ object RPGSkillsClient : ClientModInitializer {
 
 		SkillBarRenderer.register()
 
-		ClientPlayNetworking.registerGlobalReceiver(RecipeBlockedPayload.ID) { payload, _ ->
-			blockedRecipeGroup = payload.lockGroup.getOrNull()
+		ClientPlayNetworking.registerGlobalReceiver(UiActionBlockedPayload.ID) { payload, _ ->
+			uiActionLockGroup = payload.lockGroup.getOrNull()
 		}
 
 		ClientPlayNetworking.registerGlobalReceiver(ChooseClassPayload.id) { _, context ->
@@ -99,7 +99,7 @@ object RPGSkillsClient : ClientModInitializer {
 		}
 
 		ScreenEvents.BEFORE_INIT.register { _, _, _, _ ->
-			blockedRecipeGroup = null
+			uiActionLockGroup = null
 		}
 
 		ItemTooltipCallback.EVENT.register { stack, _, _, tooltip ->

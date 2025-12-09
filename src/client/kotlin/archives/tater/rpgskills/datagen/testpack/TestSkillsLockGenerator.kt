@@ -6,8 +6,10 @@ import archives.tater.rpgskills.data.LockGroupProvider
 import archives.tater.rpgskills.data.RegistryIngredient
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.block.Blocks
+import net.minecraft.enchantment.Enchantments
 import net.minecraft.entity.EntityType
 import net.minecraft.item.Items
+import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.registry.tag.ItemTags
@@ -61,6 +63,11 @@ class TestSkillsLockGenerator(
                     +EntityType.VILLAGER
                 },
                 "AAA"
+            ),
+            enchantments = LockList(
+                RegistryIngredient.of(registries, RegistryKeys.ENCHANTMENT) {
+                    +Enchantments.AQUA_AFFINITY
+                }
             ),
             recipes = LockList(
                 listOf(Identifier.of("prismarine_bricks")),

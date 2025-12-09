@@ -1,6 +1,8 @@
 package archives.tater.rpgskills.mixin.client.locking;
 
 import archives.tater.rpgskills.client.render.CrossedArrowRenderer;
+import archives.tater.rpgskills.data.LockGroup;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -29,6 +31,8 @@ public abstract class CraftingScreenMixin extends HandledScreen<CraftingScreenHa
                 (height - backgroundHeight) / 2 + 32,
                 mouseX,
                 mouseY,
-                false);
+                LockGroup::recipeMessage,
+                false
+                );
     }
 }

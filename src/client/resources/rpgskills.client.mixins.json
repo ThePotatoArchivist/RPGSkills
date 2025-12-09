@@ -5,6 +5,7 @@
   "client": [
     "attribute.ModelPredicateProviderRegistryMixin",
     "compat.bettercombat.WeaponAttributeTooltipMixin",
+    "locking.ForgingScreenHandler",
     "locking.CraftingScreenMixin",
     "locking.HandledScreenAccessor",
     "locking.InventoryScreenMixin",

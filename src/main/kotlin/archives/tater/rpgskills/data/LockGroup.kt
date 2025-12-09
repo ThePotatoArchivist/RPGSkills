@@ -69,6 +69,7 @@ data class LockGroup(
     fun itemMessage() = items.message?.let(Text::literal) ?: DEFAULT_ITEM_MESSAGE.text()
     fun blockMessage() = blocks.message?.let(Text::literal) ?: DEFAULT_BLOCK_MESSAGE.text()
     fun entityMessage() = entities.message?.let(Text::literal) ?: DEFAULT_ENTITY_MESSAGE.text()
+    fun enchantmentMessage() = enchantments.message?.let(Text::literal) ?: DEFAULT_ENCHANTMENT_MESSAGE.text()
     fun recipeMessage() = recipes.message?.let(Text::literal) ?: DEFAULT_RECIPE_MESSAGE.text()
 
     @JvmRecord
@@ -96,6 +97,7 @@ data class LockGroup(
         val DEFAULT_ITEM_NAME = Translation.unit("rpgskills.lockgroup.item.name.default")
         val DEFAULT_BLOCK_MESSAGE = Translation.unit("rpgskills.lockgroup.block.message.default")
         val DEFAULT_ENTITY_MESSAGE = Translation.unit("rpgskills.lockgroup.entity.message.default")
+        val DEFAULT_ENCHANTMENT_MESSAGE = Translation.unit("rpgskills.lockgroup.enchantment.message.default")
         val DEFAULT_RECIPE_MESSAGE = Translation.unit("rpgskills.lockgroup.recipe.message.default")
 
         val CODEC: Codec<LockGroup> = RecordCodecBuilder.create { it.group(

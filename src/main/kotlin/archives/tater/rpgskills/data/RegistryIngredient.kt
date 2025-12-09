@@ -2,10 +2,7 @@ package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.util.registryXmap
 import com.mojang.datafixers.util.Either
-import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
-import com.mojang.serialization.DataResult
-import com.mojang.serialization.DynamicOps
 import net.minecraft.block.Block
 import net.minecraft.entity.EntityType
 import net.minecraft.item.Item
@@ -18,6 +15,7 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.registry.tag.TagKey
+import kotlinx.serialization.internal.throwArrayMissingFieldException
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream
@@ -89,36 +87,46 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         }
     }
 
-    class Builder<T>(val registry: Registry<T>) {
+    class Builder<T> private constructor(val registryEntries: RegistryEntryLookup<T>, val registry: Registry<T>?) {
         private val entries = mutableListOf<RegistryEntry<T>>()
         private val tags = mutableListOf<TagKey<T>>()
+
+        constructor(registry: RegistryEntryLookup<T>) : this(registry, null)
+        constructor(registry: Registry<T>) : this(registry.readOnlyWrapper, registry)
 
         fun add(entry: RegistryEntry<T>) {
             entries.add(entry)
         }
 
+        fun add(key: RegistryKey<T>) {
+            add(registryEntries.getOrThrow(key))
+        }
+
         fun add(value: T) {
-            add(registry.getEntry(value))
+            add((registry ?: throw Exception("Registry not provided for reverse lookup")).getEntry(value))
         }
 
         fun add(tagKey: TagKey<T>) {
             tags.add(tagKey)
         }
 
-        fun build() = Composite(registry.readOnlyWrapper, entries.map(::EntryEntry) + tags.map(::TagEntry))
+        fun build() = Composite(registryEntries, entries.map(::EntryEntry) + tags.map(::TagEntry))
 
         operator fun RegistryEntry<T>.unaryPlus() = add(this)
+        operator fun RegistryKey<T>.unaryPlus() = add(this)
         operator fun T.unaryPlus() = add(this)
         operator fun TagKey<T>.unaryPlus() = add(this)
     }
 
     companion object {
-        fun <T> of(registry: RegistryWrapper<T>, vararg entries: RegistryIngredient<T>): RegistryIngredient<T> = Composite(registry, entries.toList())
+        fun <T> of(registry: RegistryEntryLookup<T>, vararg entries: RegistryIngredient<T>): RegistryIngredient<T> = Composite(registry, entries.toList())
+        fun <T> of(registry: RegistryEntryLookup<T>, init: Builder<T>.() -> Unit) = Builder(registry).apply(init).build()
         fun <T> of(registry: Registry<T>, init: Builder<T>.() -> Unit) = Builder(registry).apply(init).build()
 
         fun ofItems(init: Builder<Item>.() -> Unit) = of(Registries.ITEM, init)
         fun ofBlocks(init: Builder<Block>.() -> Unit) = of(Registries.BLOCK, init)
         fun ofEntities(init: Builder<EntityType<*>>.() -> Unit) = of(Registries.ENTITY_TYPE, init)
+        fun <T> of(lookup: RegistryWrapper.WrapperLookup, registry: RegistryKey<Registry<T>>, init: Builder<T>.() -> Unit) = of(lookup.getWrapperOrThrow(registry), init)
 
         fun <T> createCodec(registry: RegistryKey<Registry<T>>) = Composite.createCodec(registry)
 

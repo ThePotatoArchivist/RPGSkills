@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.mixin.locking;
 
-import archives.tater.rpgskills.networking.RecipeBlockedPayload;
+import archives.tater.rpgskills.networking.UiActionBlockedPayload;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -17,7 +17,7 @@ public class CraftingScreenHandlerMixin {
     )
     private static boolean clearBlocked(boolean original, @Local ServerPlayerEntity player) {
         if (!original)
-            ServerPlayNetworking.send(player, RecipeBlockedPayload.EMPTY);
+            ServerPlayNetworking.send(player, UiActionBlockedPayload.EMPTY);
         return original;
     }
 }

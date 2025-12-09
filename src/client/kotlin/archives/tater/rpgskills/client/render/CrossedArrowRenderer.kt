@@ -3,6 +3,7 @@ package archives.tater.rpgskills.client.render
 import archives.tater.rpgskills.ItemLockTooltip
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsClient
+import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.mixin.client.locking.HandledScreenAccessor
 import archives.tater.rpgskills.mixin.client.locking.ScreenAccessor
 import net.minecraft.client.gui.DrawContext
@@ -18,28 +19,46 @@ object CrossedArrowRenderer {
     private const val SMALL_HEIGHT = 18
 
     @JvmStatic
-    fun render(context: DrawContext, screen: HandledScreen<*>, x: Int, y: Int, mouseX: Int, mouseY: Int, small: Boolean = false) {
-        if (RPGSkillsClient.blockedRecipeGroup == null) return
+    fun render(context: DrawContext, screen: HandledScreen<*>, x: Int, y: Int, mouseX: Int, mouseY: Int, message: (LockGroup) -> Text, small: Boolean = false) {
+        if (RPGSkillsClient.uiActionLockGroup == null) return
 
         if (small)
             context.drawGuiTexture(TEXTURE_SMALL, x, y, SMALL_WIDTH, SMALL_HEIGHT)
         else
             context.drawGuiTexture(TEXTURE_LARGE, x, y, LARGE_WIDTH, LARGE_HEIGHT)
 
-        if (screen.screenHandler.cursorStack.isEmpty && (screen as HandledScreenAccessor).focusedSlot?.hasStack() != true
-            && mouseX > x && mouseX < x + (if (small) LARGE_WIDTH else SMALL_WIDTH)
-            && mouseY > y && mouseY < y + (if (small) LARGE_HEIGHT else SMALL_HEIGHT)
+        renderTooltip(context, screen, x, y, if (small) LARGE_WIDTH else SMALL_WIDTH, if (small) LARGE_HEIGHT else SMALL_HEIGHT, mouseX, mouseY, message)
+    }
+
+    @JvmStatic
+    fun renderTooltip(
+        context: DrawContext,
+        screen: HandledScreen<*>,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        mouseX: Int,
+        mouseY: Int,
+        message: (LockGroup) -> Text,
+    ) {
+        val blockedGroup = RPGSkillsClient.uiActionLockGroup ?: return
+
+        if (!screen.screenHandler.cursorStack.isEmpty
+            || (screen as HandledScreenAccessor).focusedSlot?.hasStack() == true
+            || mouseX <= x || mouseX >= x + width || mouseY <= y || mouseY >= y + height
+            ) return
+
+        context.drawTooltip(
+            (screen as ScreenAccessor).textRenderer,
+            mutableListOf(
+                message(blockedGroup)
+            ).also {
+                ItemLockTooltip.appendRequirements(blockedGroup, it)
+            },
+            mouseX,
+            mouseY
         )
-            context.drawTooltip(
-                (screen as ScreenAccessor).textRenderer,
-                mutableListOf<Text>(
-                    RPGSkillsClient.blockedRecipeGroup!!.recipeMessage()
-                ).also {
-                    ItemLockTooltip.appendRequirements(RPGSkillsClient.blockedRecipeGroup!!, it)
-                },
-                mouseX,
-                mouseY
-            )
     }
 }
 

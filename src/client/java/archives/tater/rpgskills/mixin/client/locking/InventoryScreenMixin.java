@@ -1,6 +1,8 @@
 package archives.tater.rpgskills.mixin.client.locking;
 
 import archives.tater.rpgskills.client.render.CrossedArrowRenderer;
+import archives.tater.rpgskills.data.LockGroup;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -29,6 +31,7 @@ public abstract class InventoryScreenMixin extends AbstractInventoryScreen<Playe
                 y + 27,
                 mouseX,
                 mouseY,
+                LockGroup::recipeMessage,
                 true);
     }
 }

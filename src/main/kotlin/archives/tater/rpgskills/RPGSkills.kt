@@ -5,7 +5,6 @@ import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
-import archives.tater.rpgskills.cca.BossTrackerComponent
 import archives.tater.rpgskills.cca.JobsComponent
 import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.criteria.RPGSkillsCriteria
@@ -54,7 +53,7 @@ object RPGSkills : ModInitializer {
 		)
 
 		with (PayloadTypeRegistry.playS2C()) {
-            register(RecipeBlockedPayload.ID, RecipeBlockedPayload.CODEC)
+            register(UiActionBlockedPayload.ID, UiActionBlockedPayload.CODEC)
             register(ChooseClassPayload)
             register(SkillPointIncreasePayload)
             register(JobCompletedPayload.ID, JobCompletedPayload.CODEC)
