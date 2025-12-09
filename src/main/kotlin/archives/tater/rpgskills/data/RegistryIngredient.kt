@@ -1,16 +1,22 @@
 package archives.tater.rpgskills.data
 
+import archives.tater.rpgskills.util.registryXmap
 import com.mojang.datafixers.util.Either
+import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
+import com.mojang.serialization.DynamicOps
 import net.minecraft.block.Block
 import net.minecraft.entity.EntityType
 import net.minecraft.item.Item
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
+import net.minecraft.registry.RegistryEntryLookup
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryEntryList
+import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.registry.tag.TagKey
 import java.util.*
 import java.util.function.Predicate
@@ -19,24 +25,24 @@ import java.util.stream.Stream
 
 sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
 
-    fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>>
+    fun findMatchingEntries(lookup: RegistryEntryLookup<T>): Stream<RegistryEntry<T>>
 
     @JvmRecord
     data class EntryEntry<T>(private val entry: RegistryEntry<T>) : RegistryIngredient<T> {
-        override fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>> = listOf(entry)
+        override fun findMatchingEntries(lookup: RegistryEntryLookup<T>): Stream<RegistryEntry<T>> = Stream.of(entry)
 
         @Suppress("DEPRECATION")
         override fun test(value: RegistryEntry<T>): Boolean = entry.matches(value)
 
         companion object {
-            fun <T> createCodec(registry: Registry<T>): Codec<EntryEntry<T>> = registry.entryCodec.xmap({ EntryEntry(it) }, { it.entry })
+            fun <T> createCodec(registry: RegistryKey<Registry<T>>): Codec<EntryEntry<T>> = RegistryFixedCodec.of(registry).xmap({ EntryEntry(it) }, { it.entry })
         }
     }
 
     @JvmRecord
     data class TagEntry<T>(private val tag: TagKey<T>) : RegistryIngredient<T> {
-        override fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>> =
-            lookup.streamEntries().filter { it.isIn(tag) }.toList()
+        override fun findMatchingEntries(lookup: RegistryEntryLookup<T>): Stream<RegistryEntry<T>> =
+            lookup.getOrThrow(tag).stream()
 
         override fun test(value: RegistryEntry<T>): Boolean = value.isIn(tag)
 
@@ -45,15 +51,15 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         }
     }
 
-    class Composite<T>(private val registry: RegistryWrapper<T>, private val entries: List<RegistryIngredient<T>> = listOf()) : RegistryIngredient<T> {
-        val matchingEntries: List<RegistryEntry<T>> by lazy { findMatchingEntries(registry) }
-        val matchingValues: List<T> by lazy { matchingEntries.stream().map { it.value() }.distinct().toList() }
+    class Composite<T>(private val registry: RegistryEntryLookup<T>, private val entries: List<RegistryIngredient<T>> = listOf()) : RegistryIngredient<T> {
+        val matchingEntries: List<RegistryEntry<T>> by lazy { findMatchingEntries(registry).toList() }
+        val matchingValues: List<T> by lazy { findMatchingEntries(registry).map { it.value() }.distinct().toList() }
 
         val size get() = matchingEntries.size
         val isEmpty get() = matchingEntries.isEmpty()
 
-        override fun findMatchingEntries(lookup: RegistryWrapper<T>): List<RegistryEntry<T>> =
-            entries.stream().flatMap { it.findMatchingEntries(lookup).stream() }.distinct().toList()
+        override fun findMatchingEntries(lookup: RegistryEntryLookup<T>): Stream<RegistryEntry<T>> =
+            entries.stream().flatMap { it.findMatchingEntries(lookup) }.distinct()
 
         override fun test(value: RegistryEntry<T>): Boolean = value in matchingEntries
 
@@ -71,9 +77,10 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         }
 
         companion object {
-            fun <T> createCodec(registry: Registry<T>): Codec<Composite<T>> = Codec.either(EntryEntry.createCodec(registry), TagEntry.createCodec(registry.key)).listOf().xmap(
-                { entries -> Composite(registry.readOnlyWrapper, entries.map { either -> either.map({ it }, { it }) }) },
-                { composite -> composite.entries.map { when (it) {
+            fun <T> createCodec(registry: RegistryKey<Registry<T>>): Codec<Composite<T>> = Codec.either(EntryEntry.createCodec(registry), TagEntry.createCodec(registry)).listOf().registryXmap(
+                registry,
+                { entries, registry -> Composite(registry, entries.map { either -> either.map({ it }, { it }) }) },
+                { composite, _ -> composite.entries.map { when (it) {
                     is EntryEntry -> Either.left(it)
                     is TagEntry -> Either.right(it)
                     else -> throw AssertionError("Cannot encode nested composites")
@@ -113,7 +120,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         fun ofBlocks(init: Builder<Block>.() -> Unit) = of(Registries.BLOCK, init)
         fun ofEntities(init: Builder<EntityType<*>>.() -> Unit) = of(Registries.ENTITY_TYPE, init)
 
-        fun <A> createCodec(registry: Registry<A>) = Composite.createCodec(registry)
+        fun <T> createCodec(registry: RegistryKey<Registry<T>>) = Composite.createCodec(registry)
 
         val EMPTY = Composite<Any>(object : RegistryWrapper<Any> {
             override fun getOptional(key: RegistryKey<Any>?): Optional<RegistryEntry.Reference<Any>> =

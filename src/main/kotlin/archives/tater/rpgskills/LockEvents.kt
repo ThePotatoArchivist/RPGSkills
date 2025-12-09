@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.fabricmc.fabric.api.event.player.UseBlockCallback
 import net.fabricmc.fabric.api.event.player.UseEntityCallback
 import net.fabricmc.fabric.api.event.player.UseItemCallback
+import net.fabricmc.fabric.api.item.v1.EnchantmentEvents
 import net.fabricmc.fabric.api.util.TriState
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.entity.player.PlayerEntity

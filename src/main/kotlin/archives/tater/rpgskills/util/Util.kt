@@ -1,17 +1,17 @@
 package archives.tater.rpgskills.util
 
 import archives.tater.rpgskills.RPGSkills
-import com.google.common.collect.HashMultimap
-import com.mojang.serialization.Codec
-import com.mojang.serialization.DataResult
-import com.mojang.serialization.MapCodec
-import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
+import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
+import com.mojang.serialization.DynamicOps
+import com.mojang.serialization.MapCodec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.advancement.criterion.BredAnimalsCriterion
 import net.minecraft.advancement.criterion.ItemCriterion
 import net.minecraft.advancement.criterion.OnKilledCriterion
@@ -25,10 +25,7 @@ import net.minecraft.nbt.NbtList
 import net.minecraft.predicate.entity.DamageSourcePredicate
 import net.minecraft.predicate.entity.EntityPredicate
 import net.minecraft.predicate.entity.LootContextPredicate
-import net.minecraft.registry.Registries
-import net.minecraft.registry.Registry
-import net.minecraft.registry.RegistryKey
-import net.minecraft.registry.RegistryWrapper
+import net.minecraft.registry.*
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.tag.TagKey
@@ -38,8 +35,8 @@ import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
+import com.google.common.collect.HashMultimap
 import org.joml.Vector2i
-import org.joml.Vector3f
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.slf4j.Logger
@@ -264,3 +261,29 @@ inline fun <K, V> MutableMap<K, V>.removeIf(condition: (Map.Entry<K, V>) -> Bool
 
 operator fun Vector2i.component1() = x
 operator fun Vector2i.component2() = y
+
+class RegistryAwareXmapCodec<A, B, E>(
+    private val registry: RegistryKey<Registry<E>>,
+    private val codec: Codec<A>,
+    private val to: (A, RegistryEntryLookup<E>) -> B,
+    private val from: (B, RegistryEntryLookup<E>) -> A
+) : Codec<B> {
+    private fun getLookup(ops: DynamicOps<*>): RegistryEntryLookup<E>? =
+        (ops as? RegistryOps)?.getEntryLookup(registry)?.getOrNull()
+
+    override fun <T> encode(input: B, ops: DynamicOps<T>, prefix: T): DataResult<T> {
+        val lookup = getLookup(ops) ?: return DataResult.error { "Can't access registry $registry" }
+        return codec.encode(from(input, lookup), ops, prefix)
+    }
+
+    override fun <T> decode(ops: DynamicOps<T>, input: T): DataResult<DFPair<B, T>> {
+        val lookup = getLookup(ops) ?: return DataResult.error { "Can't access registry $registry" }
+        return codec.decode(ops, input).map { (input, data) -> DFPair(to(input, lookup), data) }
+    }
+}
+
+fun <A, B, E> Codec<A>.registryXmap(
+    registry: RegistryKey<Registry<E>>,
+    to: (A, RegistryEntryLookup<E>) -> B,
+    from: (B, RegistryEntryLookup<E>) -> A
+) = RegistryAwareXmapCodec(registry, this, to, from)
