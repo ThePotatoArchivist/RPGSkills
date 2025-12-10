@@ -12,7 +12,10 @@ object RPGSkillsCriteria {
     private fun <T : Criterion<*>> register(path: String, criterion: T): T =
         Registry.register(Registries.CRITERION, RPGSkills.id(path), criterion)
 
+    @JvmField
     val BREAK_BLOCK = register("break_block", ItemCriterion())
+    @JvmField
+    val CRAFT_ITEM = register("craft_item", ItemCraftedCriterion)
 
     fun register() {
         PlayerBlockBreakEvents.BEFORE.register { _, player, pos, _, _ ->

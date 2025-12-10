@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.condition.IsMonsterLootCondition
+import archives.tater.rpgskills.criteria.ItemCraftedCriterion
 import archives.tater.rpgskills.criteria.RPGSkillsCriteria
 import archives.tater.rpgskills.data.BuildEntry
 import archives.tater.rpgskills.data.BuildsRegistry
@@ -25,6 +26,7 @@ import net.minecraft.predicate.entity.EntityEffectPredicate
 import net.minecraft.predicate.entity.EntityTypePredicate
 import net.minecraft.predicate.entity.LocationPredicate
 import net.minecraft.predicate.entity.LootContextPredicate
+import net.minecraft.predicate.item.ItemPredicate
 import net.minecraft.registry.Registerable
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryWrapper
@@ -69,6 +71,21 @@ class TestJobGenerator(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())
                         )
                     )),
+                    "craft_diorite" to Job.Task("Craft any sort of diorite", 24, AdvancementCriterion(
+                        RPGSkillsCriteria.CRAFT_ITEM, ItemCraftedCriterion.Conditions(
+                            item = ItemPredicate {
+                                items(
+                                    Items.DIORITE,
+                                    Items.DIORITE_SLAB,
+                                    Items.DIORITE_STAIRS,
+                                    Items.DIORITE_WALL,
+                                    Items.POLISHED_DIORITE,
+                                    Items.POLISHED_DIORITE_SLAB,
+                                    Items.POLISHED_DIORITE_STAIRS,
+                                )
+                            }
+                        )
+                    ))
                 ),
                 rewardPoints = 20,
                 cooldownTicks = 20 * 60 * 2,

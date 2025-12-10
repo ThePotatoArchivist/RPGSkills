@@ -25,6 +25,7 @@ import net.minecraft.nbt.NbtList
 import net.minecraft.predicate.entity.DamageSourcePredicate
 import net.minecraft.predicate.entity.EntityPredicate
 import net.minecraft.predicate.entity.LootContextPredicate
+import net.minecraft.predicate.item.ItemPredicate
 import net.minecraft.registry.*
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryEntryList
@@ -287,3 +288,5 @@ fun <A, B, E> Codec<A>.registryXmap(
     to: (A, RegistryEntryLookup<E>) -> B,
     from: (B, RegistryEntryLookup<E>) -> A
 ) = RegistryAwareXmapCodec(registry, this, to, from)
+
+fun ItemPredicate(init: ItemPredicate.Builder.() -> Unit): ItemPredicate = ItemPredicate.Builder.create().apply(init).build()
