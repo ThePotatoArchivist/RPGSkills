@@ -47,7 +47,7 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
                 if (canAdd)
                     add(TOOLTIP_HINT.text.asOrderedText())
                 for ((_, task) in job.value.tasks)
-                    add(getTaskText(task).asOrderedText())
+                    addAll(textRenderer.wrapLines(getTaskText(task), 180))
             })
         }
     }
