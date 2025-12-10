@@ -28,11 +28,29 @@
           {
             "block": "minecraft:granite",
             "condition": "minecraft:block_state_property"
+          },
+          {
+            "condition": "minecraft:inverted",
+            "term": {
+              "condition": "minecraft:match_tool",
+              "predicate": {
+                "predicates": {
+                  "minecraft:enchantments": [
+                    {
+                      "enchantments": "minecraft:silk_touch",
+                      "levels": {
+                        "min": 1
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         ]
       },
       "count": 10,
-      "description": "Break Granite. It's the pink rock.",
+      "description": "Break Granite without silk touch. It's the pink rock.",
       "trigger": "rpgskills:break_block"
     },
     "place_stone": {

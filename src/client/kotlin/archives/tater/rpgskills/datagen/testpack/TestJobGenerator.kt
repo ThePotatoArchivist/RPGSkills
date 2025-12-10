@@ -8,6 +8,7 @@ import archives.tater.rpgskills.data.BuildsRegistry
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.JobProvider
 import archives.tater.rpgskills.data.accept
+import archives.tater.rpgskills.data.get
 import archives.tater.rpgskills.util.*
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.advancement.AdvancementCriterion
@@ -15,20 +16,29 @@ import net.minecraft.advancement.criterion.ConsumeItemCriterion
 import net.minecraft.advancement.criterion.Criteria
 import net.minecraft.advancement.criterion.TickCriterion
 import net.minecraft.block.Blocks
+import net.minecraft.enchantment.Enchantments
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.item.Items
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition
+import net.minecraft.loot.condition.InvertedLootCondition
 import net.minecraft.loot.condition.LocationCheckLootCondition
+import net.minecraft.loot.condition.MatchToolLootCondition
 import net.minecraft.loot.context.LootContext
 import net.minecraft.predicate.BlockPredicate
+import net.minecraft.predicate.NumberRange
+import net.minecraft.predicate.NumberRange.IntRange
 import net.minecraft.predicate.entity.EntityEffectPredicate
 import net.minecraft.predicate.entity.EntityTypePredicate
 import net.minecraft.predicate.entity.LocationPredicate
 import net.minecraft.predicate.entity.LootContextPredicate
+import net.minecraft.predicate.item.EnchantmentPredicate
+import net.minecraft.predicate.item.EnchantmentsPredicate
 import net.minecraft.predicate.item.ItemPredicate
+import net.minecraft.predicate.item.ItemSubPredicateTypes
 import net.minecraft.registry.Registerable
 import net.minecraft.registry.Registries
+import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.Identifier
@@ -57,7 +67,7 @@ class TestJobGenerator(
     companion object : BuildsRegistry<Job> {
         override val registry = Job.key
 
-        val PLACE_STONE = BuildEntry(testPackId("place_stone")) {
+        val PLACE_STONE = depBuildEntry(testPackId("place_stone")) { registerable ->
             Job(
                 "Stone Placer",
                 mapOf(
@@ -66,9 +76,24 @@ class TestJobGenerator(
                             location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.STONE).build())
                         )
                     )),
-                    "place_granite" to Job.Task("Break Granite. It's the pink rock.", 10, AdvancementCriterion(
+                    "place_granite" to Job.Task("Break Granite without silk touch. It's the pink rock.", 10, AdvancementCriterion(
                         RPGSkillsCriteria.BREAK_BLOCK, itemCriterionConditions(
-                            location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build())
+                            location = LootContextPredicate.create(
+                                BlockStatePropertyLootCondition.builder(Blocks.GRANITE).build(),
+                                InvertedLootCondition.builder(
+                                    MatchToolLootCondition.builder(ItemPredicate.Builder.create().apply {
+                                        subPredicate(
+                                            ItemSubPredicateTypes.ENCHANTMENTS,
+                                            EnchantmentsPredicate.enchantments(listOf(
+                                                EnchantmentPredicate(
+                                                    registerable[RegistryKeys.ENCHANTMENT].getOrThrow(Enchantments.SILK_TOUCH),
+                                                    IntRange.atLeast(1)
+                                                )
+                                            ))
+                                        )
+                                    })
+                                ).build()
+                            ),
                         )
                     )),
                     "craft_diorite" to Job.Task("Craft any sort of diorite", 24, AdvancementCriterion(
