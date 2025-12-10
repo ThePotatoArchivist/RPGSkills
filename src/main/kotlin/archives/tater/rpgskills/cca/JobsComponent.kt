@@ -86,10 +86,10 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
     fun <T: AbstractCriterion.Conditions> onCriterion(criterion: Criterion<T>, conditionChecker: Predicate<T>) {
         val player = player as? ServerPlayerEntity ?: return
 
-        val completed = mutableSetOf<JobInstance>()
-
         for (instance in _active) {
             val (jobEntry, tasks) = instance
+            if (jobEntry in _cooldowns) continue
+
             val job = jobEntry.value
 
             for ((name, task) in job.tasks) {
@@ -108,15 +108,8 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
 
                 jobsUpdated = true
             }
-            if (tasks.isEmpty()) {
+            if (tasks.isEmpty())
                 completeJob(player, instance)
-                completed.add(instance)
-            }
-        }
-
-        if (!completed.isEmpty()) {
-            _active.removeAll(completed)
-            sync()
         }
     }
 
@@ -130,6 +123,7 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
                 ServerPlayNetworking.send(player, SkillPointIncreasePayload)
             }
         }
+        instance.resetTasks()
         _cooldowns[instance.job] = job.cooldownTicks
         ServerPlayNetworking.send(player, JobCompletedPayload(instance.job))
     }
@@ -173,14 +167,10 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         CODEC.encode(this, tag, registryLookup).logIfError()
     }
 
-    override fun applySyncPacket(buf: RegistryByteBuf?) {
-        super.applySyncPacket(buf)
-    }
-
     @JvmRecord
     data class JobInstance(
         val job: RegistryEntry<Job>,
-        val tasks: MutableMap<String, Int> = job.value.tasks.mapValuesTo(mutableMapOf()) { 0 },
+        val tasks: MutableMap<String, Int> = job.value.tasks.keys.associateWithTo(mutableMapOf()) { 0 },
     ) {
         fun resetTasks() {
             tasks.clear()
@@ -250,11 +240,6 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
                     when {
                         isFull -> RPGSkills.logger.warn(
                             "{} tried to add a job but was full: {}",
-                            context.player().gameProfile.name,
-                            job.key.orElseThrow().value
-                        )
-                        job in _cooldowns -> RPGSkills.logger.warn(
-                            "{} tried to add a job that was on cooldown: {}",
                             context.player().gameProfile.name,
                             job.key.orElseThrow().value
                         )

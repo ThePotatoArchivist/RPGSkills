@@ -19,6 +19,7 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ButtonTextures
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
+import net.minecraft.command.argument.ColorArgumentType.color
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
@@ -27,30 +28,32 @@ import net.minecraft.util.Formatting
 class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity, width: Int, x: Int, y: Int) :
     ClickableWidget(x, y, width, (textRenderer.fontHeight + 1) * (job.value.tasks.size + 1) + 2 * MARGIN + 2, Text.empty()), AbstractJobWidget {
 
-    private val jobsComponent = player[JobsComponent]
+    private val jobs = player[JobsComponent]
     private val registryManager = player.registryManager
 
     private val textWidth = width - MARGIN * 2 - CHECKBOX_WIDTH - TASK_MARGIN * 2
 
     private var closeHovered = false
 
+    private val onCooldown get() = job in jobs.cooldowns
+
     init {
-        height = getTaskText().sumOf { (text, _) -> textRenderer.getWrappedLinesHeight(text, textWidth) + TASK_MARGIN } + textRenderer.fontHeight + TASK_MARGIN + 16 + 2 * MARGIN
+        height = getTaskText(false).sumOf { (text, _) -> textRenderer.getWrappedLinesHeight(text, textWidth) + TASK_MARGIN } + textRenderer.fontHeight + TASK_MARGIN + 16 + 2 * MARGIN
     }
 
-    private fun getTaskText(): List<Pair<Text, Boolean>> {
-        val instance = jobsComponent[job] ?: return listOf()
+    private fun getTaskText(onCooldown: Boolean): List<Pair<Text, Boolean>> {
+        val instance = jobs[job] ?: return listOf()
         return job.value.tasks.map { (name, task) ->
             val pending = name in instance.tasks
 
             Text.empty().apply {
                 append(TASK_PROGRESS.text(instance.tasks[name] ?: task.count, task.count).apply {
-                    if (pending)
+                    if (pending && !onCooldown)
                         withColor(0x5555FF)
                 })
                 append(" ")
                 append(Text.literal(task.description))
-                if (!pending)
+                if (!pending && !onCooldown)
                     formatted(Formatting.DARK_GREEN)
             } to pending
         }
@@ -63,21 +66,23 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
         delta: Float
     ) {
         val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
+        val onCooldown = onCooldown
+        val color = if (onCooldown) 0x909090 else 0x404040
 
         context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
-        context.drawText(textRenderer, Text.literal(job.value.name), x + MARGIN, y + MARGIN, /*if (onCooldown) 0x909090 else*/ 0x404040, false)
+        context.drawText(textRenderer, Text.literal(job.value.name), x + MARGIN, y + MARGIN, color, false)
 
         var currentY = y + textRenderer.fontHeight + TASK_MARGIN + MARGIN
 
-        for ((text, pending) in getTaskText()) {
-            context.drawText(textRenderer, if (pending) INCOMPLETE_TASK.text else COMPLETE_TASK.text, x + MARGIN + TASK_MARGIN, currentY, if (pending) 0x404040 else 0x00aa00, false)
+        for ((text, pending) in getTaskText(onCooldown)) {
+            context.drawText(textRenderer, if (pending) INCOMPLETE_TASK.text else COMPLETE_TASK.text, x + MARGIN + TASK_MARGIN, currentY, if (pending) color else 0x00aa00, false)
             context.drawTextWrapped(
                 textRenderer,
                 text,
                 x + MARGIN + TASK_MARGIN + CHECKBOX_WIDTH,
                 currentY,
                 textWidth,
-                0x404040,
+                color,
             )
             currentY += textRenderer.getWrappedLinesHeight(text, textWidth) + TASK_MARGIN
         }
@@ -93,8 +98,10 @@ class ActiveJobWidget(private val job: RegistryEntry<Job>, player: PlayerEntity,
         if (closeHovered)
             MinecraftClient.getInstance().currentScreen?.setTooltip(CANCEL.text)
 
-        drawReward(context, textRenderer, job, width - MARGIN, height - MARGIN - textRenderer.fontHeight)
-
+        jobs.cooldowns[job]?.let { cooldown ->
+            drawCooldown(context, textRenderer, cooldown, width - MARGIN, height - MARGIN - textRenderer.fontHeight)
+        } ?:
+            drawReward(context, textRenderer, job, width - MARGIN, height - MARGIN - textRenderer.fontHeight)
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {

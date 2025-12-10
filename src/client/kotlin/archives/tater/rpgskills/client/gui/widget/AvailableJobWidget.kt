@@ -24,9 +24,7 @@ import net.minecraft.util.Formatting
 class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: JobsComponent, x: Int, y: Int) :
     ClickableWidget(x, y, WIDTH, HEIGHT, Text.empty()), AbstractJobWidget {
 
-    private val onCooldown get() = job in jobs.cooldowns
-
-    private val canAdd get() = !onCooldown && !jobs.isFull
+    private val canAdd get() = !jobs.isFull
 
     override fun renderWidget(
         context: DrawContext,
@@ -40,16 +38,7 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
         context.drawGuiTexture(TEXTURE[true, isHovered && canAdd], x, y, width, height)
         context.drawText(textRenderer, job.value.name, x + MARGIN, y + MARGIN + 1, 0x404040, false)
         jobs.cooldowns[job]?.let { cooldown ->
-            val seconds = cooldown ceilDiv 20
-            val timerString = "%d:%02d".format(seconds / 60, seconds % 60)
-            context.drawText(
-                textRenderer,
-                timerString,
-                x + width - MARGIN - textRenderer.getWidth(timerString),
-                y + MARGIN + 1,
-                0x404040,
-                false
-            )
+            drawCooldown(context, textRenderer, cooldown, MARGIN)
         } ?:
             drawReward(context, textRenderer, job, MARGIN)
 
@@ -57,7 +46,8 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
             setTooltip(buildList {
                 if (canAdd)
                     add(TOOLTIP_HINT.text.asOrderedText())
-                for ((_, task) in job.value.tasks) add(getTaskText(task).asOrderedText())
+                for ((_, task) in job.value.tasks)
+                    add(getTaskText(task).asOrderedText())
             })
         }
     }
