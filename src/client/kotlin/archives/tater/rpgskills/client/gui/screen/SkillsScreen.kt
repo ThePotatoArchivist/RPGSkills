@@ -6,7 +6,6 @@ import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.cca.BossTrackerComponent
 import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.client.gui.SkillXpBar
-import archives.tater.rpgskills.client.gui.widget.AbstractJobWidget
 import archives.tater.rpgskills.client.gui.widget.AbstractJobWidget.Companion.ORB_ICON
 import archives.tater.rpgskills.client.gui.widget.AbstractJobWidget.Companion.ORB_ICON_SIZE
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
@@ -21,9 +20,6 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
-import net.minecraft.text.Text
-import net.minecraft.util.Colors
-import net.minecraft.util.Formatting
 
 class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
     private var x = 0
@@ -65,28 +61,37 @@ class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(play
         super.render(context, mouseX, mouseY, delta)
         context.drawText(textRenderer, title, x + (WIDTH - textRenderer.getWidth(title)) / 2, y + MARGIN, 0x404040, false)
 
-        val levelText = LEVEL.text(skills.level, player.world[BossTrackerComponent].maxLevel)
-        context.drawText(textRenderer, levelText, x + MARGIN, y + MARGIN + 15, 0x404040, false)
-        if (mouseIn(mouseX, mouseY, x + MARGIN, y + MARGIN + 15, textRenderer.getWidth(levelText), textRenderer.fontHeight))
+        val pointsFull = skills.isPointsFull
+
+        val levelText = LEVEL.text(skills.level)
+        context.drawText(textRenderer, levelText, x + (WIDTH - textRenderer.getWidth(levelText)) / 2, y + MARGIN + 15, 0x404040, false)
+
+        val spendableString = skills.spendableLevels.toString()
+        context.drawOutlinedText(textRenderer, spendableString, x + (WIDTH - textRenderer.getWidth(spendableString) - 2) / 2, y + MARGIN + 32, if (pointsFull && skills.spendableLevels <= 0) 0xb2b2b2 else 0x70DACD)
+
+        context.drawGuiTexture(LEVEL_CAP_ICON, x + MARGIN, y + MARGIN + 32, LEVEL_CAP_ICON_SIZE, LEVEL_CAP_ICON_SIZE)
+        val levelCapString = player.world[BossTrackerComponent].maxLevel.toString()
+        context.drawText(textRenderer, levelCapString, x + MARGIN + LEVEL_CAP_ICON_SIZE + 2, y + MARGIN + 33, 0x404040, false)
+        if (mouseIn(mouseX, mouseY, x + MARGIN, y + MARGIN + 33, LEVEL_CAP_ICON_SIZE + 2 + textRenderer.getWidth(levelCapString), textRenderer.fontHeight))
             setTooltip(LEVEL_CAP_HINT.text)
 
-        val levelString = skills.spendableLevels.toString()
-        context.drawOutlinedText(textRenderer, levelString, x + (WIDTH - textRenderer.getWidth(levelString) - 2) / 2, y + MARGIN + 14, 0x70DACD)
-
         val progressText = PROGRESS.text(skills.remainingPoints, skills.pointsInLevel)
-        context.drawGuiTexture(ORB_ICON, x + WIDTH - MARGIN - textRenderer.getWidth(progressText) - ORB_ICON_SIZE - 2, y + MARGIN + 14, ORB_ICON_SIZE, ORB_ICON_SIZE)
-        context.drawText(textRenderer, progressText, x + WIDTH - MARGIN - textRenderer.getWidth(progressText), y + MARGIN + 15, 0x404040, false)
+        context.drawGuiTexture(ORB_ICON, x + WIDTH - MARGIN - textRenderer.getWidth(progressText) - ORB_ICON_SIZE - 2, y + MARGIN + 32, ORB_ICON_SIZE, ORB_ICON_SIZE)
+        context.drawText(textRenderer, progressText, x + WIDTH - MARGIN - textRenderer.getWidth(progressText), y + MARGIN + 33, 0x404040, false)
 
-        SkillXpBar.draw(context, skills.levelProgress, x + (WIDTH - SkillXpBar.WIDTH) / 2, y + 34)
+        SkillXpBar.draw(context, if (pointsFull) 1f else skills.levelProgress, x + (WIDTH - SkillXpBar.WIDTH) / 2, y + MARGIN + 25, pointsFull)
     }
 
     companion object {
         val TEXTURE = RPGSkills.id("textures/gui/skills.png")
+        val LEVEL_CAP_ICON = RPGSkills.id("skill/level_cap")
+
         const val WIDTH = 164
-        const val HEADER_HEIGHT = 44
+        const val HEADER_HEIGHT = 55
         const val SEGMENT_HEIGHT = 22
         const val FOOTER_HEIGHT = 9
         const val MARGIN = 9
+        const val LEVEL_CAP_ICON_SIZE = 9
 
         val TITLE = Translation.unit("screen.$MOD_ID.skills")
 

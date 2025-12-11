@@ -4,7 +4,7 @@ import archives.tater.rpgskills.RPGSkills
 import net.minecraft.client.gui.DrawContext
 
 object SkillXpBar {
-    fun draw(context: DrawContext, progress: Float, x: Int, y: Int) {
+    fun draw(context: DrawContext, progress: Float, x: Int, y: Int, disabled: Boolean = false) {
 //        val skills = player[SkillsComponent]
 
         // Experience Number
@@ -14,7 +14,7 @@ object SkillXpBar {
         // Experience Bar
         context.drawGuiTexture(EMPTY_TEXTURE, x, y, WIDTH, HEIGHT)
         context.drawGuiTexture(
-            FILLED_TEXTURE,
+            if (disabled) DISABLED_TEXTURE else FILLED_TEXTURE,
             WIDTH,
             HEIGHT,
             0,
@@ -28,6 +28,7 @@ object SkillXpBar {
 
     val EMPTY_TEXTURE = RPGSkills.id("skill/large_bar_empty")
     val FILLED_TEXTURE = RPGSkills.id("skill/large_bar_filled")
+    val DISABLED_TEXTURE = RPGSkills.id("skill/large_bar_disabled")
 
     const val WIDTH = 101
     const val HEIGHT = 5

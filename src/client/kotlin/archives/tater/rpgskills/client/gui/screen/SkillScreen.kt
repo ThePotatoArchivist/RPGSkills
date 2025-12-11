@@ -7,6 +7,7 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.cca.SkillsComponent
+import archives.tater.rpgskills.client.gui.SkillXpBar
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.ceilDiv
 import archives.tater.rpgskills.util.get
@@ -28,6 +29,7 @@ class SkillScreen(
     private var x = 0
     private var y = 0
 
+    val skills = player[SkillsComponent]
     private val maxLevel = skill.value.levels.size
 
     override fun init() {
@@ -78,8 +80,10 @@ class SkillScreen(
         context.drawItem(skill.value.icon, x + 8, y + 6)
         context.drawText(textRenderer, title, x + 26, y + 10, 0x404040, false)
 
-        SkillWidget.SKILL_LEVEL.text(player[SkillsComponent][skill], maxLevel).let {
-            context.drawText(textRenderer, it, x + WIDTH - SkillUpgradeButton.WIDTH - 8 - 4 - textRenderer.getWidth(it), y + 10, 0x00FFFF, true)
+        SkillXpBar.draw(context, skills[skill].toFloat() / maxLevel, x + WIDTH - SkillUpgradeButton.WIDTH - 8 - 4 - SkillXpBar.WIDTH, y + 12)
+
+        SkillWidget.SKILL_LEVEL.text(skills[skill], maxLevel).let {
+            context.drawText(textRenderer, it, x + WIDTH - SkillUpgradeButton.WIDTH - 8 - 4 - SkillXpBar.WIDTH - 4 - textRenderer.getWidth(it), y + 10, 0x404040, false)
         }
     }
 

@@ -38,12 +38,12 @@ class SkillWidget(
         context.drawItem(skill.value.icon, x + 3, y + 3)
         context.drawText(textRenderer, name, x + 21, y + 4, 0xffffff, true)
 
-        SkillXpBar.draw(context, level.toFloat() / maxLevel, x + 21, y + 14)
+        SkillXpBar.draw(context, level.toFloat() / maxLevel, x + 21, y + 14, skillsComponent.isPointsFull && skillsComponent.spendableLevels <= 0)
 
         if (hovered)
             MinecraftClient.getInstance().currentScreen?.setTooltip(listOf(
                 description.asOrderedText(),
-                SKILL_LEVEL.text(level, maxLevel).asOrderedText(),
+                SKILL_LEVEL.text(level, maxLevel).withColor(0x00ffff).asOrderedText(),
             ))
     }
 
@@ -60,9 +60,7 @@ class SkillWidget(
         val TEXTURE = RPGSkills.id("skill/entry")
         val TEXTURE_HIGHLIGHTED = RPGSkills.id("skill/entry_highlighted")
 
-        val SKILL_LEVEL = Translation.arg("screen.widget.$MOD_ID.skill.level") {
-            withColor(0x00ffff)
-        }
+        val SKILL_LEVEL = Translation.arg("screen.widget.$MOD_ID.skill.level")
 
         const val WIDTH = 146
         const val HEIGHT = 22
