@@ -1,17 +1,18 @@
 package archives.tater.rpgskills.util
 
 import archives.tater.rpgskills.RPGSkills
+import com.google.common.collect.HashMultimap
+import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
+import com.mojang.serialization.DynamicOps
+import com.mojang.serialization.MapCodec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
-import com.mojang.serialization.Codec
-import com.mojang.serialization.DataResult
-import com.mojang.serialization.DynamicOps
-import com.mojang.serialization.MapCodec
-import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.advancement.criterion.BredAnimalsCriterion
 import net.minecraft.advancement.criterion.ItemCriterion
 import net.minecraft.advancement.criterion.OnKilledCriterion
@@ -36,7 +37,6 @@ import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
-import com.google.common.collect.HashMultimap
 import org.joml.Vector2i
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
@@ -220,10 +220,12 @@ fun <T> Codec<T>.indexedOf(default: T): Codec<List<T>> = Codec.unboundedMap(ONE_
     { list -> list.withIndex().associateNotNull { (index, entry) -> if (entry != default || index + 1 >= list.size) index + 1 to entry else null } }
 )
 
-fun <T> RegistryWrapper<T>.streamEntriesOrdered(tag: TagKey<T>): Stream<RegistryEntry<T>> = Stream.concat(
-    getOptional(tag).getOrNull()?.stream() ?: Stream.empty(),
-    streamEntries().filter { !(it isIn tag) }
-)
+fun <T> RegistryWrapper<T>.streamEntriesOrdered(tag: TagKey<T>): Stream<out RegistryEntry<T>> = getOptional(tag).getOrNull()?.let { list ->
+    Stream.concat(
+        list.stream(),
+        streamEntries().filter { !(it isIn tag) }
+    )
+} ?: streamEntries()
 
 fun EntityPredicate(init: EntityPredicate.Builder.() -> Unit): EntityPredicate = EntityPredicate.Builder.create().apply(init).build()
 

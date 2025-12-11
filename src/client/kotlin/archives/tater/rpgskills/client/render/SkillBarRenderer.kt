@@ -43,7 +43,7 @@ object SkillBarRenderer : ClientPlayNetworking.PlayPayloadHandler<SkillPointIncr
     fun renderLevel(context: DrawContext, textRenderer: TextRenderer, clientPlayer: ClientPlayerEntity) {
         val skills = clientPlayer[SkillsComponent]
         if (skills.level <= 0) return
-        val display = "${skills.spendableLevels}/${skills.level}"
+        val display = skills.level.toString()
         val x: Int = (context.scaledWindowWidth - textRenderer.getWidth(display)) / 2
         val y = context.scaledWindowHeight - 31 - 4
         context.drawText(textRenderer, display, x + 1, y, 0, false)

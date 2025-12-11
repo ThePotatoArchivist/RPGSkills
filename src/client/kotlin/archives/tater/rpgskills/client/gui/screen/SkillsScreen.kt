@@ -3,8 +3,11 @@ package archives.tater.rpgskills.client.gui.screen
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.RPGSkillsTags
+import archives.tater.rpgskills.cca.SkillsComponent
+import archives.tater.rpgskills.client.gui.SkillXpBar
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.client.gui.widget.SkillWidget
+import archives.tater.rpgskills.client.util.drawOutlinedText
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
@@ -13,31 +16,27 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
-import net.minecraft.util.math.MathHelper.clamp
+import net.minecraft.text.Text
 
 class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
     private var x = 0
     private var y = 0
-    private lateinit var skillWidgets: List<Pair<SkillWidget, SkillUpgradeButton>>
-    private lateinit var buttonWidget: ButtonWidget
-    private var indexOffset = 0
-    private val canScroll get() = skillWidgets.size > MAX_VISIBLE
-    private var scrolling = false
+
+    private val skills = player[SkillsComponent]
+    private val allSkills = player.registryManager[Skill].streamEntriesOrdered(RPGSkillsTags.SKILL_ORDER).toList()
+
+    private var screenHeight = HEADER_HEIGHT + allSkills.size * SEGMENT_HEIGHT + FOOTER_HEIGHT
 
     override fun init() {
         x = (width - WIDTH) / 2
-        y = (height - HEIGHT) / 2
+        y = (height - screenHeight) / 2
 
-        skillWidgets = player.registryManager[Skill].streamEntriesOrdered(RPGSkillsTags.SKILL_ORDER)
-            .toList()
-            .mapIndexed { index, skill ->
-                Pair(
-                    addDrawableChild(SkillWidget(x + 9, y + index * SkillWidget.HEIGHT + 19, player, skill, this)),
-                    addDrawableChild(SkillUpgradeButton(x + 200, y + index * SkillWidget.HEIGHT + 19 + 2, player, skill))
-                )
-            }
+        allSkills.forEachIndexed { index, skill ->
+            addDrawableChild(SkillWidget(x + MARGIN, y + index * SkillWidget.HEIGHT + HEADER_HEIGHT, player, skill, this))
+            addDrawableChild(SkillUpgradeButton(x + MARGIN + SkillWidget.WIDTH - SkillUpgradeButton.WIDTH - 2, y + index * SkillWidget.HEIGHT + HEADER_HEIGHT + 2, player, skill))
+        }
 
-        buttonWidget = addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE) { close() }.apply {
+        addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE) { close() }.apply {
             width(200)
             position(width / 2 - 100, height - 25)
         }.build())
@@ -45,81 +44,47 @@ class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(play
 
     override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.renderBackground(context, mouseX, mouseY, delta)
-        context.drawTexture(TEXTURE, x, y, 0, 0, WIDTH, HEIGHT)
+        var y = y
+        context.drawTexture(TEXTURE, x, y, 0, 0, WIDTH, HEADER_HEIGHT)
+        y += HEADER_HEIGHT
+        repeat(allSkills.size) {
+            context.drawTexture(TEXTURE, x, y, 0, HEADER_HEIGHT, WIDTH, SEGMENT_HEIGHT)
+            y += SEGMENT_HEIGHT
+        }
+        context.drawTexture(TEXTURE, x, y, 0, HEADER_HEIGHT + SEGMENT_HEIGHT, WIDTH, FOOTER_HEIGHT)
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        renderBackground(context, mouseX, mouseY, delta)
-        buttonWidget.render(context, mouseX, mouseY, delta)
-        // Title
-        context.drawText(textRenderer, title, x + 8, y + 7, 0x404040, false)
-        // Bar
-        drawXpBar(context, x + 244, y + 6)
-        // List
-        (if (skillWidgets.size > MAX_VISIBLE) skillWidgets.subList(indexOffset, indexOffset + MAX_VISIBLE) else skillWidgets)
-            .forEachIndexed { index, (widget, button) ->
-                val widgetY = y + index * SkillWidget.HEIGHT + 19
-                widget.y = widgetY
-                button.y = widgetY + 2
-                widget.render(context, mouseX, mouseY, delta)
-                button.render(context, mouseX, mouseY, delta)
+        super.render(context, mouseX, mouseY, delta)
+        context.drawText(textRenderer, title, x + (WIDTH - textRenderer.getWidth(title)) / 2, y + MARGIN - 2, 0x404040, false)
+
+        context.drawText(textRenderer, AVAILABLE.text(
+            Text.literal(skills.spendableLevels.toString()).apply {
+                withColor(0x00aaaa)
             }
-        // Scrollbar
-        context.drawGuiTexture(
-            if (canScroll) SCROLLBAR_TEXTURE else SCROLLBAR_DISABLED_TEXTURE,
-            x + SCROLLBAR_X,
-            y + SCROLLBAR_Y + (SCROLL_HEIGHT - SCROLLBAR_HEIGHT) * indexOffset / (skillWidgets.size - MAX_VISIBLE),
-            SCROLL_WIDTH,
-            SCROLLBAR_HEIGHT
-        )
-    }
+        ), x + MARGIN, y + MARGIN + 10, 0x404040, false)
 
-    // based on MerchantScreen
+        val levelString = skills.level.toString()
+        context.drawOutlinedText(textRenderer, levelString, x + (WIDTH - textRenderer.getWidth(levelString) - 2) / 2, y + MARGIN + 9, 0x70DACD)
 
-    override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalAmount: Double, verticalAmount: Double): Boolean {
-        if (canScroll)
-            indexOffset = clamp((indexOffset.toDouble() - verticalAmount).toInt(), 0, skillWidgets.size - MAX_VISIBLE)
+        val progressText = PROGRESS.text(skills.remainingPoints, skills.pointsInLevel)
+        context.drawText(textRenderer, progressText, x + WIDTH - MARGIN - textRenderer.getWidth(progressText), y + MARGIN + 10, 0x404040, false)
 
-        return true
-    }
-
-    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        scrolling = canScroll
-                && mouseX > x + SCROLLBAR_X && mouseX < x + SCROLLBAR_X + SCROLL_WIDTH
-                && mouseY > y + SCROLLBAR_Y && mouseY < y + SCROLLBAR_Y + SCROLL_HEIGHT
-
-        return super.mouseClicked(mouseX, mouseY, button)
-    }
-
-    override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
-        if (!scrolling)
-            return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
-
-        val scrollStart = y + SCROLLBAR_Y
-        val scrollEnd = scrollStart + SCROLL_HEIGHT
-        val amountHidden = skillWidgets.size - MAX_VISIBLE
-        val f = (mouseY.toFloat() - scrollStart.toFloat() - SCROLLBAR_HEIGHT / 2f) / ((scrollEnd - scrollStart).toFloat() - SCROLLBAR_HEIGHT)
-        val g = f * amountHidden.toFloat() + 0.5f
-        this.indexOffset = clamp(g.toInt(), 0, amountHidden)
-        return true
+        SkillXpBar.draw(context, skills.levelProgress, x + (WIDTH - SkillXpBar.WIDTH) / 2, y + 29)
     }
 
     companion object {
         val TEXTURE = RPGSkills.id("textures/gui/skills.png")
-        const val WIDTH = 252
-        const val HEIGHT = 138
-
-        val SCROLLBAR_TEXTURE = RPGSkills.id("skill/scroll_bar")
-        val SCROLLBAR_DISABLED_TEXTURE = RPGSkills.id("skill/scroll_bar_disabled")
-
-        const val MAX_VISIBLE = 5
-        const val SCROLL_WIDTH = 6
-        const val SCROLL_HEIGHT = 110
-        const val SCROLLBAR_HEIGHT = 27
-        const val SCROLLBAR_X = 237
-        const val SCROLLBAR_Y = 19
+        const val WIDTH = 164
+        const val HEADER_HEIGHT = 39
+        const val SEGMENT_HEIGHT = 22
+        const val FOOTER_HEIGHT = 9
+        const val MARGIN = 9
 
         val TITLE = Translation.unit("screen.$MOD_ID.skills")
+
+        val AVAILABLE = Translation.arg("screen.$MOD_ID.skills.available")
+        val PROGRESS = Translation.arg("screen.$MOD_ID.skills.progress")
 
     }
 }

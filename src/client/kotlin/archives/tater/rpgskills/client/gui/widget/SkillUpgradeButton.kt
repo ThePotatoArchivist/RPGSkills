@@ -1,9 +1,8 @@
 package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.RPGSkills
-import archives.tater.rpgskills.client.util.drawOutlinedText
-import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.cca.SkillsComponent
+import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.networking.SkillUpgradePayload
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
@@ -35,15 +34,9 @@ class SkillUpgradeButton(
     }
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        val canUpgrade = canUpgrade // Performance
-        val isMaxed = isMaxed
-
-        context.drawGuiTexture(if (isMaxed) MAX_TEXTURE else TEXTURE.get(canUpgrade, isHovered), x, y, WIDTH, HEIGHT)
-
-        if (isMaxed) {
-            context.drawOutlinedText(textRenderer, MAX.text, x + (WIDTH - textRenderer.getWidth(MAX.text) - 2) / 2, y + (HEIGHT - 9) / 2, 0x70DACD)
-            return
-        }
+//            context.drawOutlinedText(textRenderer, MAX.text, x + (WIDTH - textRenderer.getWidth(MAX.text) - 2) / 2, y + (HEIGHT - 9) / 2, 0x70DACD)
+        if (!isMaxed)
+            context.drawGuiTexture(TEXTURE.get(canUpgrade, isHovered), x, y, WIDTH, HEIGHT)
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
@@ -56,9 +49,8 @@ class SkillUpgradeButton(
             RPGSkills.id("skill/upgrade_button_disabled"),
             RPGSkills.id("skill/upgrade_button_highlighted")
         )
-        val MAX_TEXTURE = RPGSkills.id("skill/upgrade_button_maxed")
 
-        const val WIDTH = 33
+        const val WIDTH = 20
         const val HEIGHT = 18
 
         val MAX = Translation.unit("screen.rpgskills.skills.max")

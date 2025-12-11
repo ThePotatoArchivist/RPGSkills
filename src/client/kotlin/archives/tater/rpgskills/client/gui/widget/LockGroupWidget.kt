@@ -4,25 +4,13 @@ import archives.tater.rpgskills.ItemLockTooltip
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.client.util.getMousePosScrolled
 import archives.tater.rpgskills.data.LockGroup
-import archives.tater.rpgskills.util.Translation
-import archives.tater.rpgskills.util.ceilDiv
-import archives.tater.rpgskills.util.component1
-import archives.tater.rpgskills.util.component2
-import archives.tater.rpgskills.util.value
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec
+import archives.tater.rpgskills.util.*
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
-import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner
-import net.minecraft.client.gui.tooltip.Tooltip
-import net.minecraft.client.gui.tooltip.TooltipState
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.component.DataComponentTypes
-import net.minecraft.enchantment.EnchantmentHelper
-import net.minecraft.enchantment.EnchantmentLevelEntry
-import net.minecraft.item.EnchantedBookItem
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.SpawnEggItem
@@ -30,9 +18,6 @@ import net.minecraft.recipe.RecipeManager
 import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import org.joml.Vector2i
-import org.joml.Vector3f
-import org.joml.Vector4f
 import kotlin.jvm.optionals.getOrNull
 
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registryLookup: WrapperLookup?, recipeManager: RecipeManager?) :
@@ -96,10 +81,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
             currentY += getHeight(columns, stacks)
         }
         if (tooltipStack != null) MinecraftClient.getInstance().currentScreen?.run {
-            setTooltip(
-                HandledScreen.getTooltipFromItem(MinecraftClient.getInstance(), tooltipStack)
-                    .map { it.asOrderedText() },
-            )
+            setTooltip(tooltipStack.name)
         }
     }
 

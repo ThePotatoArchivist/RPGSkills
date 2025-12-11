@@ -48,6 +48,9 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         }
     var points by ::_points.synced(key, player)
 
+    val remainingPoints get() = getRemainingPoints(points)
+    val pointsInLevel get() = getPointsForNextLevel(level)
+
     private var spentLevels = 0
     var spendableLevels
         get() = level - spentLevels
@@ -56,7 +59,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             sync()
         }
 
-    val levelProgress get() = getRemainingPoints(points) / getPointsForNextLevel(level).toFloat()
+    val levelProgress get() = remainingPoints / pointsInLevel.toFloat()
 
     val isPointsFull get() = level >= maxLevel
 

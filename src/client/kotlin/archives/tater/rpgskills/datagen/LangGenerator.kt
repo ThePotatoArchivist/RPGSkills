@@ -4,14 +4,14 @@ import archives.tater.rpgskills.ItemLockTooltip
 import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
+import archives.tater.rpgskills.cca.BossTrackerComponent
 import archives.tater.rpgskills.client.gui.JobCompletedToast
 import archives.tater.rpgskills.client.gui.screen.ClassScreen
 import archives.tater.rpgskills.client.gui.screen.JobsScreen
+import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
 import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
-import archives.tater.rpgskills.cca.BossTrackerComponent
-import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -43,6 +43,8 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(BossTrackerComponent.CAP_RAISE_MESSAGE, "Max level is now %s")
             add(BossTrackerComponent.CAP_REMOVED_MESSAGE, "There is no longer a level limit")
             add(SkillsScreen.TITLE, "Skills")
+            add(SkillsScreen.AVAILABLE, "SPEND: %s")
+            add(SkillsScreen.PROGRESS, "%s/%s EXP")
             add(SkillTabWidget.TOOLTIP, "Level %s")
             add(ClassScreen.SELECT, "Select Class")
             add(JobsScreen.ACTIVE, "Active Jobs %s/%s")
