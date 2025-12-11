@@ -43,7 +43,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(BossTrackerComponent.CAP_RAISE_MESSAGE, "Max level is now %s")
             add(BossTrackerComponent.CAP_REMOVED_MESSAGE, "There is no longer a level limit")
             add(SkillsScreen.TITLE, "Skills")
-            add(SkillsScreen.AVAILABLE, "SPEND: %s")
+            add(SkillsScreen.LEVEL, "LEVEL %s")
             add(SkillsScreen.PROGRESS, "%s/%s EXP")
             add(SkillTabWidget.TOOLTIP, "Level %s")
             add(ClassScreen.SELECT, "Select Class")

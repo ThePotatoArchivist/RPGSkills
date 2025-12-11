@@ -16,7 +16,6 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
-import net.minecraft.text.Text
 
 class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
     private var x = 0
@@ -58,13 +57,9 @@ class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(play
         super.render(context, mouseX, mouseY, delta)
         context.drawText(textRenderer, title, x + (WIDTH - textRenderer.getWidth(title)) / 2, y + MARGIN - 2, 0x404040, false)
 
-        context.drawText(textRenderer, AVAILABLE.text(
-            Text.literal(skills.spendableLevels.toString()).apply {
-                withColor(0x00aaaa)
-            }
-        ), x + MARGIN, y + MARGIN + 10, 0x404040, false)
+        context.drawText(textRenderer, LEVEL.text(skills.level), x + MARGIN, y + MARGIN + 10, 0x404040, false)
 
-        val levelString = skills.level.toString()
+        val levelString = skills.spendableLevels.toString()
         context.drawOutlinedText(textRenderer, levelString, x + (WIDTH - textRenderer.getWidth(levelString) - 2) / 2, y + MARGIN + 9, 0x70DACD)
 
         val progressText = PROGRESS.text(skills.remainingPoints, skills.pointsInLevel)
@@ -83,7 +78,7 @@ class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(play
 
         val TITLE = Translation.unit("screen.$MOD_ID.skills")
 
-        val AVAILABLE = Translation.arg("screen.$MOD_ID.skills.available")
+        val LEVEL = Translation.arg("screen.$MOD_ID.skills.level")
         val PROGRESS = Translation.arg("screen.$MOD_ID.skills.progress")
 
     }

@@ -35,7 +35,7 @@
   "screen.rpgskills.jobs.active": "Active Jobs %s/%s",
   "screen.rpgskills.jobs.available": "Available Jobs %s/%s",
   "screen.rpgskills.skills": "Skills",
-  "screen.rpgskills.skills.available": "SPEND: %s",
+  "screen.rpgskills.skills.level": "LEVEL %s",
   "screen.rpgskills.skills.max": "MAX",
   "screen.rpgskills.skills.progress": "%s/%s EXP",
   "screen.widget.rpgskills.attributes.title": "Attributes",

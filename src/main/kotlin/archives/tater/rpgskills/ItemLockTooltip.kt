@@ -5,7 +5,6 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
-import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.util.function.Consumer
@@ -18,8 +17,10 @@ object ItemLockTooltip {
     @JvmStatic
     @JvmOverloads
     fun appendRequirements(lockGroup: LockGroup, text: Consumer<Text>, tooltip: Boolean = true) {
-        text.accept((if (lockGroup.requirements.size == 1) REQUIRES.text() else { REQUIRES_ANY.text() })
-            .formatted(if (tooltip) Formatting.RED else Formatting.BLACK))
+        text.accept(
+            (if (lockGroup.requirements.size == 1) REQUIRES.text() else REQUIRES_ANY.text())
+                    .formatted(if (tooltip) Formatting.RED else Formatting.BLACK)
+        )
 
         for (requirement in lockGroup.requirements) {
             text.accept(REQUIREMENT.text(Text.empty().apply {
