@@ -21,7 +21,7 @@ class TestSkillGenerator(
 		provider.accept(POTATO_SKILL)
         provider.accept(COW_SKILL)
         provider.accept(GRASS_SKILL)
-        repeat(5) {
+        repeat(3) {
             provider.accept(testPackId("test$it"), Skill(
                 icon = Items.IRON_INGOT.defaultStack,
                 levels = List(5) { Skill.Level() },

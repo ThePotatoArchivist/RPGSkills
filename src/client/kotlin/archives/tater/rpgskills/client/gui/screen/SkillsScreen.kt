@@ -3,11 +3,16 @@ package archives.tater.rpgskills.client.gui.screen
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.RPGSkillsTags
+import archives.tater.rpgskills.cca.BossTrackerComponent
 import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.client.gui.SkillXpBar
+import archives.tater.rpgskills.client.gui.widget.AbstractJobWidget
+import archives.tater.rpgskills.client.gui.widget.AbstractJobWidget.Companion.ORB_ICON
+import archives.tater.rpgskills.client.gui.widget.AbstractJobWidget.Companion.ORB_ICON_SIZE
 import archives.tater.rpgskills.client.gui.widget.SkillUpgradeButton
 import archives.tater.rpgskills.client.gui.widget.SkillWidget
 import archives.tater.rpgskills.client.util.drawOutlinedText
+import archives.tater.rpgskills.client.util.mouseIn
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
@@ -16,6 +21,9 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
+import net.minecraft.text.Text
+import net.minecraft.util.Colors
+import net.minecraft.util.Formatting
 
 class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
     private var x = 0
@@ -55,23 +63,27 @@ class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(play
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.render(context, mouseX, mouseY, delta)
-        context.drawText(textRenderer, title, x + (WIDTH - textRenderer.getWidth(title)) / 2, y + MARGIN - 2, 0x404040, false)
+        context.drawText(textRenderer, title, x + (WIDTH - textRenderer.getWidth(title)) / 2, y + MARGIN, 0x404040, false)
 
-        context.drawText(textRenderer, LEVEL.text(skills.level), x + MARGIN, y + MARGIN + 10, 0x404040, false)
+        val levelText = LEVEL.text(skills.level, player.world[BossTrackerComponent].maxLevel)
+        context.drawText(textRenderer, levelText, x + MARGIN, y + MARGIN + 15, 0x404040, false)
+        if (mouseIn(mouseX, mouseY, x + MARGIN, y + MARGIN + 15, textRenderer.getWidth(levelText), textRenderer.fontHeight))
+            setTooltip(LEVEL_CAP_HINT.text)
 
         val levelString = skills.spendableLevels.toString()
-        context.drawOutlinedText(textRenderer, levelString, x + (WIDTH - textRenderer.getWidth(levelString) - 2) / 2, y + MARGIN + 9, 0x70DACD)
+        context.drawOutlinedText(textRenderer, levelString, x + (WIDTH - textRenderer.getWidth(levelString) - 2) / 2, y + MARGIN + 14, 0x70DACD)
 
         val progressText = PROGRESS.text(skills.remainingPoints, skills.pointsInLevel)
-        context.drawText(textRenderer, progressText, x + WIDTH - MARGIN - textRenderer.getWidth(progressText), y + MARGIN + 10, 0x404040, false)
+        context.drawGuiTexture(ORB_ICON, x + WIDTH - MARGIN - textRenderer.getWidth(progressText) - ORB_ICON_SIZE - 2, y + MARGIN + 14, ORB_ICON_SIZE, ORB_ICON_SIZE)
+        context.drawText(textRenderer, progressText, x + WIDTH - MARGIN - textRenderer.getWidth(progressText), y + MARGIN + 15, 0x404040, false)
 
-        SkillXpBar.draw(context, skills.levelProgress, x + (WIDTH - SkillXpBar.WIDTH) / 2, y + 29)
+        SkillXpBar.draw(context, skills.levelProgress, x + (WIDTH - SkillXpBar.WIDTH) / 2, y + 34)
     }
 
     companion object {
         val TEXTURE = RPGSkills.id("textures/gui/skills.png")
         const val WIDTH = 164
-        const val HEADER_HEIGHT = 39
+        const val HEADER_HEIGHT = 44
         const val SEGMENT_HEIGHT = 22
         const val FOOTER_HEIGHT = 9
         const val MARGIN = 9
@@ -80,6 +92,6 @@ class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(play
 
         val LEVEL = Translation.arg("screen.$MOD_ID.skills.level")
         val PROGRESS = Translation.arg("screen.$MOD_ID.skills.progress")
-
+        val LEVEL_CAP_HINT = Translation.unit("screen.$MOD_ID.skills.level_cap_hint")
     }
 }
