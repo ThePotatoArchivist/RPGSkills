@@ -59,6 +59,9 @@
     "items": {
       "$ref": "#/definitions/LockList"
     },
+    "enchantments": {
+      "$ref": "#/definitions/LockList"
+    },
     "recipes": {
       "type": "object",
       "additionalProperties": false,
