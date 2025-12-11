@@ -35,7 +35,7 @@ data class LockGroup(
     val blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
     val entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
     val enchantments: LockList<RegistryIngredient.Composite<Enchantment>> = LockList.empty(),
-    val recipes: LockList<List<Identifier>> = LockList(listOf()),
+    val recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty()
 ) {
     constructor(
         requirements: Map<RegistryEntry<Skill>, Int>,
@@ -44,7 +44,7 @@ data class LockGroup(
         blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
         entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
         enchantments: LockList<RegistryIngredient.Composite<Enchantment>> = LockList.empty(),
-        recipes: LockList<List<Identifier>> = LockList(listOf()),
+        recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
     ) : this(listOf(requirements), itemName, items, blocks, entities, enchantments, recipes)
 
     private constructor(
@@ -54,7 +54,7 @@ data class LockGroup(
         blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
         entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
         enchantments: LockList<RegistryIngredient.Composite<Enchantment>> = LockList.empty(),
-        recipes: LockList<List<Identifier>> = LockList(listOf()),
+        recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
     ) : this(requirements, itemName.getOrNull(), items, blocks, entities, enchantments, recipes)
 
     fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.any {
@@ -107,7 +107,7 @@ data class LockGroup(
             LockList.createCodec(RegistryKeys.BLOCK).optionalFieldOf("blocks", LockList.empty()).forGetter(LockGroup::blocks),
             LockList.createCodec(RegistryKeys.ENTITY_TYPE).optionalFieldOf("entities", LockList.empty()).forGetter(LockGroup::entities),
             LockList.createCodec(RegistryKeys.ENCHANTMENT).optionalFieldOf("enchantments", LockList.empty()).forGetter(LockGroup::enchantments),
-            LockList.createCodec(Identifier.CODEC.listOf()).optionalFieldOf("recipes", LockList(listOf())).forGetter(LockGroup::recipes),
+            LockList.createCodec(RegistryKeys.ITEM).optionalFieldOf("recipes", LockList.empty()).forGetter(LockGroup::recipes),
         ).apply(it, ::LockGroup) }
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))
@@ -116,7 +116,7 @@ data class LockGroup(
         private val BLOCK_CACHE = RegistryCache(key) { it.value.blocks.entries.matchingValues }
         private val ENTITY_CACHE = RegistryCache(key) { it.value.entities.entries.matchingValues }
         private val ENCHANTMENT_CACHE = RegistryCache(key) { it.value.enchantments.entries.matchingEntries }
-        private val RECIPE_CACHE = RegistryCache(key) { it.value.recipes.entries }
+        private val RECIPE_CACHE = RegistryCache(key) { it.value.recipes.entries.matchingValues }
 
         private fun <T> findLocked(player: PlayerEntity, cache: RegistryCache<T, LockGroup>, value: T) =
             cache[player.registryManager][value]?.value?.takeIf { !it.isSatisfiedBy(player) }
@@ -125,7 +125,7 @@ data class LockGroup(
         @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = findLocked(player, BLOCK_CACHE, state.block)
         @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = findLocked(player, ENTITY_CACHE, entity.type)
         @JvmStatic fun findLocked(player: PlayerEntity, enchantment: RegistryEntry<Enchantment>) = findLocked(player, ENCHANTMENT_CACHE, enchantment)
-        @JvmStatic fun findLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = findLocked(player, RECIPE_CACHE, recipe.id)
+        @JvmStatic fun findLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = findLocked(player, RECIPE_CACHE, recipe.value.getResult(player.registryManager).item)
 
         @JvmStatic fun isLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, stack) != null
         @JvmStatic fun isLocked(player: PlayerEntity, state: BlockState) = findLocked(player, state) != null

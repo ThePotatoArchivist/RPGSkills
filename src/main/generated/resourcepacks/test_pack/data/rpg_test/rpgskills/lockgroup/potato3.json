@@ -15,19 +15,7 @@
   },
   "recipes": {
     "entries": [
-      "minecraft:acacia_button",
-      "minecraft:bamboo_button",
-      "minecraft:birch_button",
-      "minecraft:cherry_button",
-      "minecraft:crimson_button",
-      "minecraft:jungle_button",
-      "minecraft:mangrove_button",
-      "minecraft:oak_button",
-      "minecraft:spruce_button",
-      "minecraft:stone_button",
-      "minecraft:warped_button",
-      "minecraft:dark_oak_button",
-      "minecraft:polished_blackstone_button"
+      "#minecraft:buttons"
     ],
     "message": "You don't know how to assemble this button"
   },

@@ -63,22 +63,7 @@
       "$ref": "#/definitions/LockList"
     },
     "recipes": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "message": {
-          "type": "string"
-        },
-        "entries": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Identifier"
-          }
-        }
-      },
-      "required": [
-        "entries"
-      ]
+      "$ref": "#/definitions/LockList"
     },
     "requirements": {
       "anyOf": [

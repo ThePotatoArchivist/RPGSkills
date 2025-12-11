@@ -38,8 +38,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
     private val enchantments = lockGroup.enchantments.entries.matchingEntries.map { enchantment ->
         Items.ENCHANTED_BOOK.defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = enchantment.value.description }
     }
-    private val recipes = if (recipeManager == null || registryLookup == null) listOf() else
-        lockGroup.recipes.entries.mapNotNull { recipeManager.get(it).getOrNull()?.value?.getResult(registryLookup) }
+    private val recipes = lockGroup.recipes.entries.matchingValues.map { it.defaultStack }
 
     private val groups = mapOf(
         Texts.ITEMS to items,

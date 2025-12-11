@@ -40,7 +40,9 @@ class TestSkillsLockGenerator(
                 },
             ),
             recipes = LockList(
-                listOf(Identifier.of("baked_potato"), Identifier.of("baked_potato_from_smoking"), Identifier.of("baked_potato_from_campfire_cooking")),
+                RegistryIngredient.ofItems {
+                    +Items.BAKED_POTATO
+                },
                 "You don't know how to cook this potato",
             ),
         ))
@@ -70,7 +72,9 @@ class TestSkillsLockGenerator(
                 }
             ),
             recipes = LockList(
-                listOf(Identifier.of("prismarine_bricks")),
+                RegistryIngredient.ofItems {
+                    +Items.PRISMARINE_BRICKS
+                },
                 "You don't know how to assemble this prismarine",
             ),
         ))
@@ -98,7 +102,9 @@ class TestSkillsLockGenerator(
                 "How to press?"
             ),
             recipes = LockList(
-                listOf("acacia", "bamboo", "birch", "cherry", "crimson", "jungle", "mangrove", "oak", "spruce", "stone", "warped", "dark_oak", "polished_blackstone").map { Identifier.of("${it}_button") },
+                RegistryIngredient.ofItems {
+                    +ItemTags.BUTTONS
+                },
                 "You don't know how to assemble this button",
             ),
         ))

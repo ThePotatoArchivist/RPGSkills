@@ -14,9 +14,7 @@
   },
   "recipes": {
     "entries": [
-      "minecraft:baked_potato",
-      "minecraft:baked_potato_from_smoking",
-      "minecraft:baked_potato_from_campfire_cooking"
+      "minecraft:baked_potato"
     ],
     "message": "You don't know how to cook this potato"
   },
