@@ -6,7 +6,6 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.*
-import archives.tater.rpgskills.util.get
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -23,7 +22,7 @@ import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
 import org.ladysnake.cca.api.v3.entity.RespawnableComponent
-import kotlin.collections.iterator
+import java.util.*
 
 @Suppress("UnstableApiUsage")
 class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<SkillsComponent>, AutoSyncedComponent {
@@ -155,13 +154,13 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
         override val key: ComponentKey<SkillsComponent> = ComponentRegistry.getOrCreate<SkillsComponent>(RPGSkills.id("skills"), SkillsComponent::class.java)
 
-        const val MAX_LEVEL = 200
-
-        data class LevelRequirement(val level: Int, val required: Int)
+        const val MAX_LEVEL = 500
 
         private val LEVEL_REQUIREMENTS = (0..<MAX_LEVEL)
             .runningFold(0) { acc, lvl -> acc + getPointsForNextLevel(lvl) }.toIntArray()
-        private val LEVEL_REQUIREMENTS_REVERSED = LEVEL_REQUIREMENTS.withIndex().map { (level, required) -> LevelRequirement(level, required) }.reversed().toTypedArray()
+
+        private val LEVEL_LOOKUP: NavigableMap<Int, Int> = LEVEL_REQUIREMENTS.withIndex()
+            .associateTo(TreeMap()) { (level, required) -> required to level }
 
         /**
          * Matches vanilla XP
@@ -174,10 +173,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         }
 
         fun getLevelForPoints(points: Int): Int =
-            LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required <= points }?.level ?: 0
+            LEVEL_LOOKUP.floorEntry(points)?.value ?: 0
 
         fun getRemainingPoints(points: Int) =
-            points - (LEVEL_REQUIREMENTS_REVERSED.firstOrNull { (_, required) -> required <= points }?.required ?: 0)
+            points - (LEVEL_LOOKUP.floorKey(points) ?: 0)
 
         fun registerEvents() {
             // Choose class
