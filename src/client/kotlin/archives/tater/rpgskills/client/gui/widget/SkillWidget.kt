@@ -38,7 +38,7 @@ class SkillWidget(
         context.drawItem(skill.value.icon, x + 3, y + 3)
         context.drawText(textRenderer, name, x + 21, y + 4, 0xffffff, true)
 
-        SkillXpBar.draw(context, level.toFloat() / maxLevel, x + 21, y + 14, skillsComponent.isPointsFull && skillsComponent.spendableLevels <= 0)
+        SkillXpBar.draw(context, level.toFloat() / maxLevel, x + 21, y + 14)
 
         if (hovered)
             MinecraftClient.getInstance().currentScreen?.setTooltip(listOf(

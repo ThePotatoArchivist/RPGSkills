@@ -63,32 +63,21 @@ class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(play
 
         val pointsFull = skills.isPointsFull
 
-        if (skills.spendableLevels > 0) {
-            val spendableString = skills.spendableLevels.toString()
-            context.drawOutlinedText(textRenderer, spendableString, x + (WIDTH - textRenderer.getWidth(spendableString) - 2) / 2, y + MARGIN + 13, 0x70DACD)
-        } else
-            context.drawGuiTexture(ORB_ICON, x + (WIDTH - ORB_ICON_SIZE) / 2, y + MARGIN + 12, ORB_ICON_SIZE, ORB_ICON_SIZE)
+        val spendableString = skills.spendableLevels.toString()
+        context.drawOutlinedText(textRenderer, spendableString, x + (WIDTH - textRenderer.getWidth(spendableString) - 2) / 2, y + MARGIN + 13, 0x70DACD)
 
         val levelText = LEVEL.text(skills.level)
         val levelTextWidth = textRenderer.getWidth(levelText)
-        context.drawText(textRenderer, levelText, x + (WIDTH - levelTextWidth - (if (pointsFull) LEVEL_CAP_ICON_SIZE + 2 else 0)) / 2, y + MARGIN + 32, 0x404040, false)
-        if (pointsFull) {
-            context.drawGuiTexture(LEVEL_CAP_ICON, x + (WIDTH + levelTextWidth - LEVEL_CAP_ICON_SIZE + 2) / 2, y + MARGIN + 31, LEVEL_CAP_ICON_SIZE, LEVEL_CAP_ICON_SIZE)
-            if (mouseIn(mouseX, mouseY, x + (WIDTH - levelTextWidth - LEVEL_CAP_ICON_SIZE - 2) / 2, y + MARGIN + 32, LEVEL_CAP_ICON_SIZE + 2 + levelTextWidth, textRenderer.fontHeight))
-                setTooltip(LEVEL_CAP_HINT.text)
-        }
+        context.drawText(textRenderer, levelText, x + (WIDTH - levelTextWidth) / 2, y + MARGIN + 32, 0x404040, false)
 
-//        context.drawGuiTexture(LEVEL_CAP_ICON, x + MARGIN, y + MARGIN + 32, LEVEL_CAP_ICON_SIZE, LEVEL_CAP_ICON_SIZE)
-//        val levelCapString = player.world[BossTrackerComponent].maxLevel.toString()
-//        context.drawText(textRenderer, levelCapString, x + MARGIN + LEVEL_CAP_ICON_SIZE + 2, y + MARGIN + 33, 0x404040, false)
-//        if (mouseIn(mouseX, mouseY, x + MARGIN, y + MARGIN + 33, LEVEL_CAP_ICON_SIZE + 2 + textRenderer.getWidth(levelCapString), textRenderer.fontHeight))
-//            setTooltip(LEVEL_CAP_HINT.text)
+        context.drawGuiTexture(ORB_ICON, x + (WIDTH - SkillXpBar.WIDTH) / 2 - 2 - ORB_ICON_SIZE, y + MARGIN + 22, ORB_ICON_SIZE, ORB_ICON_SIZE)
 
-//        val progressText = PROGRESS.text(skills.remainingPoints, skills.pointsInLevel)
-//        context.drawGuiTexture(ORB_ICON, x + WIDTH - MARGIN - textRenderer.getWidth(progressText) - ORB_ICON_SIZE - 2, y + MARGIN + 32, ORB_ICON_SIZE, ORB_ICON_SIZE)
-//        context.drawText(textRenderer, progressText, x + WIDTH - MARGIN - textRenderer.getWidth(progressText), y + MARGIN + 33, 0x404040, false)
+        SkillXpBar.draw(context, skills.levelProgress, x + (WIDTH - SkillXpBar.WIDTH) / 2, y + MARGIN + 24)
 
-        SkillXpBar.draw(context, if (pointsFull) 1f else skills.levelProgress, x + (WIDTH - SkillXpBar.WIDTH) / 2, y + MARGIN + 24, pointsFull)
+        if (pointsFull)
+            context.drawGuiTexture(LEVEL_CAP_ICON, x + (WIDTH + SkillXpBar.WIDTH) / 2 + 2, y + MARGIN + 22, LEVEL_CAP_ICON_SIZE, LEVEL_CAP_ICON_SIZE)
+        if (mouseIn(mouseX, mouseY, x + (WIDTH - SkillXpBar.WIDTH) / 2, y + MARGIN + 22, SkillXpBar.WIDTH + if (pointsFull) LEVEL_CAP_ICON_SIZE + 2 else 0, textRenderer.fontHeight))
+            setTooltip(if (pointsFull) LEVEL_CAP_HINT.text else PROGRESS.text(skills.remainingPoints, skills.pointsInLevel))
     }
 
     companion object {
