@@ -41,7 +41,7 @@ class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(play
 
         addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE) { close() }.apply {
             width(200)
-            position(width / 2 - 100, height - 25)
+            position(width / 2 - 100, (height - 25).coerceAtLeast(y + screenHeight + 2))
         }.build())
     }
 
