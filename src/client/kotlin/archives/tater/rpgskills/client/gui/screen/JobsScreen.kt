@@ -121,7 +121,8 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         context.drawCenteredText(textRenderer, ACTIVE.text(jobs.active.size, JobsComponent.MAX_JOBS), x + 97, y + 7, 0x404040)
         context.drawCenteredText(textRenderer, AVAILABLE.text(availableSkillJobs.size, selectedSkill.value.levels.sumOf { it.jobs.size }), x + 262, y + 7, 0x404040)
 
-        context.drawCenteredText(textRenderer, NO_JOBS.text, x + 98, y + 89, 0x606060)
+        if (jobs.active.isEmpty())
+            context.drawCenteredText(textRenderer, NO_JOBS.text, x + 98, y + 89, 0x606060)
     }
 
     override fun shouldPause(): Boolean = false // TODO remove, for testing only
