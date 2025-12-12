@@ -25,14 +25,7 @@ data class Skill(
     val icon: ItemStack,
     val levels: List<Level>,
     val name: String,
-    val description: String? = null,
 ) {
-    private constructor(
-        icon: ItemStack,
-        levels: List<Level>,
-        name: String,
-        description: Optional<String>,
-    ) : this(icon, levels, name, description.getOrNull())
 
     operator fun contains(job: RegistryEntry<Job>) = levels.any { job in it.jobs }
 
@@ -42,14 +35,12 @@ data class Skill(
                 SHORT_STACK_CODEC.fieldOf("icon").forGetter(Skill::icon),
                 Level.CODEC.indexedOf(default = Level()).fieldOf("levels").forGetter(Skill::levels),
                 Codec.STRING.fieldOf("name").forGetter(Skill::name),
-                Codec.STRING.optionalFieldOf("description").forGetter(Skill::description)
             ).apply(it, ::Skill)
         }
 
         override val key: RegistryKey<Registry<Skill>> = RegistryKey.ofRegistry(RPGSkills.id("skill"))
 
         val RegistryEntry<Skill>.name: MutableText get() = Text.literal(value.name)
-        val RegistryEntry<Skill>.description: MutableText get() = Text.literal(value.description ?: "")
     }
 
     @JvmRecord

@@ -26,14 +26,12 @@ class TestSkillGenerator(
                 icon = Items.IRON_INGOT.defaultStack,
                 levels = List(5) { Skill.Level() },
                 name = "Test $it",
-                description = "Things"
             ))
         }
         provider.accept(testPackId("test_many"), Skill(
             icon = Items.STRING.defaultStack,
             levels = List(30) { Skill.Level() },
             name = "Long test",
-            description = "It's very long"
         ))
     }
 
@@ -53,8 +51,7 @@ class TestSkillGenerator(
                     Skill.Level(jobs = TestJobGenerator.OTHERS.subList(3, TestJobGenerator.OTHERS.size).map { registerable[it] }),
                 ),
                 name = "Affinity",
-                description = "Unlocks potatoes & other stuff"
-            ) 
+            )
         }
 
         val COW_SKILL = depBuildEntry(testPackId("cow")) { registerable ->
@@ -66,7 +63,6 @@ class TestSkillGenerator(
                     Skill.Level(jobs = listOf(registerable[TestJobGenerator.GATHER_WHEAT]))
                 ),
                 name = "Cow Skill",
-                description = "Unlocks cows I guess"
             )
         }
 
@@ -80,7 +76,6 @@ class TestSkillGenerator(
                     Skill.Level(jobs = listOf(registerable[TestJobGenerator.STAND_ON_IRON])),
                 ),
                 name = "Grass Skill",
-                description = "Unlocks cows I guess"
             )
         }
 

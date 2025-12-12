@@ -6,7 +6,6 @@ import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.client.gui.SkillXpBar
 import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.data.Skill
-import archives.tater.rpgskills.data.Skill.Companion.description
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
@@ -28,7 +27,6 @@ class SkillWidget(
 ) : ClickableWidget(x, y, WIDTH - SkillUpgradeButton.WIDTH - 5, HEIGHT, skill.name) {
     private val skillsComponent = player[SkillsComponent]
     private val name = skill.name
-    private val description = skill.description
 
     private val level get() = skillsComponent[skill]
     private val maxLevel = skill.value.levels.size
@@ -42,7 +40,7 @@ class SkillWidget(
 
         if (hovered)
             MinecraftClient.getInstance().currentScreen?.setTooltip(listOf(
-                description.asOrderedText(),
+                TOOLTIP.text.asOrderedText(),
                 SKILL_LEVEL.text(level, maxLevel).withColor(0x00ffff).asOrderedText(),
             ))
     }
@@ -61,6 +59,7 @@ class SkillWidget(
         val TEXTURE_HIGHLIGHTED = RPGSkills.id("skill/entry_highlighted")
 
         val SKILL_LEVEL = Translation.arg("screen.widget.$MOD_ID.skill.level")
+        val TOOLTIP = Translation.unit("screen.widget.$MOD_ID.skill.tooltip")
 
         const val WIDTH = 146
         const val HEIGHT = 22

@@ -1,7 +1,10 @@
 package archives.tater.rpgskills.client.gui.widget
 
+import archives.tater.rpgskills.RPGSkills.MOD_ID
+import archives.tater.rpgskills.client.gui.widget.SkillWidget.Companion.SKILL_LEVEL
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
+import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.value
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -15,7 +18,7 @@ class SkillDisplayWidget(x: Int, y: Int, width: Int, private val skill: Registry
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         context.drawItem(skill.value.icon, x + MARGIN, y + MARGIN)
         context.drawText(textRenderer, skill.name, x + 2 * MARGIN + 16, y + MARGIN + 4, 0x404040, false)
-        SkillWidget.SKILL_LEVEL.text(level, skill.value.levels.size).let {
+        SKILL_LEVEL.text(level, skill.value.levels.size).let {
             context.drawText(textRenderer, it, x + width - 2 * MARGIN - textRenderer.getWidth(it), y + MARGIN + 4, 0x00FFFF, true)
         }
     }
@@ -29,6 +32,8 @@ class SkillDisplayWidget(x: Int, y: Int, width: Int, private val skill: Registry
     companion object {
         const val MARGIN = 2
         const val HEIGHT = MARGIN * 2 + 16
+
+        val SKILL_LEVEL = Translation.arg("screen.widget.$MOD_ID.skill_display.level")
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
     }

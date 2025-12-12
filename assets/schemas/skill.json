@@ -78,9 +78,6 @@
     }
   },
   "properties": {
-    "description": {
-      "type": "string"
-    },
     "icon": {
       "anyOf": [
         {

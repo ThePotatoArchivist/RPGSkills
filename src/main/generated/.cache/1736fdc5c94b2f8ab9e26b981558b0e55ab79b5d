@@ -1,8 +1,8 @@
-// 1.21.1	2025-12-12T01:35:23.124209997	rpgskills:test_pack/Skills
-ff5106cb8a7e119ac37eca5e48e47cc4b621a654 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test_many.json
-4ca56af39837c1b86f78731c16e848f457ac68b3 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test1.json
-552aff59cd46d5d6d5bce17985ade0dce269a6c5 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test2.json
-4d2973cb231428573b0ddcfc71bd39dbcb3a8bd0 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/potato.json
-5e8218a521a3e1f7e8ad86d548a71bbf9194c971 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test0.json
-0850d7124eefd9ae54b0a036a3c40711162d9e9b resourcepacks/test_pack/data/rpg_test/rpgskills/skill/cow.json
-f99823e522cb42488834c502a4054d218f400619 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/grass.json
+// 1.21.1	2025-12-12T03:17:46.851552657	rpgskills:test_pack/Skills
+ac9e320873a0592db94bf4d9cc96bd9812a092a3 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test1.json
+adf9accbe7b8806d757ae99e70991c8795af87af resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test_many.json
+36f91e6a7affa823edd8692eda1f30d38d9f4905 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test2.json
+bbefedf5a5b8c5e7fbbf0ec04da5510412767bf1 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/potato.json
+6b058fcfc12d8ac4f790dfb9d4ec5bd790f52f3c resourcepacks/test_pack/data/rpg_test/rpgskills/skill/test0.json
+3136468d9fa1323fd1eaedc3c217aceeae5be417 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/grass.json
+59a1616b813b59290724918b617e54d1e50d6367 resourcepacks/test_pack/data/rpg_test/rpgskills/skill/cow.json

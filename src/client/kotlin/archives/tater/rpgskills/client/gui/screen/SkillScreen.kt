@@ -82,7 +82,7 @@ class SkillScreen(
 
         SkillXpBar.draw(context, skills[skill].toFloat() / maxLevel, x + WIDTH - SkillUpgradeButton.WIDTH - 8 - 4 - SkillXpBar.WIDTH, y + 12)
 
-        SkillWidget.SKILL_LEVEL.text(skills[skill], maxLevel).let {
+        SkillDisplayWidget.SKILL_LEVEL.text(skills[skill], maxLevel).let {
             context.drawText(textRenderer, it, x + WIDTH - SkillUpgradeButton.WIDTH - 8 - 4 - SkillXpBar.WIDTH - 4 - textRenderer.getWidth(it), y + 10, 0x404040, false)
         }
     }
