@@ -11,6 +11,7 @@ import archives.tater.rpgskills.data.accept
 import archives.tater.rpgskills.data.get
 import archives.tater.rpgskills.util.*
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.advancement.AdvancementCriterion
 import net.minecraft.advancement.criterion.ConsumeItemCriterion
 import net.minecraft.advancement.criterion.Criteria
@@ -41,7 +42,10 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
+import net.minecraft.registry.tag.TagKey
 import net.minecraft.util.Identifier
+import earth.terrarium.chipped.Chipped
+import earth.terrarium.chipped.common.registry.ModBlocks as ChippedBlocks
 import net.bettercombat.api.WeaponAttributesHelper.override
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -99,15 +103,18 @@ class TestJobGenerator(
                     "craft_diorite" to Job.Task("Craft any sort of diorite", 24, AdvancementCriterion(
                         RPGSkillsCriteria.CRAFT_ITEM, ItemCraftedCriterion.Conditions(
                             item = ItemPredicate {
-                                items(
-                                    Items.DIORITE,
-                                    Items.DIORITE_SLAB,
-                                    Items.DIORITE_STAIRS,
-                                    Items.DIORITE_WALL,
-                                    Items.POLISHED_DIORITE,
-                                    Items.POLISHED_DIORITE_SLAB,
-                                    Items.POLISHED_DIORITE_STAIRS,
-                                )
+                                if (FabricLoader.getInstance().isModLoaded("chipped"))
+                                    tag(TagKey.of(RegistryKeys.ITEM, Identifier.of(Chipped.MOD_ID, "diorite")))
+                                else
+                                    items(
+                                        Items.DIORITE,
+                                        Items.DIORITE_SLAB,
+                                        Items.DIORITE_STAIRS,
+                                        Items.DIORITE_WALL,
+                                        Items.POLISHED_DIORITE,
+                                        Items.POLISHED_DIORITE_SLAB,
+                                        Items.POLISHED_DIORITE_STAIRS,
+                                    )
                             }
                         )
                     ))

@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "advancement.ItemStackMixin",
+    "advancement.chipped.WorkbenchMenuMixin",
     "attribute.BowItemMixin",
     "attribute.CrossbowItemMixin",
     "attribute.LivingEntityMixin",
