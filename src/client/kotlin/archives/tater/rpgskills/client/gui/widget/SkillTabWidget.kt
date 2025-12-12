@@ -16,7 +16,7 @@ import net.minecraft.text.Text
 class SkillTabWidget(x: Int, y: Int, private val skill: RegistryEntry<Skill>, private val index: Int, private val parent: Tabbed?) :
     ClickableWidget(x, y, WIDTH, HEIGHT, Text.empty()) {
 
-    private val tooltip = Text.literal(skill.value.description)
+    private val tooltip = Text.literal(skill.value.name)
     private val isSelectedTab get() = parent?.selectedTab == index
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
