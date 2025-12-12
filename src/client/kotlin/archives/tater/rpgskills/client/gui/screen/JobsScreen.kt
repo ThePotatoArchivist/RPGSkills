@@ -8,12 +8,17 @@ import archives.tater.rpgskills.client.gui.widget.ActiveJobWidget
 import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.client.gui.widget.AvailableJobWidget
+import archives.tater.rpgskills.client.gui.widget.ClassNavButtonWidget
+import archives.tater.rpgskills.client.gui.widget.SkillTabWidget
 import archives.tater.rpgskills.client.util.drawCenteredText
+import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.networking.CloseJobScreenPayload
 import archives.tater.rpgskills.networking.OpenJobScreenPayload
 import archives.tater.rpgskills.util.Translation
+import archives.tater.rpgskills.util.ceilDiv
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.streamEntriesOrdered
+import archives.tater.rpgskills.util.value
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.widget.ButtonWidget
@@ -21,12 +26,29 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
 import net.minecraft.text.Text
 
-class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, Text.empty()) {
+class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, Text.empty()), Tabbed, Paged {
     private var x = 0
     private var y = 0
 
+    private val skills = player.registryManager[Skill].streamEntries().toList()
+
+    override var selectedTab: Int = 0
+        set(value) {
+            field = value
+            clearAndInit()
+        }
+    override var selectedPage: Int = 0
+        set(value) {
+            field = value.mod(skills.size ceilDiv MAX_TABS)
+            clearAndInit()
+        }
+
+    private val selectedSkill get() = skills[selectedTab]
+
     private var activeCount = 0
     private var availableCount = 0
+
+    val jobs = player[JobsComponent]
 
     private val totalJobs = player.registryManager[Job].streamKeys().count()
 
@@ -42,15 +64,13 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         x = (width - WIDTH) / 2
         y = (height - HEIGHT) / 2
 
-        val jobs = player[JobsComponent]
-
         val active = jobs.active
             .map { instance -> ActiveJobWidget(instance.job, player, 168, x + 10, 0) }
         addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148, active))
         for (widget in active) addSelectableChild(widget)
 
         val availables = player.registryManager[Job].streamEntriesOrdered(RPGSkillsTags.JOB_ORDER)
-                .filter { it in jobs.available && it !in jobs }
+                .filter { it in jobs.available && it !in jobs && selectedSkill.value.levels.any { level -> it in level.jobs } }
                 .map { job -> AvailableJobWidget(job, jobs, x + 195, 0) }
                 .toList()
         addDrawableChild(AutoScrollingWidget(x + 194, y + 19, 138, 148, availables))
@@ -61,13 +81,22 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
             position(width / 2 - 100, height - 25)
         }.build())
 
+        for (i in 0..<MAX_TABS) {
+            val index = selectedPage * MAX_TABS + i
+            val skill = skills.getOrNull(index) ?: break
+            addDrawableChild(SkillTabWidget(x + 203 + (SkillTabWidget.WIDTH + 2) * i, y + HEIGHT - SkillTabWidget.HEIGHT, skill, index, this))
+        }
+
+        addDrawableChild(ClassNavButtonWidget(this, x + 203 - ClassNavButtonWidget.WIDTH - 4, y + TEXTURE_HEIGHT + 4, false))
+        addDrawableChild(ClassNavButtonWidget(this, x + 320 + 4, y + TEXTURE_HEIGHT + 4, true))
+
         availableCount = jobs.available.size
         activeCount = jobs.active.size
     }
 
     override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.renderBackground(context, mouseX, mouseY, delta)
-        context.drawTexture(TEXTURE, x, y, 0f, 0f, WIDTH, HEIGHT, 512, 256)
+        context.drawTexture(TEXTURE, x, y, 0f, 0f, WIDTH, TEXTURE_HEIGHT, 512, 256)
     }
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
@@ -90,6 +119,9 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         val TEXTURE = RPGSkills.id("textures/gui/jobs.png")
 
         const val WIDTH = 341
-        const val HEIGHT = 176
+        const val TEXTURE_HEIGHT = 176
+        const val HEIGHT = 204
+
+        const val MAX_TABS = 4
     }
 }
