@@ -31,7 +31,7 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
     private var x = 0
     private var y = 0
 
-    private val skills = player.registryManager[Skill].streamEntries()
+    private val skills = player.registryManager[Skill].streamEntriesOrdered(RPGSkillsTags.SKILL_ORDER)
         .filter { skill -> skill.value.levels.sumOf { it.jobs.size } > 0 }
         .toList()
 
