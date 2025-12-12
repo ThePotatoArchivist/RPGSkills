@@ -9,6 +9,7 @@ import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.client.gui.widget.AvailableJobWidget
 import archives.tater.rpgskills.client.gui.widget.ClassNavButtonWidget
+import archives.tater.rpgskills.client.gui.widget.LockedAvailableJobWidget
 import archives.tater.rpgskills.client.gui.widget.SkillTabWidget
 import archives.tater.rpgskills.client.util.drawCenteredText
 import archives.tater.rpgskills.data.Skill
@@ -30,7 +31,9 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
     private var x = 0
     private var y = 0
 
-    private val skills = player.registryManager[Skill].streamEntries().toList()
+    private val skills = player.registryManager[Skill].streamEntries()
+        .filter { skill -> skill.value.levels.sumOf { it.jobs.size } > 0 }
+        .toList()
 
     override var selectedTab: Int = 0
         set(value) {
@@ -70,8 +73,14 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
         for (widget in active) addSelectableChild(widget)
 
         val availables = player.registryManager[Job].streamEntriesOrdered(RPGSkillsTags.JOB_ORDER)
-                .filter { it in jobs.available && it !in jobs && selectedSkill.value.levels.any { level -> it in level.jobs } }
-                .map { job -> AvailableJobWidget(job, jobs, x + 195, 0) }
+                .filter { it !in jobs && it in selectedSkill.value }
+                .sorted(compareBy { if (it in jobs.available) 0 else 1 })
+                .map { job ->
+                    if (job in jobs.available)
+                        AvailableJobWidget(job, jobs, x + 195, 0)
+                    else
+                        LockedAvailableJobWidget(x + 195, 0)
+                }
                 .toList()
         addDrawableChild(AutoScrollingWidget(x + 194, y + 19, 138, 148, availables))
         for (button in availables) addSelectableChild(button)
@@ -87,8 +96,10 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
             addDrawableChild(SkillTabWidget(x + 203 + (SkillTabWidget.WIDTH + 2) * i, y + HEIGHT - SkillTabWidget.HEIGHT, skill, index, this))
         }
 
-        addDrawableChild(ClassNavButtonWidget(this, x + 203 - ClassNavButtonWidget.WIDTH - 4, y + TEXTURE_HEIGHT + 4, false))
-        addDrawableChild(ClassNavButtonWidget(this, x + 320 + 4, y + TEXTURE_HEIGHT + 4, true))
+        if (skills.size > MAX_TABS) {
+            addDrawableChild(ClassNavButtonWidget(this, x + 203 - ClassNavButtonWidget.WIDTH - 4, y + TEXTURE_HEIGHT + 4, false))
+            addDrawableChild(ClassNavButtonWidget(this, x + 320 + 4, y + TEXTURE_HEIGHT + 4, true))
+        }
 
         availableCount = jobs.available.size
         activeCount = jobs.active.size
@@ -101,13 +112,16 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         val jobs = player[JobsComponent]
+        val availableSkillJobs = jobs.available.filter { it in selectedSkill.value }
 
         if (activeCount != jobs.active.size || availableCount != jobs.available.size)
             clearAndInit()
 
         super.render(context, mouseX, mouseY, delta)
         context.drawCenteredText(textRenderer, ACTIVE.text(jobs.active.size, JobsComponent.MAX_JOBS), x + 97, y + 7, 0x404040)
-        context.drawCenteredText(textRenderer, AVAILABLE.text(jobs.available.size, totalJobs), x + 262, y + 7, 0x404040)
+        context.drawCenteredText(textRenderer, AVAILABLE.text(availableSkillJobs.size, selectedSkill.value.levels.sumOf { it.jobs.size }), x + 262, y + 7, 0x404040)
+
+        context.drawCenteredText(textRenderer, NO_JOBS.text, x + 98, y + 89, 0x606060)
     }
 
     override fun shouldPause(): Boolean = false // TODO remove, for testing only
@@ -115,6 +129,7 @@ class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player
     companion object {
         val ACTIVE = Translation.arg("screen.$MOD_ID.jobs.active")
         val AVAILABLE = Translation.arg("screen.$MOD_ID.jobs.available")
+        val NO_JOBS = Translation.unit("screen.$MOD_ID.jobs.no_jobs")
 
         val TEXTURE = RPGSkills.id("textures/gui/jobs.png")
 

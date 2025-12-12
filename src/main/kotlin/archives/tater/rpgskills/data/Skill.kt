@@ -34,6 +34,8 @@ data class Skill(
         description: Optional<String>,
     ) : this(icon, levels, name, description.getOrNull())
 
+    operator fun contains(job: RegistryEntry<Job>) = levels.any { job in it.jobs }
+
     companion object : RegistryKeyHolder<Registry<Skill>> {
         val CODEC: Codec<Skill> = RecordCodecBuilder.create {
             it.group(

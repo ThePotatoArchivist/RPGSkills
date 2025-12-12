@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.cca.JobsComponent
 import archives.tater.rpgskills.client.util.getMousePosScrolled
 import archives.tater.rpgskills.data.Job
@@ -22,9 +23,12 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
 class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: JobsComponent, x: Int, y: Int) :
-    ClickableWidget(x, y, WIDTH, HEIGHT, Text.empty()), AbstractJobWidget {
+    AbstractAvailableJobWidget(x, y) {
 
     private val canAdd get() = !jobs.isFull
+
+    override val isHighlighted: Boolean get() = isHovered && canAdd
+    override val isDisabled: Boolean get() = false
 
     override fun renderWidget(
         context: DrawContext,
@@ -35,7 +39,7 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
         val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
         hovered = context.scissorContains(mouseX, mouseY) && tMouseX in x..<(x + width) && tMouseY in y..<(y + height)
 
-        context.drawGuiTexture(TEXTURE[true, isHovered && canAdd], x, y, width, height)
+        super.renderWidget(context, mouseX, mouseY, delta)
         context.drawText(textRenderer, job.value.name, x + MARGIN, y + MARGIN + 1, 0x404040, false)
         jobs.cooldowns[job]?.let { cooldown ->
             drawCooldown(context, textRenderer, cooldown, MARGIN)
@@ -52,10 +56,6 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
         }
     }
 
-    override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
-
-    }
-
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean =
         hovered && super.mouseClicked(mouseX, mouseY, button)
 
@@ -67,16 +67,13 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
     }
 
     companion object {
-        const val WIDTH = 128
-        const val HEIGHT = 18
-        const val MARGIN = 4
 
         val TEXTURE = ButtonTextures(
             RPGSkills.id("skill/job_option"),
             RPGSkills.id("skill/job_option_highlighted"),
         )
 
-        val TOOLTIP_HINT = Translation.unit("screen.widget.rpgskills.available_job.tooltip_hint") {
+        val TOOLTIP_HINT = Translation.unit("screen.widget.$MOD_ID.available_job.tooltip_hint") {
             formatted(Formatting.GRAY)
         }
 

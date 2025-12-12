@@ -8,7 +8,12 @@
           "amount": 0.1,
           "operation": "add_multiplied_base"
         }
-      }
+      },
+      "jobs": [
+        "rpg_test:other_1",
+        "rpg_test:other_2",
+        "rpg_test:other_3"
+      ]
     },
     "2": {
       "attributes": {
@@ -23,9 +28,6 @@
     },
     "3": {
       "jobs": [
-        "rpg_test:other_1",
-        "rpg_test:other_2",
-        "rpg_test:other_3",
         "rpg_test:other_4",
         "rpg_test:other_5",
         "rpg_test:other_6",

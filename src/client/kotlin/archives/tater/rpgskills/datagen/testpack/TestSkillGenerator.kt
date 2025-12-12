@@ -46,11 +46,11 @@ class TestSkillGenerator(
                 levels = listOf(
                     Skill.Level(mapOf(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
-                    )),
+                    ), TestJobGenerator.OTHERS.subList(0, 3).map { registerable[it] }),
                     Skill.Level(mapOf(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
                     ), listOf(registerable[TestJobGenerator.PLACE_STONE])),
-                    Skill.Level(jobs = TestJobGenerator.OTHERS.map { registerable[it] }),
+                    Skill.Level(jobs = TestJobGenerator.OTHERS.subList(3, TestJobGenerator.OTHERS.size).map { registerable[it] }),
                 ),
                 name = "Affinity",
                 description = "Unlocks potatoes & other stuff"
