@@ -27,16 +27,6 @@ public abstract class InGameHudMixin {
 	@Shadow protected abstract boolean shouldRenderExperience();
 
 	@SuppressWarnings("DataFlowIssue") // client.player is definitely not null here
-	@WrapOperation(
-			method = "renderHeldItemTooltip",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
-	)
-	private Text init(ItemStack instance, Operation<Text> original) {
-        var lockGroup = LockGroup.findLocked(client.player, instance);
-		return lockGroup == null ? original.call(instance) : lockGroup.itemNameText();
-	}
-
-	@SuppressWarnings("DataFlowIssue") // client.player is definitely not null here
 	@Inject(
 			method = "renderExperienceBar",
 			at = @At("HEAD"),

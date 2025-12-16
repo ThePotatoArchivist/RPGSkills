@@ -30,7 +30,6 @@ import kotlin.jvm.optionals.getOrNull
 @JvmRecord
 data class LockGroup(
     val requirements: List<Map<RegistryEntry<Skill>, Int>>,
-    val itemName: String? = null,
     val items: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
     val blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
     val entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
@@ -39,23 +38,12 @@ data class LockGroup(
 ) {
     constructor(
         requirements: Map<RegistryEntry<Skill>, Int>,
-        itemName: String? = null,
         items: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
         blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
         entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
         enchantments: LockList<RegistryIngredient.Composite<Enchantment>> = LockList.empty(),
         recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
-    ) : this(listOf(requirements), itemName, items, blocks, entities, enchantments, recipes)
-
-    private constructor(
-        requirements: List<Map<RegistryEntry<Skill>, Int>>,
-        itemName: Optional<String>,
-        items: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
-        blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
-        entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
-        enchantments: LockList<RegistryIngredient.Composite<Enchantment>> = LockList.empty(),
-        recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
-    ) : this(requirements, itemName.getOrNull(), items, blocks, entities, enchantments, recipes)
+    ) : this(listOf(requirements), items, blocks, entities, enchantments, recipes)
 
     fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.any {
         it.all { (skill, level) ->
@@ -65,7 +53,6 @@ data class LockGroup(
 
     fun isSatisfiedBy(player: PlayerEntity): Boolean = isSatisfiedBy(player[SkillsComponent].skills)
 
-    fun itemNameText() = itemName?.let(Text::literal) ?: DEFAULT_ITEM_NAME.text()
     fun itemMessage() = items.message?.let(Text::literal) ?: DEFAULT_ITEM_MESSAGE.text()
     fun blockMessage() = blocks.message?.let(Text::literal) ?: DEFAULT_BLOCK_MESSAGE.text()
     fun entityMessage() = entities.message?.let(Text::literal) ?: DEFAULT_ENTITY_MESSAGE.text()
@@ -102,7 +89,6 @@ data class LockGroup(
 
         val CODEC: Codec<LockGroup> = RecordCodecBuilder.create { it.group(
             Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList().fieldOf("requirements").forGetter(LockGroup::requirements),
-            Codec.STRING.optionalFieldOf("item_name").forGetter(LockGroup::itemName),
             LockList.createCodec(RegistryKeys.ITEM).optionalFieldOf("items", LockList.empty()).forGetter(LockGroup::items),
             LockList.createCodec(RegistryKeys.BLOCK).optionalFieldOf("blocks", LockList.empty()).forGetter(LockGroup::blocks),
             LockList.createCodec(RegistryKeys.ENTITY_TYPE).optionalFieldOf("entities", LockList.empty()).forGetter(LockGroup::entities),

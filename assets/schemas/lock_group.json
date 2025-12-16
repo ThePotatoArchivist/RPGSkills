@@ -53,9 +53,6 @@
     "entities": {
       "$ref": "#/definitions/LockList"
     },
-    "item_name": {
-      "type": "string"
-    },
     "items": {
       "$ref": "#/definitions/LockList"
     },

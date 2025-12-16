@@ -11,16 +11,15 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.SpawnEggItem
-import net.minecraft.recipe.RecipeManager
 import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import kotlin.jvm.optionals.getOrNull
 
-class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registryLookup: WrapperLookup?, recipeManager: RecipeManager?) :
+class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
 
     private val requireText: List<Text> = mutableListOf<Text>().also { ItemLockTooltip.appendRequirements(lockGroup, it, tooltip = false) }
@@ -80,7 +79,10 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, registry
             currentY += getHeight(columns, stacks)
         }
         if (tooltipStack != null) MinecraftClient.getInstance().currentScreen?.run {
-            setTooltip(tooltipStack.name)
+            setTooltip(
+                HandledScreen.getTooltipFromItem(MinecraftClient.getInstance(), tooltipStack)
+                    .map { it.asOrderedText() },
+            )
         }
     }
 

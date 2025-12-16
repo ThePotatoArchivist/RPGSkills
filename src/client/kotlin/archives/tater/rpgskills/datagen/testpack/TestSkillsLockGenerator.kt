@@ -26,7 +26,6 @@ class TestSkillsLockGenerator(
             requirements = mapOf(
                 TestSkillGenerator.POTATO_SKILL.entry to 1
             ),
-            itemName = "Unknown Potato",
             items = LockList(
                 RegistryIngredient.ofItems {
                     +Items.POTATO
@@ -51,7 +50,6 @@ class TestSkillsLockGenerator(
                 TestSkillGenerator.POTATO_SKILL.entry to 2,
                 TestSkillGenerator.COW_SKILL.entry to 2,
             ),
-            itemName = "Unknown Fork",
             items = LockList(
                 RegistryIngredient.ofItems {
                     +Items.TRIDENT
@@ -87,7 +85,6 @@ class TestSkillsLockGenerator(
                     TestSkillGenerator.GRASS_SKILL.entry to 2
                 ),
             ),
-            itemName = "Unknown Button",
             items = LockList(
                 RegistryIngredient.ofItems {
                     +ItemTags.BUTTONS

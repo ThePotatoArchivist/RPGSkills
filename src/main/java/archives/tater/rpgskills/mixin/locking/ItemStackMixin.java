@@ -16,17 +16,6 @@ import java.util.function.Consumer;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
-    @ModifyExpressionValue(
-            method = "getTooltip",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getName()Lnet/minecraft/text/Text;")
-    )
-    private Text modifyName(Text original, @Local(argsOnly = true) @Nullable PlayerEntity player) {
-        if (player == null) return original;
-        var lockGroup = LockGroup.findLocked(player, (ItemStack) (Object) this);
-        if (lockGroup == null) return original;
-        return lockGroup.itemNameText();
-    }
-
     @SuppressWarnings("ConstantValue")
     @Inject(
             method = "appendAttributeModifiersTooltip",
