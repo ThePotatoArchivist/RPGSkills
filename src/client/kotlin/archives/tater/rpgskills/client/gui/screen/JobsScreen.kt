@@ -22,12 +22,14 @@ import archives.tater.rpgskills.util.streamEntriesOrdered
 import archives.tater.rpgskills.util.value
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
 import net.minecraft.text.Text
+import javax.swing.Spring.height
 
-class JobsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, Text.empty()), Tabbed, Paged {
+class JobsScreen(private val player: PlayerEntity) : Screen(Text.empty()), Tabbed, Paged {
     private var x = 0
     private var y = 0
 

@@ -17,11 +17,15 @@ import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.streamEntriesOrdered
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.screen.ScreenTexts
+import com.teamresourceful.resourcefullib.client.utils.ScreenUtils.setTooltip
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle
+import javax.swing.Spring.height
 
-class SkillsScreen(private val player: PlayerEntity) : AbstractSkillsScreen(player, TITLE.text) {
+class SkillsScreen(private val player: PlayerEntity) : Screen(TITLE.text) {
     private var x = 0
     private var y = 0
 
