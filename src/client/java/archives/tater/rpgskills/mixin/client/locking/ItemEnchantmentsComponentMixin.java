@@ -30,6 +30,6 @@ public class ItemEnchantmentsComponentMixin {
         if (player == null) return;
         var lockGroup = LockGroup.findLocked(player, enchantment);
         if (lockGroup == null) return;
-        ItemLockTooltip.appendRequirements(lockGroup, instance);
+        ItemLockTooltip.appendRequirements(lockGroup, player, instance);
     }
 }

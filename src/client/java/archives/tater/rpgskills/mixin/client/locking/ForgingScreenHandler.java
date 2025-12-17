@@ -4,6 +4,7 @@ import archives.tater.rpgskills.client.render.CrossedArrowRenderer;
 import archives.tater.rpgskills.data.LockGroup;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -12,14 +13,28 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.ForgingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 @Mixin(ForgingScreen.class)
 public abstract class ForgingScreenHandler<T extends ScreenHandler> extends HandledScreen<T> {
+    @Unique
+    private PlayerEntity player;
+
     public ForgingScreenHandler(T handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+    }
+
+    @Inject(
+            method = "<init>",
+            at = @At("TAIL")
+    )
+    private void savePlayer(net.minecraft.screen.ForgingScreenHandler handler, PlayerInventory playerInventory, Text title, Identifier texture, CallbackInfo ci) {
+        player = playerInventory.player;
     }
 
     @Inject(
@@ -36,7 +51,8 @@ public abstract class ForgingScreenHandler<T extends ScreenHandler> extends Hand
                 21,
                 mouseX,
                 mouseY,
-                LockGroup::enchantmentMessage
+                LockGroup::enchantmentMessage,
+                player
         );
     }
 }

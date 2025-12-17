@@ -8,6 +8,7 @@ import archives.tater.rpgskills.mixin.client.locking.HandledScreenAccessor
 import archives.tater.rpgskills.mixin.client.locking.ScreenAccessor
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.text.Text
 
 object CrossedArrowRenderer {
@@ -19,7 +20,7 @@ object CrossedArrowRenderer {
     private const val SMALL_HEIGHT = 18
 
     @JvmStatic
-    fun render(context: DrawContext, screen: HandledScreen<*>, x: Int, y: Int, mouseX: Int, mouseY: Int, message: (LockGroup) -> Text, small: Boolean = false) {
+    fun render(context: DrawContext, screen: HandledScreen<*>, x: Int, y: Int, mouseX: Int, mouseY: Int, message: (LockGroup) -> Text, player: PlayerEntity, small: Boolean = false) {
         if (RPGSkillsClient.uiActionLockGroup == null) return
 
         if (small)
@@ -27,7 +28,7 @@ object CrossedArrowRenderer {
         else
             context.drawGuiTexture(TEXTURE_LARGE, x, y, LARGE_WIDTH, LARGE_HEIGHT)
 
-        renderTooltip(context, screen, x, y, if (small) LARGE_WIDTH else SMALL_WIDTH, if (small) LARGE_HEIGHT else SMALL_HEIGHT, mouseX, mouseY, message)
+        renderTooltip(context, screen, x, y, if (small) LARGE_WIDTH else SMALL_WIDTH, if (small) LARGE_HEIGHT else SMALL_HEIGHT, mouseX, mouseY, message, player)
     }
 
     @JvmStatic
@@ -41,6 +42,7 @@ object CrossedArrowRenderer {
         mouseX: Int,
         mouseY: Int,
         message: (LockGroup) -> Text,
+        player: PlayerEntity,
     ) {
         val blockedGroup = RPGSkillsClient.uiActionLockGroup ?: return
 
@@ -54,7 +56,7 @@ object CrossedArrowRenderer {
             mutableListOf(
                 message(blockedGroup)
             ).also {
-                ItemLockTooltip.appendRequirements(blockedGroup, it)
+                ItemLockTooltip.appendRequirements(blockedGroup, player, it)
             },
             mouseX,
             mouseY

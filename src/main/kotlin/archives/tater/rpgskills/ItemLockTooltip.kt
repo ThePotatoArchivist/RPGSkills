@@ -1,8 +1,11 @@
 package archives.tater.rpgskills
 
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
+import archives.tater.rpgskills.util.get
+import com.mojang.authlib.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
@@ -16,11 +19,17 @@ object ItemLockTooltip {
 
     @JvmStatic
     @JvmOverloads
-    fun appendRequirements(lockGroup: LockGroup, text: Consumer<Text>, tooltip: Boolean = true) {
-        text.accept(
-            (if (lockGroup.requirements.size == 1) REQUIRES.text() else REQUIRES_ANY.text())
-                    .formatted(if (tooltip) Formatting.RED else Formatting.BLACK)
-        )
+    fun appendRequirements(lockGroup: LockGroup, player: PlayerEntity, text: Consumer<Text>, tooltip: Boolean = true) {
+
+        val skills = player[SkillsComponent]
+
+        text.accept((if (lockGroup.requirements.size == 1) REQUIRES.text() else REQUIRES_ANY.text()).apply {
+            formatted(when {
+                !tooltip -> Formatting.BLACK
+                lockGroup.isSatisfiedBy(player) -> Formatting.WHITE
+                else -> Formatting.RED
+            })
+        })
 
         for (requirement in lockGroup.requirements) {
             text.accept(REQUIREMENT.text(Text.empty().apply {
@@ -28,20 +37,26 @@ object ItemLockTooltip {
                     if (index != 0)
                         append(Text.literal(" + ").formatted(Formatting.DARK_GRAY))
                     append(skill.name.apply { if (tooltip) formatted(Formatting.WHITE) })
-                    append(Text.literal(" $level").formatted(if (tooltip) Formatting.GRAY else Formatting.DARK_AQUA))
+                    append(Text.literal(" $level").formatted(
+                        when {
+                            skills[skill] < level -> Formatting.RED
+                            tooltip -> Formatting.AQUA
+                            else -> Formatting.BLUE
+                        }
+                    ))
                 }
             }))
         }
     }
 
-    fun appendRequirements(lockGroup: LockGroup, text: MutableList<Text>, tooltip: Boolean = true) {
-        appendRequirements(lockGroup, text::add, tooltip)
+    fun appendRequirements(lockGroup: LockGroup, player: PlayerEntity, text: MutableList<Text>, tooltip: Boolean = true) {
+        appendRequirements(lockGroup, player, text::add, tooltip)
     }
 
     @JvmStatic
     fun appendTooltip(stack: ItemStack, player: PlayerEntity?, tooltip: MutableList<Text>) {
-        val lockGroup = LockGroup.findLocked(player ?: return, stack) ?: return
+        val lockGroup = LockGroup.findLocked(player ?: return, stack) ?: return // TODO Show tooltip when unlocked
 
-        appendRequirements(lockGroup, tooltip)
+        appendRequirements(lockGroup, player, tooltip)
     }
 }

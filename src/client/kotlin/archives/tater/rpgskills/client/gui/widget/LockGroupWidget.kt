@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
@@ -19,10 +20,10 @@ import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
-class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup) :
+class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
 
-    private val requireText: List<Text> = mutableListOf<Text>().also { ItemLockTooltip.appendRequirements(lockGroup, it, tooltip = false) }
+    private val requireText: List<Text> = mutableListOf<Text>().also { ItemLockTooltip.appendRequirements(lockGroup, player, it, tooltip = false) }
     private val requireTextHeight = textRenderer.fontHeight * requireText.size + GAP
 
     private val columns = (width - 2 * MARGIN) / SLOT_SIZE
