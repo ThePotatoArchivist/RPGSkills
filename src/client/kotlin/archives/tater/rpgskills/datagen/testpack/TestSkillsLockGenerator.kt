@@ -55,6 +55,8 @@ class TestSkillsLockGenerator(
                     +Items.TRIDENT
                     +Items.DIAMOND_HELMET
                     +Items.COD
+                    +Items.CHEST_MINECART
+                    +Items.ARMOR_STAND
                 },
                 "You don't know how to eat with this fork",
             ),

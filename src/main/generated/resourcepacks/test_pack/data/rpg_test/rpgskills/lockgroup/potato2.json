@@ -15,7 +15,9 @@
     "entries": [
       "minecraft:trident",
       "minecraft:diamond_helmet",
-      "minecraft:cod"
+      "minecraft:cod",
+      "minecraft:chest_minecart",
+      "minecraft:armor_stand"
     ],
     "message": "You don't know how to eat with this fork"
   },

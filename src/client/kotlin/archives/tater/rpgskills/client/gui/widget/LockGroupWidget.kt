@@ -15,6 +15,7 @@ import net.minecraft.component.DataComponentTypes
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.BlockItem
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.SpawnEggItem
@@ -36,14 +37,14 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
 
     private val canUse = buildList {
         for (item in lockGroup.items.entries.matchingValues)
-            if ((item !is BlockItem && !ENTITY_ITEMS.containsValue(item.defaultStack)) || item.defaultStack.useAction != UseAction.NONE)
+            if (!item.isPlaced() || item.defaultStack.useAction != UseAction.NONE)
                 add(item.defaultStack)
         for (block in lockGroup.blocks.entries.matchingValues)
             add(itemOf(block))
         for (entity in lockGroup.entities.entries.matchingValues)
             add(itemOf(entity))
     }
-    private val canPlace = lockGroup.items.entries.matchingValues.mapNotNull { (it as? BlockItem)?.defaultStack }
+    private val canPlace = lockGroup.items.entries.matchingValues.mapNotNull { if (it.isPlaced()) it.defaultStack else null }
     private val enchantments = lockGroup.enchantments.entries.matchingEntries.map { enchantment ->
         Items.ENCHANTED_BOOK.defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = enchantment.value.description }
     }
@@ -109,25 +110,18 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
 
         private val ENTITY_ITEMS by lazy {
-            Registries.ENTITY_TYPE.streamEntries().associateToMap {
+            Registries.ENTITY_TYPE.streamEntries().associateNotNullToMap<_, EntityType<*>, Item> {
                 it.value to
-                        (SpawnEggItem.forEntity(it.value)?.defaultStack
-                            ?: Registries.ITEM.getOrEmpty(it.registryKey().value).getOrNull()?.defaultStack
-                            ?: Items.BARRIER.defaultStack.apply {
-                                set(DataComponentTypes.RARITY, Rarity.COMMON)
-                            }
-                                ).apply {
-                                set(DataComponentTypes.ITEM_NAME, it.value.name)
-                            }
+                (SpawnEggItem.forEntity(it.value)
+                    ?: Registries.ITEM.getOrEmpty(it.registryKey().value).getOrNull())
             }
         }
 
-        fun itemOf(block: Block): ItemStack = when (val item = block.asItem()) {
-            Items.AIR -> Items.BARRIER.defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = block.name }
-            else -> item.defaultStack
-        }
+        fun Item.isPlaced() = this is BlockItem || ENTITY_ITEMS.containsValue(this)
 
-        fun itemOf(entity: EntityType<*>): ItemStack = ENTITY_ITEMS[entity]!!
+        fun itemOf(block: Block): ItemStack = (block.asItem().takeUnless { it == Items.AIR } ?: Items.BARRIER).defaultStack
+
+        fun itemOf(entity: EntityType<*>): ItemStack = (ENTITY_ITEMS[entity] ?: Items.BARRIER).defaultStack
     }
 
     object Texts {

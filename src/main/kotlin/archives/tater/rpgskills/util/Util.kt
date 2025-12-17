@@ -294,6 +294,7 @@ fun <A, B, E> Codec<A>.registryXmap(
 
 fun ItemPredicate(init: ItemPredicate.Builder.() -> Unit): ItemPredicate = ItemPredicate.Builder.create().apply(init).build()
 
-fun <T, K, V> Stream<T>.associateToMap(transform: (T) -> Pair<K, V>): Map<K, V> = this
+fun <T, K: Any, V: Any> Stream<T>.associateNotNullToMap(transform: (T) -> Pair<K?, V?>?): Map<K, V> = this
     .map { transform(it) }
-    .collect(Collectors.toMap(Pair<K, V>::first, Pair<K, V>::second))
+    .filter { it != null && it.first != null && it.second != null }
+    .collect(Collectors.toMap({ it!!.first!! }, { it!!.second!! }))
