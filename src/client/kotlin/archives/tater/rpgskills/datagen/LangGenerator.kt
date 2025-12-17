@@ -7,6 +7,7 @@ import archives.tater.rpgskills.RPGSkillsCommands
 import archives.tater.rpgskills.cca.BossTrackerComponent
 import archives.tater.rpgskills.client.gui.JobCompletedToast
 import archives.tater.rpgskills.client.gui.screen.ClassScreen
+import archives.tater.rpgskills.client.gui.screen.ConfirmScreen
 import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
@@ -48,9 +49,13 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(SkillsScreen.LEVEL_CAP_HINT, "Defeat great enemies to increase the level cap!")
             add(SkillTabWidget.TOOLTIP, "Level %s")
             add(ClassScreen.SELECT, "Select Class")
+            add(ClassScreen.CHOICE, "Really choose %s class?")
+            add(ClassScreen.WARNING, "This choice is permanent!")
             add(JobsScreen.ACTIVE, "Active Jobs %s/%s")
             add(JobsScreen.AVAILABLE, "Available Jobs %s/%s")
             add(JobsScreen.NO_JOBS, "No Jobs Assigned")
+            add(ConfirmScreen.OK, "Ok")
+            add(ConfirmScreen.CANCEL, "Cancel")
             add(ActiveJobWidget.INCOMPLETE_TASK, "\u2610")
             add(ActiveJobWidget.COMPLETE_TASK, "\u2611")
             add(ActiveJobWidget.TASK_PROGRESS, "%s/%s")

@@ -61,8 +61,13 @@ class ClassScreen(
         addDrawableChild(ClassNavButtonWidget(this, x - ClassNavButtonWidget.WIDTH - BUTTON_GAP, y + HEIGHT / 2 - ClassNavButtonWidget.HEIGHT / 2, false))
         addDrawableChild(ClassNavButtonWidget(this, x + WIDTH + BUTTON_GAP, y + HEIGHT / 2 - ClassNavButtonWidget.HEIGHT / 2, true))
         addDrawableChild(ButtonWidget.builder(SELECT.text) {
-            ClientPlayNetworking.send(ClassChoicePayload(selectedClass))
-            close()
+            client?.setScreen(ConfirmScreen(listOf(
+                CHOICE.text(selectedClass.value.name),
+                WARNING.text,
+            ), this) {
+                ClientPlayNetworking.send(ClassChoicePayload(selectedClass))
+                close()
+            })
         }.position(x, y + HEIGHT + BUTTON_GAP).width(WIDTH).build())
     }
 
@@ -95,5 +100,7 @@ class ClassScreen(
         const val BUTTON_GAP = 8
 
         val SELECT = Translation.unit("screen.rpgskills.class.select")
+        val CHOICE = Translation.arg("screen.rpgskills.class.class_choice")
+        val WARNING = Translation.unit("screen.rpgskills.class.warning")
     }
 }
