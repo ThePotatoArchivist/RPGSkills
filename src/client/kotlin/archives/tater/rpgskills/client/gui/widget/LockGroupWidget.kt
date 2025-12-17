@@ -1,10 +1,12 @@
 package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.ItemLockTooltip
-import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.client.gui.widget.LockGroupWidget.Texts.itemOf
 import archives.tater.rpgskills.client.util.getMousePosScrolled
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.util.*
+import net.minecraft.advancement.criterion.ConsumeItemCriterion.Conditions.item
+import net.minecraft.block.Block
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
@@ -12,11 +14,10 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.Item
+import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.SpawnEggItem
-import net.minecraft.registry.RegistryWrapper.WrapperLookup
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
@@ -28,22 +29,24 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
 
     private val columns = (width - 2 * MARGIN) / SLOT_SIZE
 
-    private val items = lockGroup.items.entries.matchingValues.map { it.defaultStack }
-    private val blocks = lockGroup.blocks.entries.matchingValues.map { block -> block.asItem().let {
-        if (it == Items.AIR) Items.BARRIER.defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = block.name } else it.defaultStack
-    } }
-    private val entities = lockGroup.entities.entries.matchingValues.map { entity ->
-        (SpawnEggItem.forEntity(entity) ?: Items.BARRIER).defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = entity.name }
+    private val canUse = buildList {
+        for (item in lockGroup.items.entries.matchingValues)
+            if (item !is BlockItem)
+                add(item.defaultStack)
+        for (block in lockGroup.blocks.entries.matchingValues)
+            add(itemOf(block))
+        for (entity in lockGroup.entities.entries.matchingValues)
+            add((SpawnEggItem.forEntity(entity) ?: Items.BARRIER).defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = entity.name })
     }
+    private val canPlace = lockGroup.items.entries.matchingValues.mapNotNull { (it as? BlockItem)?.defaultStack }
     private val enchantments = lockGroup.enchantments.entries.matchingEntries.map { enchantment ->
         Items.ENCHANTED_BOOK.defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = enchantment.value.description }
     }
     private val recipes = lockGroup.recipes.entries.matchingValues.map { it.defaultStack }
 
     private val groups = mapOf(
-        Texts.ITEMS to items,
-        Texts.BLOCKS to blocks,
-        Texts.ENTITIES to entities,
+        Texts.CAN_USE to canUse,
+        Texts.CAN_PLACE to canPlace,
         Texts.ENCHANTMENTS to enchantments,
         Texts.RECIPES to recipes,
     )
@@ -79,10 +82,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
             currentY += getHeight(columns, stacks)
         }
         if (tooltipStack != null) MinecraftClient.getInstance().currentScreen?.run {
-            setTooltip(
-                HandledScreen.getTooltipFromItem(MinecraftClient.getInstance(), tooltipStack)
-                    .map { it.asOrderedText() },
-            )
+            setTooltip(tooltipStack.name)
         }
     }
 
@@ -107,10 +107,14 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
     object Texts {
         private fun of(name: String) = Translation.unit("screen.widget.rpgskills.lockgroup.$name")
 
-        val ITEMS = of("items")
-        val BLOCKS = of("blocks")
-        val ENTITIES = of("entities")
+        val CAN_USE = of("can_use")
+        val CAN_PLACE = of("can_place")
         val ENCHANTMENTS = of("enchantments")
         val RECIPES = of("recipes")
+
+        fun itemOf(block: Block): ItemStack = when (val item = block.asItem()) {
+            Items.AIR -> Items.BARRIER.defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = block.name }
+            else -> item.defaultStack
+        }
     }
 }
