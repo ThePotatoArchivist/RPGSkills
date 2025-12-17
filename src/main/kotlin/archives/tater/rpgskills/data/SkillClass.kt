@@ -26,6 +26,8 @@ data class SkillClass(
         startingLevels: Map<RegistryEntry<Skill>, Int>,
     ) : this(name, icon.defaultStack, description, startingLevels)
 
+    val startingLevel get() = startingLevels.values.sum()
+
     companion object : RegistryKeyHolder<Registry<SkillClass>> {
         override val key: RegistryKey<Registry<SkillClass>> = RegistryKey.ofRegistry(RPGSkills.id("class"))
 
