@@ -28,7 +28,6 @@ class JobUnlockWidget(x: Int, y: Int, width: Int, private val job: RegistryEntry
     }
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
         text.forEachIndexed { index, text ->
             context.drawText(textRenderer, text, x + MARGIN, y + MARGIN + index * textRenderer.fontHeight, 0x404040, false)
         }
@@ -43,8 +42,6 @@ class JobUnlockWidget(x: Int, y: Int, width: Int, private val job: RegistryEntry
         val TITLE = Translation.arg("screen.widget.rpgskills.job_unlock.title") {
             formatted(Formatting.BLACK)
         }
-
-        val BACKGROUND_TEXTURE = RPGSkills.id("border9")
 
         const val MARGIN = 6
 

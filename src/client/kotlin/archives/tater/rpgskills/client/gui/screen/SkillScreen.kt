@@ -43,7 +43,7 @@ class SkillScreen(
                 val levelAmount = index + 1
                 var hasContent = false
 
-                add(TextWidget(x + 10, 0, 224, textRenderer.fontHeight + 8, LEVEL.text(levelAmount), textRenderer))
+                add(LevelTitleWidget(x + 10, 0, 224, LEVEL.text(levelAmount)))
 
                 level.attributes.takeIf { it.isNotEmpty() }?.let {
                     add(AttributesWidget(x + 10, 0, 224, it))

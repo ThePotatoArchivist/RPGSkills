@@ -35,7 +35,6 @@ class AttributesWidget(x: Int, y: Int, width: Int, attributes: Map<RegistryEntry
     }
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
-        context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
         context.drawText(textRenderer, TITLE.text, x + MARGIN, y + MARGIN, 0x404040, false)
         text.forEachIndexed { index, text ->
             context.drawText(textRenderer, text, x + MARGIN, y + MARGIN + (index + 1) * textRenderer.fontHeight, 0x404040, false)
@@ -48,8 +47,6 @@ class AttributesWidget(x: Int, y: Int, width: Int, attributes: Map<RegistryEntry
 
     companion object {
         val TITLE = Translation.unit("screen.widget.rpgskills.attributes.title")
-
-        val BACKGROUND_TEXTURE = RPGSkills.id("border9")
 
         const val MARGIN = 6
 

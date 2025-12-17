@@ -55,7 +55,6 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
 
-        context.drawGuiTexture(BACKGROUND_TEXTURE, x, y, width, height)
         requireText.forEachIndexed { index, line ->
             context.drawText(textRenderer, line, x + MARGIN, y + MARGIN + index * textRenderer.fontHeight, 0x404040, false)
         }
@@ -97,8 +96,6 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
             if (stacks.isEmpty()) 0 else textRenderer.fontHeight + GAP + (stacks.size ceilDiv columns) * SLOT_SIZE
 
         val SLOT_TEXTURE: Identifier = Identifier.ofVanilla("container/slot")
-
-        val BACKGROUND_TEXTURE = RPGSkills.id("border9")
 
         const val GAP = 4
         const val MARGIN = 6
