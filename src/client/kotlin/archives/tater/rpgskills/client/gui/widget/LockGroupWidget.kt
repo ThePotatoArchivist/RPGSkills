@@ -1,10 +1,11 @@
 package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.ItemLockTooltip
+import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.client.util.getMousePosScrolled
 import archives.tater.rpgskills.data.LockGroup
+import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.util.*
-import net.minecraft.advancement.criterion.ConsumeItemCriterion.Conditions.item
 import net.minecraft.block.Block
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -20,18 +21,28 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.SpawnEggItem
 import net.minecraft.registry.Registries
+import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import net.minecraft.util.Rarity
 import net.minecraft.util.UseAction
-import java.util.stream.Collectors
 import kotlin.jvm.optionals.getOrNull
 
-class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: PlayerEntity) :
+class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
 
-    private val requireText: List<Text> = mutableListOf<Text>().also { ItemLockTooltip.appendRequirements(lockGroup, player, it, tooltip = false) }
-    private val requireTextHeight = textRenderer.fontHeight * requireText.size + GAP
+    private val requireText: List<Text> =
+        lockGroup.requirementContaining(skill)
+            ?.entries
+            ?.filter { it.key != skill }
+            ?.takeUnless { it.isEmpty() }
+            ?.let {
+                listOf(
+                    ItemLockTooltip.getTitle(lockGroup, player, tooltip = false),
+                    ItemLockTooltip.getRequirement(it, player, tooltip = false)
+                )
+            }
+            ?: listOf()
+    private val requireTextHeight = if (requireText.isEmpty()) 0 else textRenderer.fontHeight * requireText.size + GAP
 
     private val columns = (width - 2 * MARGIN) / SLOT_SIZE
 
@@ -50,15 +61,15 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
     }
     private val recipes = lockGroup.recipes.entries.matchingValues.map { it.defaultStack }
 
-    private val groups = mapOf(
-        Texts.CAN_USE to canUse,
-        Texts.CAN_PLACE to canPlace,
-        Texts.ENCHANTMENTS to enchantments,
-        Texts.RECIPES to recipes,
+    private val groups = listOf(
+        Section(Texts.CAN_USE, SLOT_USE_TEXTURE, canUse),
+        Section(Texts.CAN_PLACE, SLOT_PLACE_TEXTURE, canPlace),
+        Section(Texts.ENCHANTMENTS, SLOT_ENCHANT_TEXTURE, enchantments),
+        Section(Texts.RECIPES, SLOT_CRAFT_TEXTURE, recipes),
     )
 
     init {
-        height = requireTextHeight + getHeight(columns, *groups.values.toTypedArray())
+        height = requireTextHeight + getTotalHeight(columns, groups.map { it.stacks })
     }
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
@@ -69,14 +80,14 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
         }
         var currentY = MARGIN + y + requireTextHeight
         var tooltipStack: ItemStack? = null
-        for ((title, stacks) in groups) {
+        for ((title, slotTexture, stacks) in groups) {
             if (stacks.isEmpty()) continue
             context.drawText(textRenderer, title.text, x + MARGIN, currentY, 0x404040, false)
 
             stacks.forEachIndexed { index, stack ->
                 val slotX = x + MARGIN + SLOT_SIZE * (index % columns)
                 val slotY = currentY + textRenderer.fontHeight + SLOT_SIZE * (index / columns)
-                context.drawGuiTexture(SLOT_TEXTURE, slotX, slotY, 0, 18, 18)
+                context.drawGuiTexture(slotTexture, slotX, slotY, 0, 18, 18)
                 context.drawItem(stack, slotX + 1, slotY + 1)
                 context.drawItemInSlot(textRenderer, stack, slotX + 1, slotY + 1)
                 if (context.scissorContains(mouseX, mouseY) && tMouseX in slotX..<(slotX + 18) && tMouseY in slotY..<(slotY + 18)) {
@@ -94,14 +105,20 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {}
 
+    @JvmRecord
+    private data class Section(val title: UnitTranslation, val slotTexture: Identifier, val stacks: List<ItemStack>)
+
     companion object {
-        private fun getHeight(columns: Int, vararg lists: List<ItemStack>): Int = 2 * MARGIN +
+        private fun getTotalHeight(columns: Int, lists: List<List<ItemStack>>): Int = 2 * MARGIN +
             lists.sumOf { stacks -> getHeight(columns, stacks) } - GAP
 
         private fun getHeight(columns: Int, stacks: List<ItemStack>) =
             if (stacks.isEmpty()) 0 else textRenderer.fontHeight + GAP + (stacks.size ceilDiv columns) * SLOT_SIZE
 
-        val SLOT_TEXTURE: Identifier = Identifier.ofVanilla("container/slot")
+        val SLOT_USE_TEXTURE = RPGSkills.id("skill/slot_use")
+        val SLOT_PLACE_TEXTURE = RPGSkills.id("skill/slot_place")
+        val SLOT_ENCHANT_TEXTURE = RPGSkills.id("skill/slot_enchant")
+        val SLOT_CRAFT_TEXTURE = RPGSkills.id("skill/slot_craft")
 
         const val GAP = 4
         const val MARGIN = 6
@@ -109,8 +126,8 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
 
-        private val ENTITY_ITEMS by lazy {
-            Registries.ENTITY_TYPE.streamEntries().associateNotNullToMap<_, EntityType<*>, Item> {
+        private val ENTITY_ITEMS by lazy<Map<EntityType<*>, Item>> {
+            Registries.ENTITY_TYPE.streamEntries().associateNotNullToMap {
                 it.value to
                 (SpawnEggItem.forEntity(it.value)
                     ?: Registries.ITEM.getOrEmpty(it.registryKey().value).getOrNull())

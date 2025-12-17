@@ -57,8 +57,9 @@ class SkillScreen(
 
                 player.registryManager[LockGroup].streamEntriesOrdered(RPGSkillsTags.LOCK_GROUP_ORDER)
                     .filter { lockEntry -> lockEntry.value.requirements.any { it[skill] == levelAmount } }
+                    .sorted(compareBy { it.value.requirementContaining(skill)?.size ?: 0 })
                     .forEach {
-                        add(LockGroupWidget(x + 10, 0, 224, it.value, player))
+                        add(LockGroupWidget(x + 10, 0, 224, it.value, skill, player))
                         hasContent = true
                     }
 
