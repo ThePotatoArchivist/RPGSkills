@@ -1,7 +1,6 @@
 package archives.tater.rpgskills.client.gui.widget
 
 import archives.tater.rpgskills.ItemLockTooltip
-import archives.tater.rpgskills.client.gui.widget.LockGroupWidget.Texts.itemOf
 import archives.tater.rpgskills.client.util.getMousePosScrolled
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.util.*
@@ -37,7 +36,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
 
     private val canUse = buildList {
         for (item in lockGroup.items.entries.matchingValues)
-            if (item !is BlockItem || item.defaultStack.useAction != UseAction.NONE)
+            if ((item !is BlockItem && !ENTITY_ITEMS.containsValue(item.defaultStack)) || item.defaultStack.useAction != UseAction.NONE)
                 add(item.defaultStack)
         for (block in lockGroup.blocks.entries.matchingValues)
             add(itemOf(block))
@@ -108,27 +107,18 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
         const val SLOT_SIZE = 18
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
-    }
-
-    object Texts {
-        private fun of(name: String) = Translation.unit("screen.widget.rpgskills.lockgroup.$name")
-
-        val CAN_USE = of("can_use")
-        val CAN_PLACE = of("can_place")
-        val ENCHANTMENTS = of("enchantments")
-        val RECIPES = of("recipes")
 
         private val ENTITY_ITEMS by lazy {
             Registries.ENTITY_TYPE.streamEntries().associateToMap {
                 it.value to
-                (SpawnEggItem.forEntity(it.value)?.defaultStack
-                    ?: Registries.ITEM.getOrEmpty(it.registryKey().value).getOrNull()?.defaultStack
-                    ?: Items.BARRIER.defaultStack.apply {
-                        set(DataComponentTypes.RARITY, Rarity.COMMON)
-                    }
-                ).apply {
-                    set(DataComponentTypes.ITEM_NAME, it.value.name)
-                }
+                        (SpawnEggItem.forEntity(it.value)?.defaultStack
+                            ?: Registries.ITEM.getOrEmpty(it.registryKey().value).getOrNull()?.defaultStack
+                            ?: Items.BARRIER.defaultStack.apply {
+                                set(DataComponentTypes.RARITY, Rarity.COMMON)
+                            }
+                                ).apply {
+                                set(DataComponentTypes.ITEM_NAME, it.value.name)
+                            }
             }
         }
 
@@ -138,5 +128,14 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
         }
 
         fun itemOf(entity: EntityType<*>): ItemStack = ENTITY_ITEMS[entity]!!
+    }
+
+    object Texts {
+        private fun of(name: String) = Translation.unit("screen.widget.rpgskills.lockgroup.$name")
+
+        val CAN_USE = of("can_use")
+        val CAN_PLACE = of("can_place")
+        val ENCHANTMENTS = of("enchantments")
+        val RECIPES = of("recipes")
     }
 }
