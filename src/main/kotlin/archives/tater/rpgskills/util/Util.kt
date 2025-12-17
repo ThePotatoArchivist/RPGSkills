@@ -44,6 +44,7 @@ import org.slf4j.Logger
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
+import java.util.stream.Collectors
 import java.util.stream.Stream
 import kotlin.jvm.optionals.getOrNull
 import kotlin.properties.ReadWriteProperty
@@ -292,3 +293,7 @@ fun <A, B, E> Codec<A>.registryXmap(
 ) = RegistryAwareXmapCodec(registry, this, to, from)
 
 fun ItemPredicate(init: ItemPredicate.Builder.() -> Unit): ItemPredicate = ItemPredicate.Builder.create().apply(init).build()
+
+fun <T, K, V> Stream<T>.associateToMap(transform: (T) -> Pair<K, V>): Map<K, V> = this
+    .map { transform(it) }
+    .collect(Collectors.toMap(Pair<K, V>::first, Pair<K, V>::second))

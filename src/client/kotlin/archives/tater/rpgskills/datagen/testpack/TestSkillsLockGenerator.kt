@@ -61,6 +61,9 @@ class TestSkillsLockGenerator(
             entities = LockList(
                 RegistryIngredient.ofEntities {
                     +EntityType.VILLAGER
+                    +EntityType.CHICKEN
+                    +EntityType.ARMOR_STAND
+                    +EntityType.TNT_MINECART
                 },
                 "AAA"
             ),

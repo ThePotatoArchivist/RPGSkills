@@ -4,7 +4,10 @@
   ],
   "entities": {
     "entries": [
-      "minecraft:villager"
+      "minecraft:villager",
+      "minecraft:chicken",
+      "minecraft:armor_stand",
+      "minecraft:tnt_minecart"
     ],
     "message": "AAA"
   },

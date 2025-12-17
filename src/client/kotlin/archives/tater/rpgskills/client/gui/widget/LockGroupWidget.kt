@@ -13,13 +13,19 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.SpawnEggItem
+import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import net.minecraft.util.Rarity
+import net.minecraft.util.UseAction
+import java.util.stream.Collectors
+import kotlin.jvm.optionals.getOrNull
 
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
@@ -31,12 +37,12 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
 
     private val canUse = buildList {
         for (item in lockGroup.items.entries.matchingValues)
-            if (item !is BlockItem)
+            if (item !is BlockItem || item.defaultStack.useAction != UseAction.NONE)
                 add(item.defaultStack)
         for (block in lockGroup.blocks.entries.matchingValues)
             add(itemOf(block))
         for (entity in lockGroup.entities.entries.matchingValues)
-            add((SpawnEggItem.forEntity(entity) ?: Items.BARRIER).defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = entity.name })
+            add(itemOf(entity))
     }
     private val canPlace = lockGroup.items.entries.matchingValues.mapNotNull { (it as? BlockItem)?.defaultStack }
     private val enchantments = lockGroup.enchantments.entries.matchingEntries.map { enchantment ->
@@ -112,9 +118,25 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, player: 
         val ENCHANTMENTS = of("enchantments")
         val RECIPES = of("recipes")
 
+        private val ENTITY_ITEMS by lazy {
+            Registries.ENTITY_TYPE.streamEntries().associateToMap {
+                it.value to
+                (SpawnEggItem.forEntity(it.value)?.defaultStack
+                    ?: Registries.ITEM.getOrEmpty(it.registryKey().value).getOrNull()?.defaultStack
+                    ?: Items.BARRIER.defaultStack.apply {
+                        set(DataComponentTypes.RARITY, Rarity.COMMON)
+                    }
+                ).apply {
+                    set(DataComponentTypes.ITEM_NAME, it.value.name)
+                }
+            }
+        }
+
         fun itemOf(block: Block): ItemStack = when (val item = block.asItem()) {
             Items.AIR -> Items.BARRIER.defaultStack.also { stack -> stack[DataComponentTypes.ITEM_NAME] = block.name }
             else -> item.defaultStack
         }
+
+        fun itemOf(entity: EntityType<*>): ItemStack = ENTITY_ITEMS[entity]!!
     }
 }
