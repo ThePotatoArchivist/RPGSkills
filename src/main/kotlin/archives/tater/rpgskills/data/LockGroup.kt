@@ -20,6 +20,7 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.Text
@@ -103,6 +104,8 @@ data class LockGroup(
         private val ENTITY_CACHE = RegistryCache(key) { it.value.entities.entries.matchingValues }
         private val ENCHANTMENT_CACHE = RegistryCache(key) { it.value.enchantments.entries.matchingEntries }
         private val RECIPE_CACHE = RegistryCache(key) { it.value.recipes.entries.matchingValues }
+
+        fun groupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) = ITEM_CACHE[registries][stack.item]?.value
 
         private fun <T> findLocked(player: PlayerEntity, cache: RegistryCache<T, LockGroup>, value: T) =
             cache[player.registryManager][value]?.value?.takeIf { !it.isSatisfiedBy(player) }

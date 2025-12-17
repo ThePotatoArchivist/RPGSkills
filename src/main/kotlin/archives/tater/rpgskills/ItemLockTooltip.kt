@@ -5,6 +5,7 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.value
 import com.mojang.authlib.minecraft.client.MinecraftClient
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
@@ -54,8 +55,8 @@ object ItemLockTooltip {
     }
 
     @JvmStatic
-    fun appendTooltip(stack: ItemStack, player: PlayerEntity?, tooltip: MutableList<Text>) {
-        val lockGroup = LockGroup.findLocked(player ?: return, stack) ?: return // TODO Show tooltip when unlocked
+    fun appendTooltip(stack: ItemStack, player: PlayerEntity, tooltip: MutableList<Text>) {
+        val lockGroup = LockGroup.groupOf(player.registryManager, stack) ?: return
 
         appendRequirements(lockGroup, player, tooltip)
     }
