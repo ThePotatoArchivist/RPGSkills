@@ -9,29 +9,39 @@
       "type": "string",
       "pattern": "^#[a-z0-9_.-]+:[a-z0-9/._-]+$"
     },
-    "LockList": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "message": {
-          "type": "string"
-        },
-        "entries": {
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "$ref": "#/definitions/Identifier"
-              },
-              {
-                "$ref": "#/definitions/Tag"
-              }
-            ]
+    "RegistryEntryList": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/Identifier"
+          },
+          {
+            "$ref": "#/definitions/Tag"
           }
+        ]
+      }
+    },
+    "LockList": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "entries": {
+              "$ref": "#/definitions/RegistryEntryList"
+            }
+          },
+          "required": [
+            "entries"
+          ]
+        },
+        {
+          "$ref": "#/definitions/RegistryEntryList"
         }
-      },
-      "required": [
-        "entries"
       ]
     },
     "Requirement": {

@@ -1,9 +1,7 @@
 {
-  "items": {
-    "entries": [
-      "minecraft:barrier"
-    ]
-  },
+  "items": [
+    "minecraft:barrier"
+  ],
   "requirements": {
     "rpg_test:potato": 2
   }

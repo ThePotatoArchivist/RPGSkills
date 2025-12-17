@@ -1,9 +1,7 @@
 {
-  "blocks": {
-    "entries": [
-      "minecraft:crafting_table"
-    ]
-  },
+  "blocks": [
+    "minecraft:crafting_table"
+  ],
   "items": {
     "entries": [
       "minecraft:potato",

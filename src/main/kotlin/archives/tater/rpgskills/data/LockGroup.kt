@@ -5,10 +5,8 @@ import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.advancement.AdvancementRewards.Builder.recipe
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
-import net.minecraft.command.argument.EntityArgumentType.entity
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
@@ -16,7 +14,6 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.recipe.RecipeEntry
-import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
@@ -24,7 +21,6 @@ import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.Text
-import net.minecraft.util.Identifier
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -73,8 +69,15 @@ data class LockGroup(
                 Codec.STRING.optionalFieldOf("message").forGetter(LockList<T>::message),
             ).apply(instance, ::LockList) }
 
-            fun <T> createCodec(registry: RegistryKey<Registry<T>>): Codec<LockList<RegistryIngredient.Composite<T>>> =
-                createCodec(RegistryIngredient.createCodec(registry))
+            fun <T> createShortCodec(containerCodec: Codec<T>): Codec<LockList<T>> = AlternateCodec(
+                createCodec(containerCodec),
+                containerCodec.xmap({ LockList(it) }, { it.entries })
+            ) {
+                it.message == null
+            }
+
+            fun <T> createShortCodec(registry: RegistryKey<Registry<T>>): Codec<LockList<RegistryIngredient.Composite<T>>> =
+                createShortCodec(RegistryIngredient.createCodec(registry))
 
             fun <T> empty() = LockList<RegistryIngredient.Composite<T>>(RegistryIngredient.empty())
         }
@@ -90,11 +93,11 @@ data class LockGroup(
 
         val CODEC: Codec<LockGroup> = RecordCodecBuilder.create { it.group(
             Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList().fieldOf("requirements").forGetter(LockGroup::requirements),
-            LockList.createCodec(RegistryKeys.ITEM).optionalFieldOf("items", LockList.empty()).forGetter(LockGroup::items),
-            LockList.createCodec(RegistryKeys.BLOCK).optionalFieldOf("blocks", LockList.empty()).forGetter(LockGroup::blocks),
-            LockList.createCodec(RegistryKeys.ENTITY_TYPE).optionalFieldOf("entities", LockList.empty()).forGetter(LockGroup::entities),
-            LockList.createCodec(RegistryKeys.ENCHANTMENT).optionalFieldOf("enchantments", LockList.empty()).forGetter(LockGroup::enchantments),
-            LockList.createCodec(RegistryKeys.ITEM).optionalFieldOf("recipes", LockList.empty()).forGetter(LockGroup::recipes),
+            LockList.createShortCodec(RegistryKeys.ITEM).optionalFieldOf("items", LockList.empty()).forGetter(LockGroup::items),
+            LockList.createShortCodec(RegistryKeys.BLOCK).optionalFieldOf("blocks", LockList.empty()).forGetter(LockGroup::blocks),
+            LockList.createShortCodec(RegistryKeys.ENTITY_TYPE).optionalFieldOf("entities", LockList.empty()).forGetter(LockGroup::entities),
+            LockList.createShortCodec(RegistryKeys.ENCHANTMENT).optionalFieldOf("enchantments", LockList.empty()).forGetter(LockGroup::enchantments),
+            LockList.createShortCodec(RegistryKeys.ITEM).optionalFieldOf("recipes", LockList.empty()).forGetter(LockGroup::recipes),
         ).apply(it, ::LockGroup) }
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))

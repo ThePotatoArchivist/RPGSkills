@@ -1,9 +1,7 @@
 {
-  "enchantments": {
-    "entries": [
-      "minecraft:aqua_affinity"
-    ]
-  },
+  "enchantments": [
+    "minecraft:aqua_affinity"
+  ],
   "entities": {
     "entries": [
       "minecraft:villager"
