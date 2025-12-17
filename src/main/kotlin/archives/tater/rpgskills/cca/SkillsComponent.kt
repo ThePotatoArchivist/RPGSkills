@@ -192,7 +192,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                     RPGSkills.logger.warn("${player.name.string} tried to set skills class when it was already set")
                     return@registerGlobalReceiver
                 }
-                skillsComponent._points = LEVEL_REQUIREMENTS[payload.skillClass.value.startingLevel]
+                skillsComponent._points = skillsComponent._points.coerceAtLeast(LEVEL_REQUIREMENTS[payload.skillClass.value.startingLevel])
                 skillsComponent.skillClass = payload.skillClass
 
                 player.interactionManager.gameMode.setAbilities(player.abilities)
