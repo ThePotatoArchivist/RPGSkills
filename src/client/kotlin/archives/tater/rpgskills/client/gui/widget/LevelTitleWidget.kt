@@ -21,7 +21,6 @@ class LevelTitleWidget(x: Int, y: Int, width: Int, message: Text) :
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
-        TODO("Not yet implemented")
     }
 
     companion object {

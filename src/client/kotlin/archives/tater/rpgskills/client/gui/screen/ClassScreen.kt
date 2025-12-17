@@ -79,8 +79,10 @@ class ClassScreen(
     companion object {
         val TEXTURE = RPGSkills.id("textures/gui/class.png")
 
-        const val WIDTH = 134
+        const val WIDTH = 512
         const val HEIGHT = 164
+
+        const val DESCRIPTION_WIDTH = 117
 
         const val BUTTON_GAP = 8
 
