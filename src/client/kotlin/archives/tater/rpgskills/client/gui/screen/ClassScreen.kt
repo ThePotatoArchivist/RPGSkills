@@ -6,6 +6,7 @@ import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.client.gui.widget.ClassNavButtonWidget
 import archives.tater.rpgskills.client.gui.widget.SkillDisplayWidget
 import archives.tater.rpgskills.client.gui.widget.WrappedTextWidget
+import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.ClassChoicePayload
 import archives.tater.rpgskills.util.Translation
@@ -28,6 +29,7 @@ class ClassScreen(
     private var y = 0
 
     private val classes = player.registryManager[SkillClass].streamEntriesOrdered(RPGSkillsTags.CLASS_ORDER).toList()
+    private val skills = player.registryManager[Skill].streamEntriesOrdered(RPGSkillsTags.SKILL_ORDER).toList()
 
     override var selectedPage = 0
         set(value) {
@@ -42,15 +44,19 @@ class ClassScreen(
 
         val selectedClass = selectedClass
 
-        addDrawableChild(
-            AutoScrollingWidget(
-                x + 9, y + 26, 116, 129, selectedClass.value.startingLevels.map { (skill, level) ->
-                    SkillDisplayWidget(x + 9, 0, 116 - AutoScrollingWidget.SCROLLER_WIDTH, skill, level)
-                }.withFirst(
-                    WrappedTextWidget(x + 9, 0, 116 - AutoScrollingWidget.SCROLLER_WIDTH, 4, Text.literal(selectedClass.value.description), 0x404040, textRenderer)
-                )
-            )
-        )
+        addDrawableChild(WrappedTextWidget(x + 9, y + 26, STATS_LEFT - 1 - MARGIN, 4, Text.literal(selectedClass.value.description), 0x404040, textRenderer))
+//            AutoScrollingWidget(
+//                x + 9, y + 26, 116, 129, .withFirst(
+//                )
+//            )
+
+        var currentY = y + MARGIN + 2
+        for (skill in skills) {
+            val level = selectedClass.value.startingLevels[skill] ?: 0
+            addDrawableChild(SkillDisplayWidget(x + STATS_LEFT, currentY, skill, level).also {
+                currentY += it.height
+            })
+        }
 
         addDrawableChild(ClassNavButtonWidget(this, x - ClassNavButtonWidget.WIDTH - BUTTON_GAP, y + HEIGHT / 2 - ClassNavButtonWidget.HEIGHT / 2, false))
         addDrawableChild(ClassNavButtonWidget(this, x + WIDTH + BUTTON_GAP, y + HEIGHT / 2 - ClassNavButtonWidget.HEIGHT / 2, true))
@@ -69,7 +75,7 @@ class ClassScreen(
 
     override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         super.renderBackground(context, mouseX, mouseY, delta)
-        context.drawTexture(TEXTURE, x, y, 0, 0, WIDTH, HEIGHT)
+        context.drawTexture(TEXTURE, x, y, 0f, 0f, WIDTH, HEIGHT, 512, 256)
     }
 
     override fun shouldCloseOnEsc(): Boolean = false
@@ -79,9 +85,11 @@ class ClassScreen(
     companion object {
         val TEXTURE = RPGSkills.id("textures/gui/class.png")
 
-        const val WIDTH = 512
-        const val HEIGHT = 164
+        const val WIDTH = 301
+        const val HEIGHT = 187
+        const val MARGIN = 8
 
+        const val STATS_LEFT = 165
         const val DESCRIPTION_WIDTH = 117
 
         const val BUTTON_GAP = 8
