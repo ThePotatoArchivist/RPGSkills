@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.util.registryXmap
+import archives.tater.rpgskills.util.value
 import com.mojang.datafixers.util.Either
 import com.mojang.serialization.Codec
 import net.minecraft.block.Block
@@ -23,7 +24,7 @@ import java.util.stream.Stream
 abstract class RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
 
     val matchingEntries: List<RegistryEntry<T>> by lazy { findMatchingEntries().toList() }
-    val matchingValues: List<T> by lazy { matchingEntries.stream().map { it.value() }.distinct().toList() }
+    val matchingValues: List<T> by lazy { matchingEntries.stream().map { it.value }.distinct().toList() }
 
     val size get() = matchingEntries.size
     val isEmpty get() = matchingEntries.isEmpty()
@@ -40,7 +41,7 @@ abstract class RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         val matchingValues: List<T>
     }
 
-    data class DirectEntry<T>(private val entry: RegistryEntry<T>) : RegistryIngredient<T>(), Entry<T> {
+    data class DirectEntry<T>(val entry: RegistryEntry<T>) : RegistryIngredient<T>(), Entry<T> {
         override fun findMatchingEntries(): Stream<RegistryEntry<T>> = Stream.of(entry)
 
         companion object {
@@ -48,7 +49,7 @@ abstract class RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
         }
     }
 
-    data class TagEntry<T>(private val registry: RegistryEntryLookup<T>, private val tag: TagKey<T>) : RegistryIngredient<T>(), Entry<T> {
+    data class TagEntry<T>(private val registry: RegistryEntryLookup<T>, val tag: TagKey<T>) : RegistryIngredient<T>(), Entry<T> {
         override fun findMatchingEntries(): Stream<RegistryEntry<T>> = registry.getOrThrow(tag).stream()
 
         companion object {

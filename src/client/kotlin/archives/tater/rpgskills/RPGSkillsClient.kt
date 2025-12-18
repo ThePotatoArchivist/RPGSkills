@@ -38,6 +38,8 @@ import kotlin.jvm.optionals.getOrNull
 object RPGSkillsClient : ClientModInitializer {
 	@JvmField
 	var uiActionLockGroup: LockGroup? = null
+    @JvmField
+    var animationCounter = 0
 
 	const val RPG_SKILLS_CATEGORY = "category.$MOD_ID.$MOD_ID"
 	const val SKILLS_KEY_TRANSLATION = "key.$MOD_ID.screen.skills"
@@ -88,6 +90,7 @@ object RPGSkillsClient : ClientModInitializer {
         }
 
 		ClientTickEvents.END_CLIENT_TICK.register { client ->
+            animationCounter++
 			if (skillsKey.wasPressed)
 				client.player?.let {
 					client.setScreen(SkillsScreen(it))

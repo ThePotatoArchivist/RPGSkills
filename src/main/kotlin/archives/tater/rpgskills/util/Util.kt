@@ -35,6 +35,7 @@ import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceReloader
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
+import net.minecraft.text.Texts
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
 import org.joml.Vector2i
@@ -244,14 +245,7 @@ fun <T> singleTagGenerator(tag: TagKey<T>, vararg entries: RegistryKey<T>) =
 fun <T> RegistryEntryList(registry: Registry<T>, vararg entries: T): RegistryEntryList.Direct<T> =
     RegistryEntryList.of(entries.map { registry.getEntry(it) })
 
-fun <T> Iterable<T>.joinToText(separator: String = ", ", transform: (T) -> Text): MutableText = Text.empty().apply {
-    var first = true
-    for (value in this@joinToText) {
-        if (!first) append(separator)
-        append(transform(value))
-        first = false
-    }
-}
+fun <T> Iterable<T>.joinToText(separator: String = ", ", transform: (T) -> Text): MutableText = Texts.join(toList(), Text.literal(separator), transform)
 
 inline fun <T> MutableIterator<T>.removeIf(condition: (T) -> Boolean) {
     for (value in this)
@@ -298,3 +292,7 @@ fun <T, K: Any, V: Any> Stream<T>.associateNotNullToMap(transform: (T) -> Pair<K
     .map { transform(it) }
     .filter { it != null && it.first != null && it.second != null }
     .collect(Collectors.toMap({ it!!.first!! }, { it!!.second!! }))
+
+fun Text.takeIfTranslated() = takeIf { Texts.hasTranslation(this) }
+
+fun snakeToTitleCase(text: String) = text.split('_').joinToString(" ") { it.replaceFirstChar(Char::titlecase) }
