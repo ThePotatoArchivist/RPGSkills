@@ -11,9 +11,12 @@ import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.item.SpawnEggItem
 import net.minecraft.recipe.RecipeEntry
+import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
@@ -21,6 +24,9 @@ import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.Text
+import net.minecraft.util.UseAction
+import com.google.common.collect.BiMap
+import jdk.vm.ci.code.Location.stack
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -110,7 +116,18 @@ data class LockGroup(
         private val ENCHANTMENT_CACHE = RegistryCache(key) { it.value.enchantments.entries.matchingEntries }
         private val RECIPE_CACHE = RegistryCache(key) { it.value.recipes.entries.matchingValues }
 
-        fun groupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) = ITEM_CACHE[registries][stack.item]?.value
+        fun useGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) =
+            ITEM_CACHE[registries][stack.item]?.value?.takeIf { isUsedItem(stack.item) }
+                ?: (stack.item as? BlockItem)?.let { BLOCK_CACHE[registries][it.block]?.value }
+                ?: ENTITY_ITEMS.entries.find { (_, item) -> stack isOf item }?.key?.let {
+                    ENTITY_CACHE[registries][it]?.value
+                }
+
+        fun placeGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) =
+            ITEM_CACHE[registries][stack.item]?.value?.takeIf { isPlacedItem(stack.item) }
+
+        fun craftGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) =
+            RECIPE_CACHE[registries][stack.item]?.value
 
         private fun <T> findLocked(player: PlayerEntity, cache: RegistryCache<T, LockGroup>, value: T) =
             cache[player.registryManager][value]?.value?.takeIf { !it.isSatisfiedBy(player) }
@@ -126,6 +143,17 @@ data class LockGroup(
         @JvmStatic fun isLocked(player: PlayerEntity, entity: Entity) = findLocked(player, entity) != null
         @JvmStatic fun isLocked(player: PlayerEntity, enchantment: RegistryEntry<Enchantment>) = findLocked(player, enchantment) != null
         @JvmStatic fun isLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = findLocked(player, recipe) != null
+
+        val ENTITY_ITEMS by lazy {
+            Registries.ENTITY_TYPE.streamEntries().associateNotNullToMap {
+                it.value to
+                        (SpawnEggItem.forEntity(it.value)
+                            ?: Registries.ITEM.getOrEmpty(it.registryKey().value).getOrNull())
+            }
+        }
+
+        fun isPlacedItem(item: Item) = item is BlockItem || ENTITY_ITEMS.containsValue(item)
+        fun isUsedItem(item: Item) = !isPlacedItem(item) || item.defaultStack.useAction != UseAction.NONE
     }
 
 }

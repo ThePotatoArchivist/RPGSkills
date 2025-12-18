@@ -107,7 +107,7 @@ object RPGSkillsClient : ClientModInitializer {
 
 		ItemTooltipCallback.EVENT.register { stack, _, _, tooltip ->
             MinecraftClient.getInstance().player?.let {
-                ItemLockTooltip.appendTooltip(stack, it, tooltip)
+                RequirementTooltip.appendTooltip(stack, it, tooltip)
             }
 		}
 	}

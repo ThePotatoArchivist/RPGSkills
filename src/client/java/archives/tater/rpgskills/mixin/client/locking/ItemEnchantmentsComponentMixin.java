@@ -1,13 +1,12 @@
 package archives.tater.rpgskills.mixin.client.locking;
 
-import archives.tater.rpgskills.ItemLockTooltip;
+import archives.tater.rpgskills.RequirementTooltip;
 import archives.tater.rpgskills.data.LockGroup;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.client.MinecraftClient;
@@ -30,6 +29,6 @@ public class ItemEnchantmentsComponentMixin {
         if (player == null) return;
         var lockGroup = LockGroup.findLocked(player, enchantment);
         if (lockGroup == null) return;
-        ItemLockTooltip.appendRequirements(lockGroup, player, instance);
+        RequirementTooltip.appendRequirements(lockGroup, player, instance);
     }
 }

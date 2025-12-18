@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.client.gui.widget
 
-import archives.tater.rpgskills.ItemLockTooltip
+import archives.tater.rpgskills.RequirementTooltip
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.client.gui.fallbackText
@@ -17,22 +17,15 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.BlockItem
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.Items.ENCHANTED_BOOK
-import net.minecraft.item.SpawnEggItem
-import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.text.Text
-import net.minecraft.util.Colors
-import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.UseAction
-import kotlin.jvm.optionals.getOrNull
 
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, level: Int, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
@@ -43,7 +36,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                 .filter { it.key != skill }
                 .takeUnless { it.isEmpty() }
                 ?.let {
-                    ItemLockTooltip.getRequirement(it, player, tooltip = false).apply {
+                    RequirementTooltip.getRequirement(it, player, tooltip = false).apply {
                         withColor(getColor(index))
                     }
                 }
@@ -52,7 +45,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         ?.joinToText(WidgetTexts.OR.text)
 
     private val requireTooltip = buildList {
-        ItemLockTooltip.appendRequirements(lockGroup, player, this)
+        RequirementTooltip.appendRequirements(lockGroup, player, this)
     }
 
     private val columns = (width - 2 * MARGIN) / SLOT_SIZE
@@ -62,7 +55,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
             WidgetTexts.CAN_USE.getText(additionalRequirements),
             SLOT_USE_TEXTURE,
             buildList<DisplayedSlot> {
-                addAll(lockGroup.items.toDisplayedSlot({ it.name }) { if (!it.isPlaced() || it.defaultStack.useAction != UseAction.NONE) it.defaultStack else null })
+                addAll(lockGroup.items.toDisplayedSlot({ it.name }) { if (LockGroup.isUsedItem(it)) it.defaultStack else null })
                 addAll(lockGroup.blocks.toDisplayedSlot({ it.name }) { itemOf(it) })
                 addAll(lockGroup.entities.toDisplayedSlot({ it.name }) { itemOf(it) })
             }
@@ -70,7 +63,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         Section(
             WidgetTexts.CAN_PLACE.getText(additionalRequirements),
             SLOT_PLACE_TEXTURE,
-            lockGroup.items.toDisplayedSlot({ it.name }) { if (it.isPlaced()) it.defaultStack else null }
+            lockGroup.items.toDisplayedSlot({ it.name }) { if (LockGroup.isPlacedItem(it)) it.defaultStack else null }
         ),
         Section(
             WidgetTexts.CAN_ENCHANT.getText(additionalRequirements),
@@ -156,19 +149,9 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
             else -> 0xffffff
         }
 
-        private val ENTITY_ITEMS by lazy<Map<EntityType<*>, Item>> {
-            Registries.ENTITY_TYPE.streamEntries().associateNotNullToMap {
-                it.value to
-                (SpawnEggItem.forEntity(it.value)
-                    ?: Registries.ITEM.getOrEmpty(it.registryKey().value).getOrNull())
-            }
-        }
-
-        fun Item.isPlaced() = this is BlockItem || ENTITY_ITEMS.containsValue(this)
-
         fun itemOf(block: Block): ItemStack = (block.asItem().takeUnless { it == Items.AIR } ?: Items.BARRIER).defaultStack
 
-        fun itemOf(entity: EntityType<*>): ItemStack = (ENTITY_ITEMS[entity] ?: Items.BARRIER).defaultStack
+        fun itemOf(entity: EntityType<*>): ItemStack = (LockGroup.ENTITY_ITEMS[entity] ?: Items.BARRIER).defaultStack
 
         private fun <T> LockGroup.LockList<RegistryIngredient.Composite<T>>.toDisplayedSlot(text: (T) -> Text, transform: (T) -> ItemStack?): List<DisplayedSlot> =
             entries.entries.mapNotNull { entry ->

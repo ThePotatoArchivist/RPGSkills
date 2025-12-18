@@ -7,10 +7,8 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.joinToText
-import archives.tater.rpgskills.util.value
-import com.mojang.authlib.minecraft.client.MinecraftClient
-import net.minecraft.advancement.criterion.ConstructBeaconCriterion.Conditions.level
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.BlockItem
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.text.MutableText
@@ -19,9 +17,8 @@ import net.minecraft.util.Formatting
 import java.util.function.Consumer
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.forEachIndexed
 
-object ItemLockTooltip {
+object RequirementTooltip {
     val REQUIRES = Translation.unit("rpgskills.tooltip.stack.requires")
     val REQUIRES_ANY = Translation.unit("rpgskills.tooltip.stack.requires.any")
     val REQUIREMENT = Translation.arg("rpgskills.tooltip.stack.requirement") { formatted(Formatting.DARK_GRAY) }
@@ -70,7 +67,11 @@ object ItemLockTooltip {
 
     @JvmStatic
     fun appendTooltip(stack: ItemStack, player: PlayerEntity, tooltip: MutableList<Text>) {
-        val lockGroup = LockGroup.groupOf(player.registryManager, stack) ?: return
+        val itemLockGroup = LockGroup.useGroupOf(player.registryManager, stack)
+        val blockLockGroup = LockGroup.placeGroupOf(player.registryManager, stack)
+        val craftLockGroup = LockGroup.craftGroupOf(player.registryManager, stack)
+
+        TODO()
 
         appendRequirements(lockGroup, player, tooltip)
     }

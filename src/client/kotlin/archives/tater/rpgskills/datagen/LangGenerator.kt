@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.datagen
 
-import archives.tater.rpgskills.ItemLockTooltip
+import archives.tater.rpgskills.RequirementTooltip
 import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
@@ -86,9 +86,9 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(LockGroup.DEFAULT_ENTITY_MESSAGE, "You don't know how to interact with this mob")
             add(LockGroup.DEFAULT_ENCHANTMENT_MESSAGE, "You don't know how to apply this enchantment")
             add(LockGroup.DEFAULT_RECIPE_MESSAGE, "You don't know how to craft this recipe")
-            add(ItemLockTooltip.REQUIRES, "Requires:")
-            add(ItemLockTooltip.REQUIRES_ANY, "Requires either:")
-            add(ItemLockTooltip.REQUIREMENT, "- %s")
+            add(RequirementTooltip.REQUIRES, "Requires:")
+            add(RequirementTooltip.REQUIRES_ANY, "Requires either:")
+            add(RequirementTooltip.REQUIREMENT, "- %s")
             add(SkillUpgradeButton.MAX, "MAX")
             add(RPGSkillsClient.RPG_SKILLS_CATEGORY, "RPG Skills")
             add(RPGSkillsClient.SKILLS_KEY_TRANSLATION, "Open Skills")

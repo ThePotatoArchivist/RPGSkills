@@ -1,6 +1,6 @@
 package archives.tater.rpgskills.client.render
 
-import archives.tater.rpgskills.ItemLockTooltip
+import archives.tater.rpgskills.RequirementTooltip
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.data.LockGroup
@@ -56,7 +56,7 @@ object CrossedArrowRenderer {
             mutableListOf(
                 message(blockedGroup)
             ).also {
-                ItemLockTooltip.appendRequirements(blockedGroup, player, it)
+                RequirementTooltip.appendRequirements(blockedGroup, player, it)
             },
             mouseX,
             mouseY
