@@ -15,73 +15,62 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.registry.tag.TagKey
-import kotlinx.serialization.internal.throwArrayMissingFieldException
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Stream
 
 
-sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
+abstract class RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
 
-    fun findMatchingEntries(lookup: RegistryEntryLookup<T>): Stream<RegistryEntry<T>>
+    val matchingEntries: List<RegistryEntry<T>> by lazy { findMatchingEntries().toList() }
+    val matchingValues: List<T> by lazy { matchingEntries.stream().map { it.value() }.distinct().toList() }
 
-    @JvmRecord
-    data class EntryEntry<T>(private val entry: RegistryEntry<T>) : RegistryIngredient<T> {
-        override fun findMatchingEntries(lookup: RegistryEntryLookup<T>): Stream<RegistryEntry<T>> = Stream.of(entry)
+    val size get() = matchingEntries.size
+    val isEmpty get() = matchingEntries.isEmpty()
 
-        @Suppress("DEPRECATION")
-        override fun test(value: RegistryEntry<T>): Boolean = entry.matches(value)
+    protected abstract fun findMatchingEntries(): Stream<RegistryEntry<T>>
+
+    @JvmName("testValue")
+    fun test(value: T): Boolean = value in matchingValues
+
+    override fun test(value: RegistryEntry<T>): Boolean = value in matchingEntries
+
+    sealed interface Entry<T> {
+        val matchingEntries: List<RegistryEntry<T>>
+        val matchingValues: List<T>
+    }
+
+    data class DirectEntry<T>(private val entry: RegistryEntry<T>) : RegistryIngredient<T>(), Entry<T> {
+        override fun findMatchingEntries(): Stream<RegistryEntry<T>> = Stream.of(entry)
 
         companion object {
-            fun <T> createCodec(registry: RegistryKey<Registry<T>>): Codec<EntryEntry<T>> = RegistryFixedCodec.of(registry).xmap({ EntryEntry(it) }, { it.entry })
+            fun <T> createCodec(registry: RegistryKey<Registry<T>>): Codec<DirectEntry<T>> = RegistryFixedCodec.of(registry).xmap({ DirectEntry(it) }, { it.entry })
         }
     }
 
-    @JvmRecord
-    data class TagEntry<T>(private val tag: TagKey<T>) : RegistryIngredient<T> {
-        override fun findMatchingEntries(lookup: RegistryEntryLookup<T>): Stream<RegistryEntry<T>> =
-            lookup.getOrThrow(tag).stream()
-
-        override fun test(value: RegistryEntry<T>): Boolean = value.isIn(tag)
+    data class TagEntry<T>(private val registry: RegistryEntryLookup<T>, private val tag: TagKey<T>) : RegistryIngredient<T>(), Entry<T> {
+        override fun findMatchingEntries(): Stream<RegistryEntry<T>> = registry.getOrThrow(tag).stream()
 
         companion object {
-            fun <T> createCodec(registryRef: RegistryKey<out Registry<T>>): Codec<TagEntry<T>> = TagKey.codec(registryRef).xmap({ TagEntry(it) }, { it.tag })
+            fun <T> createCodec(registry: RegistryKey<Registry<T>>): Codec<TagEntry<T>> =
+                TagKey.codec(registry).registryXmap(registry,
+                    { it, registry -> TagEntry(registry, it) },
+                    { it, _ -> it.tag }
+                )
         }
     }
 
-    class Composite<T>(private val registry: RegistryEntryLookup<T>, private val entries: List<RegistryIngredient<T>> = listOf()) : RegistryIngredient<T> {
-        val matchingEntries: List<RegistryEntry<T>> by lazy { findMatchingEntries(registry).toList() }
-        val matchingValues: List<T> by lazy { findMatchingEntries(registry).map { it.value() }.distinct().toList() }
-
-        val size get() = matchingEntries.size
-        val isEmpty get() = matchingEntries.isEmpty()
-
-        override fun findMatchingEntries(lookup: RegistryEntryLookup<T>): Stream<RegistryEntry<T>> =
-            entries.stream().flatMap { it.findMatchingEntries(lookup) }.distinct()
-
-        override fun test(value: RegistryEntry<T>): Boolean = value in matchingEntries
-
-        @JvmName("testValue")
-        fun test(value: T): Boolean = value in matchingValues
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-            return entries == (other as Composite<*>).entries
-        }
-
-        override fun hashCode(): Int {
-            return entries.hashCode()
-        }
+    data class Composite<T>(private val registry: RegistryEntryLookup<T>, val entries: List<Entry<T>> = listOf()) : RegistryIngredient<T>() {
+        override fun findMatchingEntries(): Stream<RegistryEntry<T>> =
+            entries.stream().flatMap { it.matchingEntries.stream() }.distinct()
 
         companion object {
-            fun <T> createCodec(registry: RegistryKey<Registry<T>>): Codec<Composite<T>> = Codec.either(EntryEntry.createCodec(registry), TagEntry.createCodec(registry)).listOf().registryXmap(
+            fun <T> createCodec(registry: RegistryKey<Registry<T>>): Codec<Composite<T>> = Codec.either(DirectEntry.createCodec(registry), TagEntry.createCodec(registry)).listOf().registryXmap(
                 registry,
                 { entries, registry -> Composite(registry, entries.map { either -> either.map({ it }, { it }) }) },
                 { composite, _ -> composite.entries.map { when (it) {
-                    is EntryEntry -> Either.left(it)
+                    is DirectEntry -> Either.left(it)
                     is TagEntry -> Either.right(it)
-                    else -> throw AssertionError("Cannot encode nested composites")
                 } } }
             )
         }
@@ -110,7 +99,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
             tags.add(tagKey)
         }
 
-        fun build() = Composite(registryEntries, entries.map(::EntryEntry) + tags.map(::TagEntry))
+        fun build() = Composite(registryEntries, entries.map(::DirectEntry) + tags.map { TagEntry(registryEntries, it) })
 
         operator fun RegistryEntry<T>.unaryPlus() = add(this)
         operator fun RegistryKey<T>.unaryPlus() = add(this)
@@ -119,7 +108,7 @@ sealed interface RegistryIngredient<T> : Predicate<RegistryEntry<T>> {
     }
 
     companion object {
-        fun <T> of(registry: RegistryEntryLookup<T>, vararg entries: RegistryIngredient<T>): RegistryIngredient<T> = Composite(registry, entries.toList())
+        fun <T> of(registry: RegistryEntryLookup<T>, vararg entries: Entry<T>): RegistryIngredient<T> = Composite(registry, entries.toList())
         fun <T> of(registry: RegistryEntryLookup<T>, init: Builder<T>.() -> Unit) = Builder(registry).apply(init).build()
         fun <T> of(registry: Registry<T>, init: Builder<T>.() -> Unit) = Builder(registry).apply(init).build()
 
