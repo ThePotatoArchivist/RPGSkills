@@ -60,7 +60,7 @@
   "screen.widget.rpgskills.lockgroup.recipes": "Can now craft",
   "screen.widget.rpgskills.skill.level": "Level %s/%s",
   "screen.widget.rpgskills.skill.tooltip": "Click to view unlocks",
-  "screen.widget.rpgskills.skill_display.level": "%s/%s",
   "screen.widget.rpgskills.skilltab.tooltip": "Level %s",
-  "toast.rpgskills.job_complete": "Job Complete!"
+  "toast.rpgskills.job_complete": "Job Complete!",
+  "widget.rpgskills.skill_display.level": "Level"
 }

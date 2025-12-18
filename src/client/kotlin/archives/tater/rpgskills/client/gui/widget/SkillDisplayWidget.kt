@@ -3,6 +3,7 @@ package archives.tater.rpgskills.client.gui.widget
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.client.gui.SkillXpBar
 import archives.tater.rpgskills.client.gui.widget.SkillWidget.Companion.SKILL_LEVEL
+import archives.tater.rpgskills.client.util.mouseIn
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
@@ -19,11 +20,15 @@ class SkillDisplayWidget(x: Int, y: Int, private val skill: RegistryEntry<Skill>
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
 //        context.drawGuiTexture(ActiveJobWidget.BACKGROUND_TEXTURE, x, y, width, height)
         context.drawItem(skill.value.icon, x + MARGIN, y + MARGIN)
-        context.drawText(textRenderer, skill.name, x + MARGIN + 2 + 16, y + MARGIN, 0x404040, false)
-        SKILL_LEVEL.text(level, skill.value.levels.size).let {
-            context.drawText(textRenderer, it, x + width - MARGIN - 2 - textRenderer.getWidth(it), y + MARGIN, 0x00FFFF, true)
+        context.drawText(textRenderer, skill.name, x + MARGIN + 2 + 16, y + MARGIN + 4, 0xFFFFFF, true)
+        level.toString().let {
+            val levelWidth = textRenderer.getWidth(it)
+            val levelX = x + width - MARGIN - 2 - levelWidth
+            val levelY = y + MARGIN + 4
+            context.drawText(textRenderer, it, levelX, levelY, if (level == 0) 0xCCCCCC else 0x00FFFF, true)
+            if (mouseIn(mouseX, mouseY, levelX, levelY, levelWidth, textRenderer.fontHeight))
+                MinecraftClient.getInstance().currentScreen?.setTooltip(LEVEL.text)
         }
-        SkillXpBar.draw(context, level.toFloat() / skill.value.levels.size, x + MARGIN + 2 + 16, y + height - MARGIN - SkillXpBar.HEIGHT)
     }
 
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {
@@ -37,7 +42,7 @@ class SkillDisplayWidget(x: Int, y: Int, private val skill: RegistryEntry<Skill>
         const val HEIGHT = MARGIN * 2 + 16
         const val WIDTH = 127
 
-        val SKILL_LEVEL = Translation.arg("screen.widget.$MOD_ID.skill_display.level")
+        val LEVEL = Translation.unit("widget.$MOD_ID.skill_display.level")
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
     }
