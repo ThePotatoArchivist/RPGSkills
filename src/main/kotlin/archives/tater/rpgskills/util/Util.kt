@@ -245,7 +245,10 @@ fun <T> singleTagGenerator(tag: TagKey<T>, vararg entries: RegistryKey<T>) =
 fun <T> RegistryEntryList(registry: Registry<T>, vararg entries: T): RegistryEntryList.Direct<T> =
     RegistryEntryList.of(entries.map { registry.getEntry(it) })
 
-fun <T> Iterable<T>.joinToText(separator: String = ", ", transform: (T) -> Text): MutableText = Texts.join(toList(), Text.literal(separator), transform)
+fun Collection<Text>.joinToText(separator: Text): Text = Texts.join(this, separator)
+fun Collection<Text>.joinToText(separator: String = ", "): Text = Texts.join(this, Text.literal(separator))
+fun <T> Collection<T>.joinToText(separator: Text, transform: (T) -> Text): MutableText = Texts.join(this, separator, transform)
+fun <T> Collection<T>.joinToText(separator: String = ", ", transform: (T) -> Text): MutableText = Texts.join(this, Text.literal(separator), transform)
 
 inline fun <T> MutableIterator<T>.removeIf(condition: (T) -> Boolean) {
     for (value in this)

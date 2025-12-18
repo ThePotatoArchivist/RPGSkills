@@ -172,9 +172,9 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                         }
                         subExec("all") { command ->
                             val component = command.source.server.overworld[BossTrackerComponent]
-                            val all = component.increasesLevelCap
+                            val all = component.increasesLevelCap.toList()
                             command.source.sendFeedback(LIST_BOSSES_ALL.text(component.totalCount, all.joinToText { it.value.name }), false)
-                            all.size()
+                            all.size
                         }
                     }
                     subExec("reset") {

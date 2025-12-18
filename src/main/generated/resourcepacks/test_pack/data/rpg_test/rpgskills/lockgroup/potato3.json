@@ -20,9 +20,11 @@
   },
   "requirements": [
     {
+      "rpg_test:cow": 1,
       "rpg_test:potato": 3
     },
     {
+      "rpg_test:cow": 1,
       "rpg_test:grass": 2
     }
   ]

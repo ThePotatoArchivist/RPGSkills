@@ -15,40 +15,41 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
-import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
+import net.minecraft.item.Items.ENCHANTED_BOOK
 import net.minecraft.item.SpawnEggItem
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.text.Text
-import net.minecraft.text.Texts
+import net.minecraft.util.Colors
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.UseAction
 import kotlin.jvm.optionals.getOrNull
 
-class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, player: PlayerEntity) :
+class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, level: Int, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
 
-    private val requireText: List<Text> =
-        lockGroup.requirementContaining(skill)
-            ?.entries
-            ?.filter { it.key != skill }
-            ?.takeUnless { it.isEmpty() }
-            ?.let {
-                listOf(
-                    ItemLockTooltip.getTitle(lockGroup, player, tooltip = false),
-                    ItemLockTooltip.getRequirement(it, player, tooltip = false)
-                )
-            }
-            ?: listOf()
-    private val requireTextHeight = if (requireText.isEmpty()) 0 else textRenderer.fontHeight * requireText.size + GAP
+    private val additionalRequirements = lockGroup.requirementsContaining(skill, level)
+        .mapIndexedNotNull { index, requirement ->
+            requirement.entries
+                .filter { it.key != skill }
+                .takeUnless { it.isEmpty() }
+                ?.let {
+                    ItemLockTooltip.getRequirement(it, player, tooltip = false).apply {
+                        withColor(getColor(index))
+                    }
+                }
+        }
+        .takeUnless { it.isEmpty() }
+        ?.joinToText(WidgetTexts.OR.text)
 
     private val requireTooltip = buildList {
         ItemLockTooltip.appendRequirements(lockGroup, player, this)
@@ -56,40 +57,48 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
 
     private val columns = (width - 2 * MARGIN) / SLOT_SIZE
 
-    private val canUse = buildList {
-        addAll(lockGroup.items.toDisplayedSlot({ it.name }) { if (!it.isPlaced() || it.defaultStack.useAction != UseAction.NONE) it.defaultStack else null })
-        addAll(lockGroup.blocks.toDisplayedSlot({ it.name }) { itemOf(it) })
-        addAll(lockGroup.entities.toDisplayedSlot({ it.name }) { itemOf(it) })
-    }
-    private val canPlace = lockGroup.items.toDisplayedSlot({ it.name }) { if (it.isPlaced()) it.defaultStack else null }
-    private val enchantments = lockGroup.enchantments.toDisplayedSlot({ it.description }) {
-        Items.ENCHANTED_BOOK.defaultStack
-    }
-    private val recipes = lockGroup.recipes.toDisplayedSlot({ it.name }) { it.defaultStack }
-
     private val groups = listOf(
-        Section(WidgetTexts.CAN_USE, SLOT_USE_TEXTURE, canUse),
-        Section(WidgetTexts.CAN_PLACE, SLOT_PLACE_TEXTURE, canPlace),
-        Section(WidgetTexts.ENCHANTMENTS, SLOT_ENCHANT_TEXTURE, enchantments),
-        Section(WidgetTexts.RECIPES, SLOT_CRAFT_TEXTURE, recipes),
+        Section(
+            WidgetTexts.CAN_USE.getText(additionalRequirements),
+            SLOT_USE_TEXTURE,
+            buildList<DisplayedSlot> {
+                addAll(lockGroup.items.toDisplayedSlot({ it.name }) { if (!it.isPlaced() || it.defaultStack.useAction != UseAction.NONE) it.defaultStack else null })
+                addAll(lockGroup.blocks.toDisplayedSlot({ it.name }) { itemOf(it) })
+                addAll(lockGroup.entities.toDisplayedSlot({ it.name }) { itemOf(it) })
+            }
+        ),
+        Section(
+            WidgetTexts.CAN_PLACE.getText(additionalRequirements),
+            SLOT_PLACE_TEXTURE,
+            lockGroup.items.toDisplayedSlot({ it.name }) { if (it.isPlaced()) it.defaultStack else null }
+        ),
+        Section(
+            WidgetTexts.CAN_ENCHANT.getText(additionalRequirements),
+            SLOT_ENCHANT_TEXTURE,
+            lockGroup.enchantments.toDisplayedSlot({ it.description }) {
+                ENCHANTED_BOOK.defaultStack
+            }
+        ),
+        Section(
+            WidgetTexts.CAN_CRAFT.getText(additionalRequirements),
+            SLOT_CRAFT_TEXTURE,
+            lockGroup.recipes.toDisplayedSlot({ it.name }) { it.defaultStack }
+        ),
     )
 
     init {
-        height = requireTextHeight + getTotalHeight(columns, groups.map { it.slots })
+        height = getTotalHeight(columns, groups.map { it.slots })
     }
 
     override fun renderWidget(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
         val animationCounter = RPGSkillsClient.animationCounter / ANIMATION_RATE
 
-        requireText.forEachIndexed { index, line ->
-            context.drawText(textRenderer, line, x + MARGIN, y + MARGIN + index * textRenderer.fontHeight, 0x404040, false)
-        }
-        var currentY = MARGIN + y + requireTextHeight
+        var currentY = MARGIN + y
         var tooltip: Text? = null
         for ((title, slotTexture, stacks) in groups) {
             if (stacks.isEmpty()) continue
-            context.drawText(textRenderer, title.text, x + MARGIN, currentY, 0x404040, false)
+            context.drawText(textRenderer, title, x + MARGIN, currentY, 0x404040, false)
 
             stacks.forEachIndexed { index, (text, stacks) ->
                 val slotX = x + MARGIN + SLOT_SIZE * (index % columns)
@@ -119,7 +128,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
     @JvmRecord
     private data class DisplayedSlot(val text: Text, val stacks: List<ItemStack>)
     @JvmRecord
-    private data class Section(val title: UnitTranslation, val slotTexture: Identifier, val slots: List<DisplayedSlot>)
+    private data class Section(val title: Text, val slotTexture: Identifier, val slots: List<DisplayedSlot>)
 
     companion object {
         private fun getTotalHeight(columns: Int, lists: List<List<*>>): Int = 2 * MARGIN +
@@ -139,6 +148,13 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         const val ANIMATION_RATE = 20
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
+
+        fun getColor(index: Int) = when(index) {
+            0 -> 0xB25C19 // Orange
+            1 -> 0x24A80C // Green
+            2 -> 0x24A80C // Blue
+            else -> 0xffffff
+        }
 
         private val ENTITY_ITEMS by lazy<Map<EntityType<*>, Item>> {
             Registries.ENTITY_TYPE.streamEntries().associateNotNullToMap {
@@ -170,11 +186,20 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
     }
 
     object WidgetTexts {
-        private fun of(name: String) = Translation.unit("screen.widget.rpgskills.lockgroup.$name")
+        private fun unit(name: String) = Translation.unit("screen.widget.rpgskills.lockgroup.$name")
+        private fun arg(name: String) = Translation.arg("screen.widget.rpgskills.lockgroup.$name")
+
+        private fun of(name: String) = SectionTitle(unit(name), arg("$name.additional"))
 
         val CAN_USE = of("can_use")
         val CAN_PLACE = of("can_place")
-        val ENCHANTMENTS = of("enchantments")
-        val RECIPES = of("recipes")
+        val CAN_ENCHANT = of("can_enchant")
+        val CAN_CRAFT = of("can_craft")
+        val OR = unit("or")
+
+        data class SectionTitle(val normal: UnitTranslation, val additional: ArgTranslation) {
+            fun getText(additional: Text?) =
+                if (additional == null) normal.text else this.additional.text(additional)
+        }
     }
 }

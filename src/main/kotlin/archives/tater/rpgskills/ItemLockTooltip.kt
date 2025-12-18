@@ -6,8 +6,10 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.joinToText
 import archives.tater.rpgskills.util.value
 import com.mojang.authlib.minecraft.client.MinecraftClient
+import net.minecraft.advancement.criterion.ConstructBeaconCriterion.Conditions.level
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
@@ -25,21 +27,21 @@ object ItemLockTooltip {
     val REQUIREMENT = Translation.arg("rpgskills.tooltip.stack.requirement") { formatted(Formatting.DARK_GRAY) }
 
     @JvmStatic
-    fun getRequirement(requirement: Collection<Map.Entry<RegistryEntry<Skill>, Int>>, player: PlayerEntity, tooltip: Boolean = true): Text = Text.empty().apply {
-
+    fun getRequirement(requirement: Collection<Map.Entry<RegistryEntry<Skill>, Int>>, player: PlayerEntity, tooltip: Boolean = true): MutableText {
         val skills = player[SkillsComponent]
 
-        requirement.forEachIndexed { index, (skill, level) ->
-            if (index != 0)
-                append(Text.literal(" + ").formatted(Formatting.DARK_GRAY))
-            append(skill.name.apply { if (tooltip) formatted(Formatting.WHITE) })
-            append(Text.literal(" $level").formatted(
-                when {
-                    skills[skill] < level -> Formatting.RED
-                    tooltip -> Formatting.AQUA
-                    else -> Formatting.BLUE
-                }
-            ))
+        return requirement.toList().joinToText (Text.literal(" + ").formatted(Formatting.DARK_GRAY)) { (skill, level) ->
+            Text.empty().apply {
+                append(skill.name)
+                append(Text.literal(" $level").apply {
+                    when {
+                        !tooltip -> {}
+                        skills[skill] < level -> formatted(Formatting.RED)
+                        else -> formatted(Formatting.AQUA)
+                    }
+                })
+                if (tooltip) formatted(Formatting.WHITE)
+            }
         }
     }
 

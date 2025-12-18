@@ -9,14 +9,12 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.client.gui.SkillXpBar
 import archives.tater.rpgskills.util.Translation
-import archives.tater.rpgskills.util.ceilDiv
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.streamEntriesOrdered
 import archives.tater.rpgskills.util.value
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
-import net.minecraft.client.gui.widget.TextWidget
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.screen.ScreenTexts
@@ -57,9 +55,9 @@ class SkillScreen(
 
                 player.registryManager[LockGroup].streamEntriesOrdered(RPGSkillsTags.LOCK_GROUP_ORDER)
                     .filter { lockEntry -> lockEntry.value.requirements.any { it[skill] == levelAmount } }
-                    .sorted(compareBy { it.value.requirementContaining(skill)?.size ?: 0 })
+                    .sorted(compareBy { it.value.requirementsContaining(skill, levelAmount).sumOf { requirement -> requirement.size } })
                     .forEach {
-                        add(LockGroupWidget(x + 10, 0, 224, it.value, skill, player))
+                        add(LockGroupWidget(x + 10, 0, 224, it.value, skill, levelAmount, player))
                         hasContent = true
                     }
 

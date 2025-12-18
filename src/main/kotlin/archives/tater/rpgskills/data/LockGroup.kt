@@ -56,7 +56,7 @@ data class LockGroup(
     fun enchantmentMessage() = enchantments.message?.let(Text::literal) ?: DEFAULT_ENCHANTMENT_MESSAGE.text()
     fun recipeMessage() = recipes.message?.let(Text::literal) ?: DEFAULT_RECIPE_MESSAGE.text()
 
-    fun requirementContaining(skill: RegistryEntry<Skill>) = requirements.find { skill in it }
+    fun requirementsContaining(skill: RegistryEntry<Skill>, level: Int) = requirements.filter { it[skill] == level }
 
     @JvmRecord
     data class LockList<T>(

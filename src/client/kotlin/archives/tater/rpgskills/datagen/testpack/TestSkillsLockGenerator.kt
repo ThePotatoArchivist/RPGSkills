@@ -84,10 +84,12 @@ class TestSkillsLockGenerator(
         provider.accept(testPackId("potato3"), LockGroup(
             requirements = listOf(
                 mapOf(
-                    TestSkillGenerator.POTATO_SKILL.entry to 3
+                    TestSkillGenerator.COW_SKILL.entry to 1,
+                    TestSkillGenerator.POTATO_SKILL.entry to 3,
                 ),
                 mapOf(
-                    TestSkillGenerator.GRASS_SKILL.entry to 2
+                    TestSkillGenerator.COW_SKILL.entry to 1,
+                    TestSkillGenerator.GRASS_SKILL.entry to 2,
                 ),
             ),
             items = LockList(
