@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
@@ -101,6 +102,6 @@ class SkillScreen(
         const val WIDTH = 252
         const val HEIGHT = 176
 
-        val LEVEL = Translation.arg("screen.rgpskills.skill.level")
+        val LEVEL = Translation.arg("screen.$MOD_ID.skill.level")
     }
 }

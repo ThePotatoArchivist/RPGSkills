@@ -25,8 +25,6 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.text.Text
 import net.minecraft.util.UseAction
-import com.google.common.collect.BiMap
-import jdk.vm.ci.code.Location.stack
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 

@@ -31,8 +31,12 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
+import net.minecraft.command.argument.EntityArgumentType.player
+import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.sound.SoundEvents
+import com.teamresourceful.resourcefullib.client.utils.ScreenUtils
 import org.lwjgl.glfw.GLFW
+import java.awt.im.InputContext
 import kotlin.jvm.optionals.getOrNull
 
 object RPGSkillsClient : ClientModInitializer {
@@ -60,6 +64,8 @@ object RPGSkillsClient : ClientModInitializer {
     ))
 
     val JOB_SKILL_CACHE = RegistryCache(Skill.key) { skill -> skill.value.levels.flatMap { level -> level.jobs } }
+
+    fun requirementKeyPressed(client: MinecraftClient) = InputUtil.isKeyPressed(client.window.handle, GLFW.GLFW_KEY_LEFT_SHIFT)
 
 	override fun onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
@@ -106,8 +112,9 @@ object RPGSkillsClient : ClientModInitializer {
 		}
 
 		ItemTooltipCallback.EVENT.register { stack, _, _, tooltip ->
-            MinecraftClient.getInstance().player?.let {
-                RequirementTooltip.appendTooltip(stack, it, tooltip)
+            val client = MinecraftClient.getInstance()
+            client.player?.let {
+                RequirementTooltip.appendTooltip(stack, it, tooltip, requirementKeyPressed(client))
             }
 		}
 	}
