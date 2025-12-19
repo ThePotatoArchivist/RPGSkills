@@ -83,10 +83,10 @@ object RequirementTooltip {
 
         if (useLock == null && placeLock == null && craftLock == null) return
 
-//        if (!keyPressed) {
-//            tooltip.add(HINT.text)
-//            return
-//        }
+        if (!keyPressed) {
+            tooltip.add(HINT.text)
+            return
+        }
 
         useLock?.let {
             tooltip.add(Text.empty())

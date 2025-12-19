@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package archives.tater.rpgskills.util
 
 import archives.tater.rpgskills.RPGSkills
@@ -57,6 +59,10 @@ internal inline fun <T: Any, C> MapCodec<Optional<T>>.forGetter(crossinline gett
     forGetter { Optional.ofNullable(getter(it)) }
 
 inline val <T> RegistryEntry<T>.value: T get() = value()
+
+inline fun <T> RegistryEntry<T>.component1() = key.getOrNull()
+inline operator fun <T> RegistryEntry<T>.component2() = value
+inline operator fun <T> RegistryEntry.Reference<T>.component1(): RegistryKey<T> = registryKey()
 
 fun IdentifiableResourceReloadListener(
     fabricId: Identifier, reload: (
@@ -291,10 +297,15 @@ fun <A, B, E> Codec<A>.registryXmap(
 
 fun ItemPredicate(init: ItemPredicate.Builder.() -> Unit): ItemPredicate = ItemPredicate.Builder.create().apply(init).build()
 
-fun <T, K: Any, V: Any> Stream<T>.associateNotNullToMap(transform: (T) -> Pair<K?, V?>?): Map<K, V> = this
+fun <T, K: Any, V: Any> Stream<T>.associateNotNull(transform: (T) -> Pair<K?, V?>?): Map<K, V> = this
     .map { transform(it) }
     .filter { it != null && it.first != null && it.second != null }
     .collect(Collectors.toMap({ it!!.first!! }, { it!!.second!! }))
+
+fun <K: Any, V: Any> Stream<K>.associateNotNullWith(transform: (K) -> V?): Map<K, V> = this
+    .map { key -> transform(key)?.let { key to it } }
+    .filter { it != null }
+    .collect(Collectors.toMap({ it.first }, { it.second }))
 
 fun Text.takeIfTranslated() = takeIf { Texts.hasTranslation(this) }
 

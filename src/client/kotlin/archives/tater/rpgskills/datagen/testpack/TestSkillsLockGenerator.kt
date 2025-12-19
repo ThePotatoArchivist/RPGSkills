@@ -57,6 +57,7 @@ class TestSkillsLockGenerator(
                     +Items.COD
                     +Items.CHEST_MINECART
                     +Items.ARMOR_STAND
+                    +ItemTags.BOATS
                 },
                 "You don't know how to eat with this fork",
             ),
@@ -66,6 +67,7 @@ class TestSkillsLockGenerator(
                     +EntityType.CHICKEN
                     +EntityType.ARMOR_STAND
                     +EntityType.TNT_MINECART
+                    +EntityType.BOAT
                 },
                 "AAA"
             ),

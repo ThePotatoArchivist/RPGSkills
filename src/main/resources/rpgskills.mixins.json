@@ -11,6 +11,7 @@
     "job.AbstractCriterionMixin",
     "job.AdvancementCriterionAccessor",
     "locking.AnvilScreenHandlerMixin",
+    "locking.BoatItemAccessor",
     "locking.CraftingScreenHandlerMixin",
     "locking.ItemStackMixin",
     "locking.LivingEntityMixin",

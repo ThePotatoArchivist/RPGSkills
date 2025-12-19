@@ -2,6 +2,7 @@ package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.cca.SkillsComponent
+import archives.tater.rpgskills.mixin.locking.BoatItemAccessor
 import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -12,8 +13,11 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.BlockItem
+import net.minecraft.item.BoatItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
+import net.minecraft.item.ProjectileItem
 import net.minecraft.item.SpawnEggItem
 import net.minecraft.recipe.RecipeEntry
 import net.minecraft.registry.Registries
@@ -117,9 +121,7 @@ data class LockGroup(
         fun useGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) =
             ITEM_CACHE[registries][stack.item]?.value?.takeIf { isUsedItem(stack.item) }
                 ?: (stack.item as? BlockItem)?.let { BLOCK_CACHE[registries][it.block]?.value }
-                ?: ENTITY_ITEMS.entries.find { (_, item) -> stack isOf item }?.key?.let {
-                    ENTITY_CACHE[registries][it]?.value
-                }
+                ?: ITEM_ENTITIES[stack.item]?.let { ENTITY_CACHE[registries][it]?.value }
 
         fun placeGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) =
             ITEM_CACHE[registries][stack.item]?.value?.takeIf { isPlacedItem(stack.item) }
@@ -143,14 +145,29 @@ data class LockGroup(
         @JvmStatic fun isLocked(player: PlayerEntity, recipe: RecipeEntry<*>) = findLocked(player, recipe) != null
 
         val ENTITY_ITEMS by lazy {
-            Registries.ENTITY_TYPE.streamEntries().associateNotNullToMap {
-                it.value to
-                        (SpawnEggItem.forEntity(it.value)
-                            ?: Registries.ITEM.getOrEmpty(it.registryKey().value).getOrNull())
+            Registries.ENTITY_TYPE.streamEntries().associateNotNull { (key, entityType) ->
+                entityType to when (entityType) {
+                    EntityType.BOAT -> Items.OAK_BOAT
+                    EntityType.CHEST_BOAT -> Items.OAK_CHEST_BOAT
+                    else -> SpawnEggItem.forEntity(entityType)
+                        ?: Registries.ITEM.getOrEmpty(key.value).getOrNull().takeUnless { it is ProjectileItem }
+                }
             }
         }
 
-        fun isPlacedItem(item: Item) = item is BlockItem || ENTITY_ITEMS.containsValue(item)
+        val ITEM_ENTITIES by lazy {
+            Registries.ITEM.streamEntries().associateNotNull { (key, item) ->
+                item to when (item) {
+                    is BoatItem if (item as BoatItemAccessor).chest -> EntityType.CHEST_BOAT
+                    is BoatItem -> EntityType.BOAT
+                    is SpawnEggItem -> item.getEntityType(item.defaultStack)
+                    is ProjectileItem -> null
+                    else -> Registries.ENTITY_TYPE.getOrEmpty(key.value).getOrNull()
+                }
+            }
+        }
+
+        fun isPlacedItem(item: Item) = item is BlockItem || item in ITEM_ENTITIES
         fun isUsedItem(item: Item) = !isPlacedItem(item) || item.defaultStack.useAction != UseAction.NONE
     }
 

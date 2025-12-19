@@ -7,7 +7,8 @@
       "minecraft:villager",
       "minecraft:chicken",
       "minecraft:armor_stand",
-      "minecraft:tnt_minecart"
+      "minecraft:tnt_minecart",
+      "minecraft:boat"
     ],
     "message": "AAA"
   },
@@ -17,7 +18,8 @@
       "minecraft:diamond_helmet",
       "minecraft:cod",
       "minecraft:chest_minecart",
-      "minecraft:armor_stand"
+      "minecraft:armor_stand",
+      "#minecraft:boats"
     ],
     "message": "You don't know how to eat with this fork"
   },

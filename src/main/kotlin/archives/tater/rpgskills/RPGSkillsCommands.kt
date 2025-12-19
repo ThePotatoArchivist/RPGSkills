@@ -1,17 +1,16 @@
 package archives.tater.rpgskills
 
 import archives.tater.rpgskills.RPGSkills.MOD_ID
+import archives.tater.rpgskills.cca.BossTrackerComponent
+import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.data.SkillClass
-import archives.tater.rpgskills.cca.BossTrackerComponent
-import archives.tater.rpgskills.cca.SkillsComponent
-import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.*
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType.getInteger
 import com.mojang.brigadier.arguments.IntegerArgumentType.integer
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.command.argument.EntityArgumentType.getPlayer
 import net.minecraft.command.argument.EntityArgumentType.player
@@ -146,6 +145,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                         argumentExec("player", player()) { command ->
                             val player = getPlayer(command, "player")
                             player[SkillsComponent].skillClass = null
+                            SkillsComponent.openClassScreen(player)
                             command.source.sendFeedback(RESET_CLASS.text(player.displayName!!), true)
                             0
                         }

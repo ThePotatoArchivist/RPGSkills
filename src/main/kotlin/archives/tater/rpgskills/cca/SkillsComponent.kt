@@ -6,6 +6,7 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.*
+import net.fabricmc.fabric.api.networking.v1.PacketSender
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -17,7 +18,9 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents
+import org.apache.logging.log4j.core.jmx.Server
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
@@ -183,6 +186,12 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         fun getRemainingPoints(points: Int) =
             points - (LEVEL_LOOKUP.floorKey(points) ?: 0)
 
+        fun openClassScreen(player: ServerPlayerEntity) {
+            ServerPlayNetworking.send(player, ChooseClassPayload)
+            player.abilities.invulnerable = true
+            player.sendAbilitiesUpdate()
+        }
+
         fun registerEvents() {
             // Choose class
             ServerPlayNetworking.registerGlobalReceiver(ClassChoicePayload.ID) { payload, context ->
@@ -215,12 +224,10 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             }
 
             // Join without class
-            ServerPlayConnectionEvents.JOIN.register { handler, sender, server ->
+            ServerPlayConnectionEvents.JOIN.register { handler, _, server ->
                 val player = handler.player
                 if (player[SkillsComponent].skillClass != null || server.registryManager[SkillClass].isEmpty()) return@register
-                sender.sendPacket(ChooseClassPayload)
-                player.abilities.invulnerable = true
-                player.sendAbilitiesUpdate()
+                openClassScreen(player)
             }
         }
     }
