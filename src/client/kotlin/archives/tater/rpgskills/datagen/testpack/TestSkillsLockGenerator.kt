@@ -58,6 +58,7 @@ class TestSkillsLockGenerator(
                     +Items.CHEST_MINECART
                     +Items.ARMOR_STAND
                     +ItemTags.BOATS
+                    +Items.ARROW
                 },
                 "You don't know how to eat with this fork",
             ),

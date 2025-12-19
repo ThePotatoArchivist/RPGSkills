@@ -19,6 +19,7 @@
       "minecraft:cod",
       "minecraft:chest_minecart",
       "minecraft:armor_stand",
+      "minecraft:arrow",
       "#minecraft:boats"
     ],
     "message": "You don't know how to eat with this fork"
