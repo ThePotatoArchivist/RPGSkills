@@ -143,9 +143,9 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         private val textRenderer = MinecraftClient.getInstance().textRenderer
 
         fun getColor(index: Int) = when(index) {
-            0 -> 0xB25C19 // Orange
-            1 -> 0x24A80C // Green
-            2 -> 0x24A80C // Blue
+            0 -> 0x5F320F // Orange
+            1 -> 0x146306 // Green
+            2 -> 0x07295C // Blue
             else -> 0xffffff
         }
 

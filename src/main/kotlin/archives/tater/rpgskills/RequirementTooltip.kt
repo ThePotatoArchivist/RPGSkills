@@ -22,7 +22,7 @@ import kotlin.collections.component2
 object RequirementTooltip {
     val REQUIREMENT = Translation.arg("$MOD_ID.tooltip.stack.requirement") { formatted(Formatting.DARK_GRAY) }
     val HINT = Translation.unit("$MOD_ID.tooltip.stack.hint") {
-        formatted(Formatting.DARK_GRAY)
+        formatted(Formatting.GRAY)
     }
     val REQUIRES = Translation.unit("$MOD_ID.tooltip.stack.requires")
     val USE_REQUIRES = Translation.unit("$MOD_ID.tooltip.stack.requires.use")
@@ -54,7 +54,7 @@ object RequirementTooltip {
             formatted(
                 when {
                     !tooltip -> Formatting.BLACK
-                    lockGroup.isSatisfiedBy(player) -> Formatting.WHITE
+                    lockGroup.isSatisfiedBy(player) -> Formatting.GRAY
                     else -> Formatting.RED
                 }
             )
