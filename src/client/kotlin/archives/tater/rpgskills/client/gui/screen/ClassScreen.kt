@@ -2,10 +2,10 @@ package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
-import archives.tater.rpgskills.client.gui.widget.AutoScrollingWidget
 import archives.tater.rpgskills.client.gui.widget.ClassNavButtonWidget
 import archives.tater.rpgskills.client.gui.widget.SkillDisplayWidget
 import archives.tater.rpgskills.client.gui.widget.WrappedTextWidget
+import archives.tater.rpgskills.client.util.confirmScreen
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.ClassChoicePayload
@@ -13,7 +13,6 @@ import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.streamEntriesOrdered
 import archives.tater.rpgskills.util.value
-import archives.tater.rpgskills.util.withFirst
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
@@ -61,12 +60,15 @@ class ClassScreen(
         addDrawableChild(ClassNavButtonWidget(this, x - ClassNavButtonWidget.WIDTH - BUTTON_GAP, y + HEIGHT / 2 - ClassNavButtonWidget.HEIGHT / 2, false))
         addDrawableChild(ClassNavButtonWidget(this, x + WIDTH + BUTTON_GAP, y + HEIGHT / 2 - ClassNavButtonWidget.HEIGHT / 2, true))
         addDrawableChild(ButtonWidget.builder(SELECT.text) {
-            client?.setScreen(ConfirmScreen(listOf(
+            client?.setScreen(confirmScreen(
                 CHOICE.text(selectedClass.value.name),
-                WARNING.text,
-            ), this) {
-                ClientPlayNetworking.send(ClassChoicePayload(selectedClass))
-                close()
+                WARNING.text
+            ) {
+                if (it) {
+                    ClientPlayNetworking.send(ClassChoicePayload(selectedClass))
+                    close()
+                } else
+                    client?.setScreen(this)
             })
         }.position(x, y + HEIGHT + BUTTON_GAP).width(WIDTH).build())
     }

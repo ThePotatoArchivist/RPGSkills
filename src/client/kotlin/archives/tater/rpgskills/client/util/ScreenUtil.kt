@@ -6,8 +6,10 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.screen.ConfirmScreen
 import net.minecraft.client.gui.tooltip.Tooltip
 import net.minecraft.client.gui.widget.ButtonWidget
+import net.minecraft.screen.ScreenTexts
 import net.minecraft.text.Text
 import org.joml.Vector2i
 import org.joml.Vector3f
@@ -88,3 +90,11 @@ fun inRange(value: Int, a: Int, b: Int) = if (a < b) value in a-1..<b else value
 fun mouseIn(mouseX: Int, mouseY: Int, startX: Int, startY: Int, width: Int, height: Int): Boolean {
     return inRange(mouseX, startX, startX + width) && inRange(mouseY, startY, startY + height)
 }
+
+fun confirmScreen(
+    title: Text,
+    message: Text = Text.empty(),
+    yesText: Text = ScreenTexts.YES,
+    noText: Text = ScreenTexts.NO,
+    callback: (confirmed: Boolean) -> Unit
+) = ConfirmScreen(callback, title, message, yesText, noText)
