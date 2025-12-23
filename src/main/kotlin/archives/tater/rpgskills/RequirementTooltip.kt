@@ -21,7 +21,7 @@ import kotlin.collections.component2
 
 object RequirementTooltip {
     val REQUIREMENT = Translation.arg("$MOD_ID.tooltip.stack.requirement") { formatted(Formatting.DARK_GRAY) }
-    val HINT = Translation.unit("$MOD_ID.tooltip.stack.hint") {
+    val HINT = Translation.arg("$MOD_ID.tooltip.stack.hint") {
         formatted(Formatting.DARK_GRAY)
     }
     val REQUIRES = Translation.unit("$MOD_ID.tooltip.stack.requires")
@@ -76,7 +76,7 @@ object RequirementTooltip {
     }
 
     @JvmStatic
-    fun appendTooltip(stack: ItemStack, player: PlayerEntity, tooltip: MutableList<Text>, keyPressed: Boolean) {
+    fun appendTooltip(stack: ItemStack, player: PlayerEntity, tooltip: MutableList<Text>, keyPressed: Boolean, keybinding: Text) {
         val useLock = LockGroup.useGroupOf(player.registryManager, stack)
         val placeLock = LockGroup.placeGroupOf(player.registryManager, stack)
         val craftLock = LockGroup.craftGroupOf(player.registryManager, stack)
@@ -84,7 +84,7 @@ object RequirementTooltip {
         if (useLock == null && placeLock == null && craftLock == null) return
 
         if (!keyPressed) {
-            tooltip.add(HINT.text)
+            tooltip.add(HINT.text(keybinding))
             return
         }
 

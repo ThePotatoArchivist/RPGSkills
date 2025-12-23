@@ -12,6 +12,7 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.cca.SkillsComponent
+import archives.tater.rpgskills.client.ScreenKeyBinding
 import archives.tater.rpgskills.entity.RPGSkillsEntities
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.JobCompletedPayload
@@ -34,6 +35,7 @@ import net.minecraft.client.util.InputUtil
 import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.sound.SoundEvents
+import net.minecraft.text.Text
 import com.teamresourceful.resourcefullib.client.utils.ScreenUtils
 import org.lwjgl.glfw.GLFW
 import java.awt.im.InputContext
@@ -48,6 +50,7 @@ object RPGSkillsClient : ClientModInitializer {
 	const val RPG_SKILLS_CATEGORY = "category.$MOD_ID.$MOD_ID"
 	const val SKILLS_KEY_TRANSLATION = "key.$MOD_ID.screen.skills"
     const val JOBS_KEY_TRANSLATION = "key.$MOD_ID.screen.jobs"
+    const val REQUIREMENTS_KEY_TRANSLATION = "key.$MOD_ID.tooltip.requirements"
 
 	val skillsKey: KeyBinding = KeyBindingHelper.registerKeyBinding(KeyBinding(
 		SKILLS_KEY_TRANSLATION,
@@ -63,9 +66,13 @@ object RPGSkillsClient : ClientModInitializer {
         RPG_SKILLS_CATEGORY,
     ))
 
-    val JOB_SKILL_CACHE = RegistryCache(Skill.key) { skill -> skill.value.levels.flatMap { level -> level.jobs } }
+    val requirementsKey = ScreenKeyBinding(
+        REQUIREMENTS_KEY_TRANSLATION,
+        GLFW.GLFW_KEY_LEFT_SHIFT,
+        RPG_SKILLS_CATEGORY
+    ).also { KeyBindingHelper.registerKeyBinding(it) }
 
-    fun requirementKeyPressed(client: MinecraftClient) = InputUtil.isKeyPressed(client.window.handle, GLFW.GLFW_KEY_LEFT_SHIFT)
+    val JOB_SKILL_CACHE = RegistryCache(Skill.key) { skill -> skill.value.levels.flatMap { level -> level.jobs } }
 
 	override fun onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
@@ -114,7 +121,7 @@ object RPGSkillsClient : ClientModInitializer {
 		ItemTooltipCallback.EVENT.register { stack, _, _, tooltip ->
             val client = MinecraftClient.getInstance()
             client.player?.let {
-                RequirementTooltip.appendTooltip(stack, it, tooltip, requirementKeyPressed(client))
+                RequirementTooltip.appendTooltip(stack, it, tooltip, requirementsKey.isDown, Text.keybind(requirementsKey.translationKey))
             }
 		}
 	}

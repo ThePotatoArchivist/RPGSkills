@@ -5,6 +5,9 @@
   "client": [
     "attribute.ModelPredicateProviderRegistryMixin",
     "compat.bettercombat.WeaponAttributeTooltipMixin",
+    "keybinding.KeyBindingAccessor",
+    "keybinding.KeyBindingEntryMixin",
+    "keybinding.KeyBindingMixin",
     "locking.CraftingScreenMixin",
     "locking.EnchantingPhrasesAccessor",
     "locking.ForgingScreenHandler",
