@@ -36,6 +36,7 @@ class TestSkillsLockGenerator(
             blocks = LockList(
                 RegistryIngredient.ofBlocks {
                     +Blocks.CRAFTING_TABLE
+                    +Blocks.END_GATEWAY
                 },
             ),
             recipes = LockList(

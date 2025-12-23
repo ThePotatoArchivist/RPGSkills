@@ -37,8 +37,6 @@
   "screen.rpgskills.class.class_choice": "Really choose %s class?",
   "screen.rpgskills.class.select": "Select Class",
   "screen.rpgskills.class.warning": "This choice is permanent!",
-  "screen.rpgskills.confirm.cancel": "Cancel",
-  "screen.rpgskills.confirm.ok": "Ok",
   "screen.rpgskills.jobs.active": "Active Jobs %s/%s",
   "screen.rpgskills.jobs.available": "Available Jobs %s/%s",
   "screen.rpgskills.jobs.no_jobs": "No Jobs Assigned",

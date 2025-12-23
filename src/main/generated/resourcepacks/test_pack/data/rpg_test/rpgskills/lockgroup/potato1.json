@@ -1,6 +1,7 @@
 {
   "blocks": [
-    "minecraft:crafting_table"
+    "minecraft:crafting_table",
+    "minecraft:end_gateway"
   ],
   "items": {
     "entries": [

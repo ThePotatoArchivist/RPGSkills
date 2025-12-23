@@ -170,9 +170,9 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
             else -> 0xffffff
         }
 
-        fun itemOf(block: Block): ItemStack = (block.asItem().takeUnless { it == Items.AIR } ?: Items.BARRIER).defaultStack
+        fun itemOf(block: Block): ItemStack? = block.asItem().takeUnless { it == Items.AIR }?.defaultStack
 
-        fun itemOf(entity: EntityType<*>): ItemStack = (LockGroup.ENTITY_ITEMS[entity] ?: Items.BARRIER).defaultStack
+        fun itemOf(entity: EntityType<*>): ItemStack? = LockGroup.ENTITY_ITEMS[entity]?.defaultStack
 
         @Suppress("UNCHECKED_CAST")
         private fun <T> LockGroup.LockList<RegistryIngredient.Composite<T>>.toDisplayedSlot(text: (T) -> Text, transform: (T) -> ItemStack?): List<DisplayedSlot> =
