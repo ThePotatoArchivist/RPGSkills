@@ -41,6 +41,10 @@ repositories {
 	maven { url 'https://maven.wispforest.io/releases' }
 	maven { url 'https://maven.su5ed.dev/releases' }
     maven { url 'https://maven.teamresourceful.com/repository/maven-public/' }
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
 }
 
 loom {
@@ -86,6 +90,8 @@ dependencies {
 
 	modLocalRuntime modCompileOnly("io.wispforest:accessories-fabric:${project.accessories_version}")
     modLocalRuntime modCompileOnly("earth.terrarium.chipped:chipped-fabric-1.21.1:${project.chipped_version}")
+    modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
+    modLocalRuntime "dev.emi:emi-fabric:${emi_version}"
 
 	modClientRuntimeOnly "maven.modrinth:skip-backup-screen:${project.sbs_version}"
 }

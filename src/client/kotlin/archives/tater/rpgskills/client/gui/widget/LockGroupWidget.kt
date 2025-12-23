@@ -5,10 +5,12 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.client.gui.fallbackText
 import archives.tater.rpgskills.client.util.getMousePosScrolled
+import archives.tater.rpgskills.client.util.mouseIn
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.RegistryIngredient
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.util.*
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.block.Block
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
@@ -25,7 +27,9 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import net.minecraft.util.UseAction
+import dev.emi.emi.api.EmiApi
+import dev.emi.emi.api.stack.EmiIngredient
+import dev.emi.emi.api.stack.EmiStack
 
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, level: Int, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
@@ -79,6 +83,8 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         ),
     )
 
+    private var hoveredSlot: DisplayedSlot? = null
+
     init {
         height = getTotalHeight(columns, groups.map { it.slots })
     }
@@ -89,18 +95,21 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
 
         var currentY = MARGIN + y
         var tooltip: Text? = null
+        hoveredSlot = null
         for ((title, slotTexture, stacks) in groups) {
             if (stacks.isEmpty()) continue
             context.drawText(textRenderer, title, x + MARGIN, currentY, 0x404040, false)
 
-            stacks.forEachIndexed { index, (text, stacks) ->
+            stacks.forEachIndexed { index, slot ->
+                val (text, stacks) = slot
                 val slotX = x + MARGIN + SLOT_SIZE * (index % columns)
                 val slotY = currentY + textRenderer.fontHeight + SLOT_SIZE * (index / columns)
                 val stack = stacks[animationCounter % stacks.size]
                 context.drawGuiTexture(slotTexture, slotX, slotY, 0, 18, 18)
                 context.drawItem(stack, slotX + 1, slotY + 1)
                 context.drawItemInSlot(textRenderer, stack, slotX + 1, slotY + 1)
-                if (context.scissorContains(mouseX, mouseY) && tMouseX in slotX..<(slotX + 18) && tMouseY in slotY..<(slotY + 18)) {
+                if (context.scissorContains(mouseX, mouseY) && mouseIn(tMouseX, tMouseY, slotX, slotY, 18, 18)) {
+                    hoveredSlot = slot
                     tooltip = text
                     HandledScreen.drawSlotHighlight(context, slotX + 1, slotY + 1, 0)
                 }
@@ -116,10 +125,22 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         }
     }
 
+    override fun clicked(mouseX: Double, mouseY: Double): Boolean = hoveredSlot != null
+
+    override fun onClick(mouseX: Double, mouseY: Double) {
+        val (_, stacks, entry) = this@LockGroupWidget.hoveredSlot ?: return
+        if (FabricLoader.getInstance().isModLoaded("emi"))
+            EmiApi.displayRecipes(when (entry) {
+                is RegistryIngredient.TagEntry -> EmiIngredient.of(entry.tag)
+                else if stacks.size == 1 -> EmiStack.of(stacks[0])
+                else -> EmiIngredient.of(stacks.map { EmiStack.of(it) })
+            })
+    }
+
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {}
 
     @JvmRecord
-    private data class DisplayedSlot(val text: Text, val stacks: List<ItemStack>)
+    private data class DisplayedSlot(val text: Text, val stacks: List<ItemStack>, val entry: RegistryIngredient.Entry<*>)
     @JvmRecord
     private data class Section(val title: Text, val slotTexture: Identifier, val slots: List<DisplayedSlot>)
 
@@ -153,6 +174,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
 
         fun itemOf(entity: EntityType<*>): ItemStack = (LockGroup.ENTITY_ITEMS[entity] ?: Items.BARRIER).defaultStack
 
+        @Suppress("UNCHECKED_CAST")
         private fun <T> LockGroup.LockList<RegistryIngredient.Composite<T>>.toDisplayedSlot(text: (T) -> Text, transform: (T) -> ItemStack?): List<DisplayedSlot> =
             entries.entries.mapNotNull { entry ->
                 entry.matchingValues
@@ -164,7 +186,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                             Text.translatable(entry.tag.translationKey).takeIfTranslated()
                                 ?: Text.translatable(TagKey.of(RegistryKeys.ITEM, entry.tag.id).translationKey).takeIfTranslated()
                                 ?: entry.tag.fallbackText()
-                    }, it) }
+                    }, it, entry) }
             }
     }
 

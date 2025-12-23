@@ -69,6 +69,9 @@ class SkillScreen(
 
         addDrawableChild(AutoScrollingWidget(x + 9, y + 26, 234, 141, scrollContents))
 
+        for (item in scrollContents)
+            addSelectableChild(item)
+
         addDrawableChild(ButtonWidget.builder(ScreenTexts.BACK) { close() }.apply {
             width(200)
             position(client!!.window.scaledWidth / 2 - 100, client!!.window.scaledHeight - 25)

@@ -4,6 +4,7 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkills.MOD_ID
 import archives.tater.rpgskills.cca.JobsComponent
 import archives.tater.rpgskills.client.util.getMousePosScrolled
+import archives.tater.rpgskills.client.util.mouseIn
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.networking.AddJobPayload
 import archives.tater.rpgskills.util.Translation
@@ -37,7 +38,7 @@ class AvailableJobWidget(private val job: RegistryEntry<Job>, private val jobs: 
         delta: Float
     ) {
         val (tMouseX, tMouseY) = getMousePosScrolled(context, mouseX, mouseY)
-        hovered = context.scissorContains(mouseX, mouseY) && tMouseX in x..<(x + width) && tMouseY in y..<(y + height)
+        hovered = context.scissorContains(mouseX, mouseY) && mouseIn(tMouseX, tMouseY, x, y, width, height)
 
         super.renderWidget(context, mouseX, mouseY, delta)
         context.drawText(textRenderer, job.value.name, x + MARGIN, y + MARGIN + 1, 0x404040, false)

@@ -19,6 +19,10 @@ import kotlin.math.abs
 class AttributesWidget(x: Int, y: Int, width: Int, attributes: Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier>) :
     ClickableWidget(x, y, width, textRenderer.fontHeight * (attributes.size + 1) + 2 * MARGIN, Text.empty()) {
 
+    init {
+        active = false
+    }
+
     val text = attributes.mapNotNull { (attribute, modifier) ->
         if (modifier.amount == 0.0) return@mapNotNull null
 

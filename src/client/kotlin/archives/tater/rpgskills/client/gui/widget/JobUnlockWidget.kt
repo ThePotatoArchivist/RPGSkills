@@ -15,6 +15,10 @@ import net.minecraft.util.Formatting
 class JobUnlockWidget(x: Int, y: Int, width: Int, private val job: RegistryEntry<Job>) :
     ClickableWidget(x, y, width, 0, Text.empty()), AbstractJobWidget {
 
+    init {
+        active = false
+    }
+
     val text = buildList {
         val textWidth = width - 2 * MARGIN
 

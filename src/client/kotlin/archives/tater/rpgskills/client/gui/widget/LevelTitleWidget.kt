@@ -10,6 +10,10 @@ import net.minecraft.text.Text
 class LevelTitleWidget(x: Int, y: Int, width: Int, message: Text) :
     ClickableWidget(x, y, width, textRenderer.fontHeight + 2 * MARGIN, message) {
 
+    init {
+        active = false
+    }
+
     override fun renderWidget(
         context: DrawContext,
         mouseX: Int,

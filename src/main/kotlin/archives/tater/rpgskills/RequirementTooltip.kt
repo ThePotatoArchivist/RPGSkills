@@ -22,7 +22,7 @@ import kotlin.collections.component2
 object RequirementTooltip {
     val REQUIREMENT = Translation.arg("$MOD_ID.tooltip.stack.requirement") { formatted(Formatting.DARK_GRAY) }
     val HINT = Translation.unit("$MOD_ID.tooltip.stack.hint") {
-        formatted(Formatting.GRAY)
+        formatted(Formatting.DARK_GRAY)
     }
     val REQUIRES = Translation.unit("$MOD_ID.tooltip.stack.requires")
     val USE_REQUIRES = Translation.unit("$MOD_ID.tooltip.stack.requires.use")
