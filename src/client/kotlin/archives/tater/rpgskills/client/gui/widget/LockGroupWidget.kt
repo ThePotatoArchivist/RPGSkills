@@ -109,7 +109,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                 context.drawItem(stack, slotX + 1, slotY + 1)
                 context.drawItemInSlot(textRenderer, stack, slotX + 1, slotY + 1)
                 if (entry is RegistryIngredient.TagEntry)
-                    context.drawGuiTexture(TAG_ICON_TEXTURE, slotX + 1, slotY + 1 + 16 - TAG_ICON_SIZE, TAG_ICON_SIZE, TAG_ICON_SIZE)
+                    context.drawGuiTexture(TAG_ICON_TEXTURE, slotX + 1, slotY + 1 + 16 - TAG_ICON_SIZE, 16, TAG_ICON_SIZE, TAG_ICON_SIZE)
                 if (context.scissorContains(mouseX, mouseY) && mouseIn(tMouseX, tMouseY, slotX, slotY, 18, 18)) {
                     hoveredSlot = slot
                     tooltip = text
