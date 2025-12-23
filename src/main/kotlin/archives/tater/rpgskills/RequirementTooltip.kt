@@ -65,8 +65,10 @@ object RequirementTooltip {
     fun appendRequirements(lockGroup: LockGroup, player: PlayerEntity, text: Consumer<Text>, title: MutableText? = null, tooltip: Boolean = true) {
         text.accept(getTitle(lockGroup, player, title, tooltip))
         lockGroup.requirements.forEachIndexed { index, requirement ->
-            text.accept(REQUIREMENT.text(getRequirement(requirement.entries, player, tooltip)).apply {
-                if (index + 1 < lockGroup.requirements.size) append(OR.text)
+            text.accept(Text.empty().apply { // Prevent bug with rpg series spell engine
+                append(REQUIREMENT.text(getRequirement(requirement.entries, player, tooltip)).apply {
+                    if (index + 1 < lockGroup.requirements.size) append(OR.text)
+                })
             })
         }
     }
