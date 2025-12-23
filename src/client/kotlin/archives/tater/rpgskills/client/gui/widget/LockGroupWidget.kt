@@ -101,13 +101,15 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
             context.drawText(textRenderer, title, x + MARGIN, currentY, 0x404040, false)
 
             stacks.forEachIndexed { index, slot ->
-                val (text, stacks) = slot
+                val (text, stacks, entry) = slot
                 val slotX = x + MARGIN + SLOT_SIZE * (index % columns)
                 val slotY = currentY + textRenderer.fontHeight + SLOT_SIZE * (index / columns)
                 val stack = stacks[animationCounter % stacks.size]
                 context.drawGuiTexture(slotTexture, slotX, slotY, 0, 18, 18)
                 context.drawItem(stack, slotX + 1, slotY + 1)
                 context.drawItemInSlot(textRenderer, stack, slotX + 1, slotY + 1)
+                if (entry is RegistryIngredient.TagEntry)
+                    context.drawGuiTexture(TAG_ICON_TEXTURE, slotX + 1, slotY + 1 + 16 - TAG_ICON_SIZE, TAG_ICON_SIZE, TAG_ICON_SIZE)
                 if (context.scissorContains(mouseX, mouseY) && mouseIn(tMouseX, tMouseY, slotX, slotY, 18, 18)) {
                     hoveredSlot = slot
                     tooltip = text
@@ -155,11 +157,13 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         val SLOT_PLACE_TEXTURE = RPGSkills.id("skill/slot_place")
         val SLOT_ENCHANT_TEXTURE = RPGSkills.id("skill/slot_enchant")
         val SLOT_CRAFT_TEXTURE = RPGSkills.id("skill/slot_craft")
+        val TAG_ICON_TEXTURE = RPGSkills.id("skill/tag")
 
         const val GAP = 4
         const val MARGIN = 6
         const val SLOT_SIZE = 18
         const val ANIMATION_RATE = 20
+        const val TAG_ICON_SIZE = 4
 
         private val textRenderer = MinecraftClient.getInstance().textRenderer
 
