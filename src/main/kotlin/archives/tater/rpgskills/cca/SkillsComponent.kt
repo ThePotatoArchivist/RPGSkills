@@ -49,7 +49,15 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             field = value.coerceAtMost(LEVEL_REQUIREMENTS[maxLevel])
             level = getLevelForPoints(field)
         }
-    var points by ::_points.synced(key, player)
+    var points
+        get() = _points
+        set(value) {
+            val prevLevel = level
+            _points = value
+            if (level > prevLevel)
+                player.playSoundToPlayer(SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
+            sync()
+        }
 
     val remainingPoints get() = getRemainingPoints(points)
     val pointsInLevel get() = getPointsForNextLevel(level)
