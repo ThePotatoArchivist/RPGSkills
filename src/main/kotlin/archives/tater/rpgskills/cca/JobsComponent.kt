@@ -151,9 +151,12 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         tickCooldowns()
     }
 
+    override fun shouldCopyForRespawn(lossless: Boolean, keepInventory: Boolean, sameCharacter: Boolean): Boolean = sameCharacter
+
     override fun copyFrom(other: JobsComponent, registryLookup: RegistryWrapper.WrapperLookup) {
         _active = other._active
         _cooldowns = other._cooldowns
+        available = other.available
     }
 
     override fun readFromNbt(tag: NbtCompound, registryLookup: RegistryWrapper.WrapperLookup) {
