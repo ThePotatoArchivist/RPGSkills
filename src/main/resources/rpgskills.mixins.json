@@ -8,6 +8,7 @@
     "attribute.BowItemMixin",
     "attribute.CrossbowItemMixin",
     "attribute.LivingEntityMixin",
+    "compat.spellengine.SpellHelperMixin",
     "job.AbstractCriterionMixin",
     "job.AdvancementCriterionAccessor",
     "locking.AnvilScreenHandlerMixin",

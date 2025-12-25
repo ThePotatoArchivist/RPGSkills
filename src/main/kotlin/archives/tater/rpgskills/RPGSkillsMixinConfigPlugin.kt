@@ -1,9 +1,10 @@
-package archives.tater.rpgskills.client
+package archives.tater.rpgskills
 
 import net.fabricmc.loader.api.FabricLoader
-import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo
+import net.bettercombat.api.WeaponAttributesHelper.override
+import org.objectweb.asm.tree.ClassNode
 
 class RPGSkillsMixinConfigPlugin : IMixinConfigPlugin {
     override fun onLoad(mixinPackage: String?) {
@@ -11,8 +12,10 @@ class RPGSkillsMixinConfigPlugin : IMixinConfigPlugin {
 
     override fun getRefMapperConfig(): String? = null
 
-    override fun shouldApplyMixin(targetClassName: String?, mixinClassName: String): Boolean {
-        return FabricLoader.getInstance().isModLoaded("bettercombat") || !mixinClassName.contains("bettercombat")
+    override fun shouldApplyMixin(targetClassName: String?, mixinClassName: String): Boolean = when {
+        mixinClassName.contains("bettercombat") -> FabricLoader.getInstance().isModLoaded("bettercombat")
+        mixinClassName.contains("spellengine") -> FabricLoader.getInstance().isModLoaded("spell_engine")
+        else -> true
     }
 
     override fun acceptTargets(myTargets: MutableSet<String>?, otherTargets: MutableSet<String>?) {
