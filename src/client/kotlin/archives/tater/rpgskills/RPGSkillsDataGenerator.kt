@@ -5,6 +5,7 @@ import archives.tater.rpgskills.datagen.testpack.*
 import archives.tater.rpgskills.util.singleTagGenerator
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider.ItemTagProvider
 import net.minecraft.registry.RegistryBuilder
 
 object RPGSkillsDataGenerator : DataGeneratorEntrypoint {
@@ -20,6 +21,7 @@ object RPGSkillsDataGenerator : DataGeneratorEntrypoint {
 			addProvider(::StructureTagGenerator)
 			addProvider(::EntityTagGenerator)
             addProvider(::BlockTagGenerator)
+            addProvider(::ItemTagGenerator)
 		}
 		with (fabricDataGenerator.createBuiltinResourcePack(RPGSkills.id("test_pack"))) {
             addProvider(::TestJobGenerator)

@@ -15,9 +15,12 @@ object RPGSkillsTags {
 
     private fun <T> of(registry: RegistryKeyHolder<Registry<T>>, path: String) = of(registry.key, path)
 
+    private fun ofItem(path: String) = of(RegistryKeys.ITEM, path)
     private fun ofEntity(path: String) = of(RegistryKeys.ENTITY_TYPE, path)
     private fun ofStructure(path: String) = of(RegistryKeys.STRUCTURE, path)
     private fun ofBlock(path: String) = of(RegistryKeys.BLOCK, path)
+
+    val NOT_PLACEABLE = ofItem("not_placeable")
 
     val MINIBOSS = ofEntity("bosses/miniboss")
     val BASIC_BOSS = ofEntity("bosses/basic")

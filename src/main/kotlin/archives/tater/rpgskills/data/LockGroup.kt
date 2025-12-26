@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.mixin.locking.BoatItemAccessor
 import archives.tater.rpgskills.util.*
@@ -167,7 +168,7 @@ data class LockGroup(
             }
         }
 
-        fun isPlacedItem(item: Item) = item is BlockItem || item in ITEM_ENTITIES
+        fun isPlacedItem(item: Item) = (item is BlockItem || item in ITEM_ENTITIES) && !(Registries.ITEM.getEntry(item) isIn RPGSkillsTags.NOT_PLACEABLE)
         fun isUsedItem(item: Item) = !isPlacedItem(item) || item.defaultStack.useAction != UseAction.NONE
     }
 

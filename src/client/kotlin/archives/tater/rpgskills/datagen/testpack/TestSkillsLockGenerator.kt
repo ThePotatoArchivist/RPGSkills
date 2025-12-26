@@ -30,6 +30,7 @@ class TestSkillsLockGenerator(
                 RegistryIngredient.ofItems {
                     +Items.POTATO
                     +Items.POISONOUS_POTATO
+                    +Items.ENDER_EYE
                 },
                 "You don't know if this potato is safe to eat",
             ),
