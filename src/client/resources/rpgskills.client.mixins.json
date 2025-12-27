@@ -15,15 +15,13 @@
     "locking.InventoryScreenMixin",
     "locking.MinecraftClientMixin",
     "locking.ScreenAccessor",
+    "locking.EnchantmentMixin",
+    "locking.ItemEnchantmentsComponentMixin",
     "xp.ClientPlayNetworkHandlerMixin",
     "xp.InGameHudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
-  "plugin": "archives.tater.rpgskills.RPGSkillsMixinConfigPlugin",
-  "mixins": [
-    "locking.EnchantmentMixin",
-    "locking.ItemEnchantmentsComponentMixin"
-  ]
+  "plugin": "archives.tater.rpgskills.RPGSkillsMixinConfigPlugin"
 }
