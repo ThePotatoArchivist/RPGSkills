@@ -74,9 +74,8 @@ class JobsScreen(private val player: PlayerEntity) : Screen(Text.empty()), Tabbe
         addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148, active))
         for (widget in active) addSelectableChild(widget)
 
-        val availables = player.registryManager[Job].streamEntriesOrdered(RPGSkillsTags.JOB_ORDER)
-                .filter { it !in jobs && it in selectedSkill.value }
-                .sorted(compareBy { if (it in jobs.available) 0 else 1 })
+        val availables = selectedSkill.value.levels.flatMap { it.jobs }
+                .filter { it !in jobs }
                 .map { job ->
                     if (job in jobs.available)
                         AvailableJobWidget(job, jobs, x + 195, 0)

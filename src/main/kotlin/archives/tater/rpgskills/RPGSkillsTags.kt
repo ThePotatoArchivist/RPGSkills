@@ -40,7 +40,6 @@ object RPGSkillsTags {
     val NON_SKILL_POINT_DROP = ofBlock("non_skill_point_drop")
 
     val SKILL_ORDER = of(Skill, "order")
-    val JOB_ORDER = of(Job, "order")
     val CLASS_ORDER = of(SkillClass, "order")
     val LOCK_GROUP_ORDER = of(LockGroup, "order")
 }

@@ -34,12 +34,6 @@ object RPGSkillsDataGenerator : DataGeneratorEntrypoint {
                 TestSkillGenerator.GRASS_SKILL.key,
                 TestSkillGenerator.POTATO_SKILL.key
             ))
-            addProvider(singleTagGenerator(RPGSkillsTags.JOB_ORDER,
-                TestJobGenerator.GATHER_WHEAT.key,
-                TestJobGenerator.STAND_ON_IRON.key,
-                TestJobGenerator.PLACE_STONE.key,
-                TestJobGenerator.KILL_POISONED.key,
-            ))
 		}
 	}
 }
