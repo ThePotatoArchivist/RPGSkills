@@ -48,7 +48,7 @@ class JobsScreen(private val player: PlayerEntity) : Screen(Text.empty()), Tabbe
             clearAndInit()
         }
 
-    private val selectedSkill get() = skills[selectedTab]
+    private val selectedSkill get() = skills.getOrNull(selectedTab)
 
     private var activeCount = 0
     private var availableCount = 0
@@ -74,15 +74,16 @@ class JobsScreen(private val player: PlayerEntity) : Screen(Text.empty()), Tabbe
         addDrawableChild(AutoScrollingWidget(x + 9, y + 19, 178, 148, active))
         for (widget in active) addSelectableChild(widget)
 
-        val availables = selectedSkill.value.levels.flatMap { it.jobs }
-                .filter { it !in jobs }
-                .map { job ->
-                    if (job in jobs.available)
-                        AvailableJobWidget(job, jobs, x + 195, 0)
-                    else
-                        LockedAvailableJobWidget(x + 195, 0)
-                }
-                .toList()
+        val availables = selectedSkill?.value?.levels?.flatMap { it.jobs }
+            ?.filter { it !in jobs }
+            ?.map { job ->
+                if (job in jobs.available)
+                    AvailableJobWidget(job, jobs, x + 195, 0)
+                else
+                    LockedAvailableJobWidget(x + 195, 0)
+            }
+            ?.toList()
+            ?: listOf()
         addDrawableChild(AutoScrollingWidget(x + 194, y + 19, 138, 148, availables))
         for (button in availables) addSelectableChild(button)
 
@@ -113,14 +114,14 @@ class JobsScreen(private val player: PlayerEntity) : Screen(Text.empty()), Tabbe
 
     override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
         val jobs = player[JobsComponent]
-        val availableSkillJobs = jobs.available.filter { it in selectedSkill.value }
+        val availableSkillJobs = jobs.available.filter { selectedSkill?.value?.contains(it) == true }
 
         if (activeCount != jobs.active.size || availableCount != jobs.available.size)
             clearAndInit()
 
         super.render(context, mouseX, mouseY, delta)
         context.drawCenteredText(textRenderer, ACTIVE.text(jobs.active.size, JobsComponent.MAX_JOBS), x + 97, y + 7, 0x404040)
-        context.drawCenteredText(textRenderer, AVAILABLE.text(availableSkillJobs.size, selectedSkill.value.levels.sumOf { it.jobs.size }), x + 262, y + 7, 0x404040)
+        context.drawCenteredText(textRenderer, AVAILABLE.text(availableSkillJobs.size, selectedSkill?.value?.levels?.sumOf { it.jobs.size } ?: 0), x + 262, y + 7, 0x404040)
 
         if (jobs.active.isEmpty())
             context.drawCenteredText(textRenderer, NO_JOBS.text, x + 98, y + 89, 0x606060)
