@@ -55,8 +55,6 @@ class JobsScreen(private val player: PlayerEntity) : Screen(Text.empty()), Tabbe
 
     val jobs = player[JobsComponent]
 
-    private val totalJobs = player.registryManager[Job].streamKeys().count()
-
     override fun onDisplayed() {
         ClientPlayNetworking.send(OpenJobScreenPayload)
     }
