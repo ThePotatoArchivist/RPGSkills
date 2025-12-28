@@ -8,6 +8,7 @@ import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.cca.JobsComponent
 import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.criteria.RPGSkillsCriteria
+import archives.tater.rpgskills.entity.RPGSkillsEntities
 import archives.tater.rpgskills.item.RPGSkillsItems
 import archives.tater.rpgskills.networking.*
 import net.fabricmc.api.ModInitializer
@@ -36,6 +37,7 @@ object RPGSkills : ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		RPGSkillsItems.register()
+        RPGSkillsEntities.register()
         RPGSkillsConditions.register()
         RPGSkillsCriteria.register()
 
