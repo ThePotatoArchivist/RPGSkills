@@ -1,6 +1,8 @@
 package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.condition.IsMonsterLootCondition
+import archives.tater.rpgskills.condition.MaxAgeLootCondition
+import archives.tater.rpgskills.condition.RPGSkillsConditions
 import archives.tater.rpgskills.criteria.ItemCraftedCriterion
 import archives.tater.rpgskills.criteria.RPGSkillsCriteria
 import archives.tater.rpgskills.data.BuildEntry
@@ -11,10 +13,12 @@ import archives.tater.rpgskills.data.accept
 import archives.tater.rpgskills.data.get
 import archives.tater.rpgskills.util.*
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
+import net.fabricmc.fabric.impl.resource.conditions.conditions.AndResourceCondition
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.advancement.AdvancementCriterion
 import net.minecraft.advancement.criterion.ConsumeItemCriterion
 import net.minecraft.advancement.criterion.Criteria
+import net.minecraft.advancement.criterion.ItemCriterion
 import net.minecraft.advancement.criterion.TickCriterion
 import net.minecraft.block.Blocks
 import net.minecraft.enchantment.Enchantments
@@ -24,6 +28,8 @@ import net.minecraft.item.Items
 import net.minecraft.loot.condition.BlockStatePropertyLootCondition
 import net.minecraft.loot.condition.InvertedLootCondition
 import net.minecraft.loot.condition.LocationCheckLootCondition
+import net.minecraft.loot.condition.LootConditionType
+import net.minecraft.loot.condition.LootConditionTypes
 import net.minecraft.loot.condition.MatchToolLootCondition
 import net.minecraft.loot.context.LootContext
 import net.minecraft.predicate.BlockPredicate
@@ -129,10 +135,16 @@ class TestJobGenerator(
             Job(
                 "Farmin'",
                 mapOf(
-                    "harvest_crops" to Job.Task("Eat anything", 20, AdvancementCriterion(
-                        Criteria.CONSUME_ITEM, ConsumeItemCriterion.Conditions(
-                            Optional.empty(),
-                            Optional.empty()
+                    "harvest_crops" to Job.Task("Harvest any full crops", 20, AdvancementCriterion(
+                        RPGSkillsCriteria.BREAK_BLOCK, itemCriterionConditions(
+                            location = LootContextPredicate.create(
+                                LocationCheckLootCondition.builder(LocationPredicate.Builder.create().apply {
+                                    block(BlockPredicate.Builder.create().apply {
+                                        tag(BlockTags.CROPS)
+                                    })
+                                }).build(),
+                                MaxAgeLootCondition,
+                            )
                         )
                     )),
                     "plant_crops" to Job.Task("Plant any crop", 20, AdvancementCriterion(

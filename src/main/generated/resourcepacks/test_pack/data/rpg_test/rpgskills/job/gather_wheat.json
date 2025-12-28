@@ -4,10 +4,25 @@
   "reward_points": 20,
   "tasks": [
     {
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "#minecraft:crops"
+              }
+            }
+          },
+          {
+            "condition": "rpgskills:block_max_age"
+          }
+        ]
+      },
       "count": 20,
-      "description": "Eat anything",
+      "description": "Harvest any full crops",
       "id": "harvest_crops",
-      "trigger": "minecraft:consume_item"
+      "trigger": "rpgskills:break_block"
     },
     {
       "conditions": {

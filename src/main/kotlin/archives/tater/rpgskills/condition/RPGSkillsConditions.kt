@@ -12,6 +12,7 @@ object RPGSkillsConditions {
         Registry.register(Registries.LOOT_CONDITION_TYPE, RPGSkills.id(path), LootConditionType(codec))
 
     val IS_MONSTER = register("is_monster", IsMonsterLootCondition.CODEC)
+    val MAX_AGE = register("block_max_age", MaxAgeLootCondition.CODEC)
 
     fun register() {
 
