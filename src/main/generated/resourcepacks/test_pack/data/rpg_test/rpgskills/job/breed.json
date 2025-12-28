@@ -2,8 +2,8 @@
   "cooldown_ticks": 2000,
   "name": "Breed",
   "reward_points": 20,
-  "tasks": {
-    "breed": {
+  "tasks": [
+    {
       "conditions": {
         "parent": [
           {
@@ -22,7 +22,8 @@
       },
       "count": 4,
       "description": "Breed animals",
+      "id": "breed",
       "trigger": "minecraft:bred_animals"
     }
-  }
+  ]
 }

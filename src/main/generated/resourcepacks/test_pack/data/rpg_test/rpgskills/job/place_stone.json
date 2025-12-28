@@ -3,18 +3,22 @@
   "name": "Stone Placer",
   "reward_points": 20,
   "spawn_as_orbs": true,
-  "tasks": {
-    "craft_diorite": {
+  "tasks": [
+    {
       "conditions": {
-        "item": {
-          "items": "#chipped:diorite"
-        }
+        "location": [
+          {
+            "block": "minecraft:stone",
+            "condition": "minecraft:block_state_property"
+          }
+        ]
       },
-      "count": 24,
-      "description": "Craft any sort of diorite",
-      "trigger": "rpgskills:craft_item"
+      "count": 20,
+      "description": "Place Stone! you know it's like the gray material the ground is made of",
+      "id": "place_stone",
+      "trigger": "minecraft:placed_block"
     },
-    "place_granite": {
+    {
       "conditions": {
         "location": [
           {
@@ -43,20 +47,19 @@
       },
       "count": 10,
       "description": "Break Granite without silk touch. It's the pink rock.",
+      "id": "place_granite",
       "trigger": "rpgskills:break_block"
     },
-    "place_stone": {
+    {
       "conditions": {
-        "location": [
-          {
-            "block": "minecraft:stone",
-            "condition": "minecraft:block_state_property"
-          }
-        ]
+        "item": {
+          "items": "#chipped:diorite"
+        }
       },
-      "count": 20,
-      "description": "Place Stone! you know it's like the gray material the ground is made of",
-      "trigger": "minecraft:placed_block"
+      "count": 24,
+      "description": "Craft any sort of diorite",
+      "id": "craft_diorite",
+      "trigger": "rpgskills:craft_item"
     }
-  }
+  ]
 }

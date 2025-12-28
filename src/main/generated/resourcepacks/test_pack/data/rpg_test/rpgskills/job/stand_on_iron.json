@@ -2,8 +2,8 @@
   "cooldown_ticks": 600,
   "name": "Stand on iron",
   "reward_points": 200,
-  "tasks": {
-    "stand": {
+  "tasks": [
+    {
       "conditions": {
         "player": [
           {
@@ -21,7 +21,8 @@
       },
       "count": 600,
       "description": "Stand on iron",
+      "id": "stand",
       "trigger": "minecraft:tick"
     }
-  }
+  ]
 }

@@ -2,13 +2,14 @@
   "cooldown_ticks": 24000,
   "name": "Farmin'",
   "reward_points": 20,
-  "tasks": {
-    "harvest_crops": {
+  "tasks": [
+    {
       "count": 20,
       "description": "Eat anything",
+      "id": "harvest_crops",
       "trigger": "minecraft:consume_item"
     },
-    "plant_crops": {
+    {
       "conditions": {
         "location": [
           {
@@ -23,7 +24,8 @@
       },
       "count": 20,
       "description": "Plant any crop",
+      "id": "plant_crops",
       "trigger": "minecraft:placed_block"
     }
-  }
+  ]
 }

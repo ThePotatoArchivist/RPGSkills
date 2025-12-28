@@ -1,8 +1,0 @@
-{
-  "values": [
-    "rpg_test:gather_wheat",
-    "rpg_test:stand_on_iron",
-    "rpg_test:place_stone",
-    "rpg_test:kill_poisoned"
-  ]
-}

@@ -2,8 +2,8 @@
   "cooldown_ticks": 100,
   "name": "Another!",
   "reward_points": 1,
-  "tasks": {
-    "thing": {
+  "tasks": [
+    {
       "conditions": {
         "item": {
           "items": "minecraft:porkchop"
@@ -11,7 +11,8 @@
       },
       "count": 4,
       "description": "Eat pork",
+      "id": "thing",
       "trigger": "minecraft:consume_item"
     }
-  }
+  ]
 }

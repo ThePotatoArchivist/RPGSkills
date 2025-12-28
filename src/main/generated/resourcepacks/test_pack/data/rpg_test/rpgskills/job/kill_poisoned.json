@@ -2,8 +2,8 @@
   "cooldown_ticks": 24000,
   "name": "Kill Poisoned",
   "reward_points": 20,
-  "tasks": {
-    "kill_poisoned": {
+  "tasks": [
+    {
       "conditions": {
         "entity": [
           {
@@ -25,7 +25,8 @@
       },
       "count": 4,
       "description": "Kill zombie while poisoned",
+      "id": "kill_poisoned",
       "trigger": "minecraft:player_killed_entity"
     }
-  }
+  ]
 }

@@ -310,3 +310,14 @@ fun <K: Any, V: Any> Stream<K>.associateNotNullWith(transform: (K) -> V?): Map<K
 fun Text.takeIfTranslated() = takeIf { Texts.hasTranslation(this) }
 
 fun snakeToTitleCase(text: String) = text.split('_').joinToString(" ") { it.replaceFirstChar(Char::titlecase) }
+
+fun <K, V> sequencedMapCodec(key: MapCodec<K>, value: MapCodec<V>): Codec<Map<K, V>> =
+    RecordCodecBuilder.create<Pair<K, V>> { it.group(
+        key.forGetter { it.first },
+        value.forGetter { it.second },
+    ).apply(it, ::Pair) }
+        .listOf()
+        .xmap(
+            { LinkedHashMap<K, V>(it.size).apply { for ((key, value) in it) set(key, value) } },
+            { it.entries.map { (key, value) -> key to value } }
+        )

@@ -4,11 +4,15 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.mixin.job.AdvancementCriterionAccessor
 import archives.tater.rpgskills.util.RegistryKeyHolder
 import archives.tater.rpgskills.util.intRangeCodec
+import archives.tater.rpgskills.util.sequencedMapCodec
 import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.advancement.AdvancementCriterion
 import net.minecraft.registry.Registry
 import net.minecraft.registry.RegistryKey
+import java.util.SequencedMap
+import java.util.SortedMap
 
 @JvmRecord
 data class Job(
@@ -25,7 +29,7 @@ data class Job(
         val criteria: AdvancementCriterion<*>,
     ) {
         companion object {
-            val CODEC: Codec<Task> = RecordCodecBuilder.create { it.group(
+            val CODEC: MapCodec<Task> = RecordCodecBuilder.mapCodec { it.group(
                 Codec.STRING.fieldOf("description").forGetter(Task::description),
                 intRangeCodec(min = 1).fieldOf("count").forGetter(Task::count),
                 AdvancementCriterionAccessor.getMAP_CODEC().forGetter(Task::criteria)
@@ -36,7 +40,7 @@ data class Job(
     companion object : RegistryKeyHolder<Registry<Job>> {
         val CODEC: Codec<Job> = RecordCodecBuilder.create { it.group(
             Codec.STRING.fieldOf("name").forGetter(Job::name),
-            Codec.unboundedMap(Codec.STRING, Task.CODEC).fieldOf("tasks").forGetter(Job::tasks),
+            sequencedMapCodec(Codec.STRING.fieldOf("id"), Task.CODEC).fieldOf("tasks").forGetter(Job::tasks),
             intRangeCodec(min = 0).fieldOf("reward_points").forGetter(Job::rewardPoints),
             intRangeCodec(min = 0).fieldOf("cooldown_ticks").forGetter(Job::cooldownTicks),
             Codec.BOOL.optionalFieldOf("spawn_as_orbs", false).forGetter(Job::spawnAsOrbs),
