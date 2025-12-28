@@ -311,7 +311,7 @@ fun Text.takeIfTranslated() = takeIf { Texts.hasTranslation(this) }
 
 fun snakeToTitleCase(text: String) = text.split('_').joinToString(" ") { it.replaceFirstChar(Char::titlecase) }
 
-fun <K, V> sequencedMapCodec(key: MapCodec<K>, value: MapCodec<V>): Codec<Map<K, V>> =
+fun <K, V> sequencedMapCodec(key: MapCodec<K>, value: MapCodec<V>): Codec<SequencedMap<K, V>> =
     RecordCodecBuilder.create<Pair<K, V>> { it.group(
         key.forGetter { it.first },
         value.forGetter { it.second },

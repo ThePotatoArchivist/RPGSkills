@@ -1,4 +1,4 @@
-// 1.21.1	2025-12-27T22:41:16.629051318	RPG Skills/Tags for minecraft:entity_type
+// 1.21.1	2025-12-28T10:25:10.756311818	RPG Skills/Tags for minecraft:entity_type
 48feb07cbb3f1906b0d7038b7282c8bddf242ab3 data/rpgskills/tags/entity_type/bosses/dlc.json
 abc0b51162f309d232503306baf68059eb06e083 data/rpgskills/tags/entity_type/increases_level_cap.json
 af8e366c0e5ac46aaac3948d4108a2b644f360b2 data/rpgskills/tags/entity_type/not_buffed.json
@@ -6,5 +6,5 @@ af8e366c0e5ac46aaac3948d4108a2b644f360b2 data/rpgskills/tags/entity_type/not_buf
 c6304b7e4d04459824f39e9101ab5025473e5642 data/rpgskills/tags/entity_type/bosses/final.json
 02b6a7799286f073bd43ecf20b3eab2e16d73deb data/rpgskills/tags/entity_type/bosses/basic.json
 131ba28ae1bf60d5120b12304ec5308974c4ec6f data/rpgskills/tags/entity_type/bosses/miniboss.json
-a060d789fd17db1a7ac0e141958107ca1780f474 data/rpgskills/tags/entity_type/bosses/early.json
 6bba1fdb003086be6ff041069afad0e5397cad05 data/rpgskills/tags/entity_type/bosses/mid.json
+a060d789fd17db1a7ac0e141958107ca1780f474 data/rpgskills/tags/entity_type/bosses/early.json

@@ -17,11 +17,19 @@ import java.util.SortedMap
 @JvmRecord
 data class Job(
     val name: String,
-    val tasks: Map<String, Task>,
+    val tasks: SequencedMap<String, Task>,
     val rewardPoints: Int,
     val cooldownTicks: Int,
     val spawnAsOrbs: Boolean = false,
 ) {
+    constructor(
+        name: String,
+        tasks: Map<String, Task>,
+        rewardPoints: Int,
+        cooldownTicks: Int,
+        spawnAsOrbs: Boolean = false,
+    ) : this(name, LinkedHashMap(tasks), rewardPoints, cooldownTicks, spawnAsOrbs)
+
     @JvmRecord
     data class Task(
         val description: String,
