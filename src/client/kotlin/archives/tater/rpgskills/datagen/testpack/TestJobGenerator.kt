@@ -75,11 +75,6 @@ class TestJobGenerator(
             Job(
                 "Stone Placer",
                 mapOf(
-                    "place_stone" to Job.Task("Place Stone! you know it's like the gray material the ground is made of", 20, AdvancementCriterion(
-                        Criteria.PLACED_BLOCK, itemCriterionConditions(
-                            location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.STONE).build())
-                        )
-                    )),
                     "place_granite" to Job.Task("Break Granite without silk touch. It's the pink rock.", 10, AdvancementCriterion(
                         RPGSkillsCriteria.BREAK_BLOCK, itemCriterionConditions(
                             location = LootContextPredicate.create(
@@ -98,6 +93,11 @@ class TestJobGenerator(
                                     })
                                 ).build()
                             ),
+                        )
+                    )),
+                    "place_stone" to Job.Task("Place Stone! you know it's like the gray material the ground is made of", 20, AdvancementCriterion(
+                        Criteria.PLACED_BLOCK, itemCriterionConditions(
+                            location = LootContextPredicate.create(BlockStatePropertyLootCondition.builder(Blocks.STONE).build())
                         )
                     )),
                     "craft_diorite" to Job.Task("Craft any sort of diorite", 24, AdvancementCriterion(

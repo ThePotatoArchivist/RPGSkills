@@ -8,20 +8,6 @@
       "conditions": {
         "location": [
           {
-            "block": "minecraft:stone",
-            "condition": "minecraft:block_state_property"
-          }
-        ]
-      },
-      "count": 20,
-      "description": "Place Stone! you know it's like the gray material the ground is made of",
-      "id": "place_stone",
-      "trigger": "minecraft:placed_block"
-    },
-    {
-      "conditions": {
-        "location": [
-          {
             "block": "minecraft:granite",
             "condition": "minecraft:block_state_property"
           },
@@ -49,6 +35,20 @@
       "description": "Break Granite without silk touch. It's the pink rock.",
       "id": "place_granite",
       "trigger": "rpgskills:break_block"
+    },
+    {
+      "conditions": {
+        "location": [
+          {
+            "block": "minecraft:stone",
+            "condition": "minecraft:block_state_property"
+          }
+        ]
+      },
+      "count": 20,
+      "description": "Place Stone! you know it's like the gray material the ground is made of",
+      "id": "place_stone",
+      "trigger": "minecraft:placed_block"
     },
     {
       "conditions": {
