@@ -6,7 +6,6 @@
       "type": "string"
     }
   },
-
   "type": "object",
   "properties": {
     "name": {
@@ -24,33 +23,38 @@
       "type": "boolean"
     },
     "tasks": {
-      "patternProperties": {
-        "[a-z0-9_]+": {
-          "type": "object",
-          "properties": {
-            "trigger": {
-              "$ref": "#/definitions/Identifier",
-              "description": "See https://misode.github.io/advancement/"
-            },
-            "conditions": {
-              "type": "object",
-              "description": "See https://misode.github.io/advancement/"
-            },
-            "description": {
-              "type": "string"
-            },
-            "count": {
-              "type": "integer",
-              "minimum": 1
-            }
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "[a-z0-9_]+"
           },
-          "additionalProperties": false,
-          "required": [
-            "trigger",
-            "description",
-            "count"
-          ]
-        }
+          "trigger": {
+            "$ref": "#/definitions/Identifier",
+            "description": "See https://misode.github.io/advancement/"
+          },
+          "conditions": {
+            "type": "object",
+            "description": "See https://misode.github.io/advancement/"
+          },
+          "description": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "trigger",
+          "id",
+          "description",
+          "count"
+        ]
       }
     }
   },
