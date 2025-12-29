@@ -5,6 +5,7 @@ import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.get
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
+import com.mojang.serialization.Codec
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
@@ -81,7 +82,8 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         registryLookup: RegistryWrapper.WrapperLookup
     ) {
         CODEC.update(this, tag).logIfError()
-        updateLevelCap()
+        if (!world.isClient)
+            updateLevelCap()
     }
 
     override fun writeToNbt(
@@ -103,6 +105,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
 
         val CODEC = recordMutationCodec(
             Registries.ENTITY_TYPE.codec.mutateCollection().fieldFor("defeated_bosses", BossTrackerComponent::_defeated),
+            intRangeCodec(min = 0).fieldOf("max_level").forAccess(BossTrackerComponent::maxLevel),
         )
 
         val BOSS_DEFEAT_TITLE = Translation.unit("rpgskills.title.boss_defeat") {
