@@ -8,6 +8,7 @@
     "attribute.BowItemMixin",
     "attribute.CrossbowItemMixin",
     "attribute.LivingEntityMixin",
+    "compat.cataclysm.WeaponFusionMenuMixin",
     "compat.spellengine.SpellHelperMixin",
     "job.AbstractCriterionMixin",
     "job.AdvancementCriterionAccessor",

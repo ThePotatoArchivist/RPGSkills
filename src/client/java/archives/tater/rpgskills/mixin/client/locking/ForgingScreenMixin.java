@@ -10,17 +10,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ingame.AnvilScreen;
 import net.minecraft.client.gui.screen.ingame.ForgingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.SmithingScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.ForgingScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Mixin(ForgingScreen.class)
-public abstract class ForgingScreenMixin<T extends ScreenHandler> extends HandledScreen<T> {
+public abstract class ForgingScreenMixin<T extends ForgingScreenHandler> extends HandledScreen<T> {
     @Unique
     private PlayerEntity player;
 
@@ -32,7 +34,7 @@ public abstract class ForgingScreenMixin<T extends ScreenHandler> extends Handle
             method = "<init>",
             at = @At("TAIL")
     )
-    private void savePlayer(net.minecraft.screen.ForgingScreenHandler handler, PlayerInventory playerInventory, Text title, Identifier texture, CallbackInfo ci) {
+    private void savePlayer(ForgingScreenHandler handler, PlayerInventory playerInventory, Text title, Identifier texture, CallbackInfo ci) {
         player = playerInventory.player;
     }
 
@@ -51,7 +53,7 @@ public abstract class ForgingScreenMixin<T extends ScreenHandler> extends Handle
                 21,
                 mouseX,
                 mouseY,
-                LockGroup::enchantmentMessage,
+                ((Object) this instanceof AnvilScreen) ? LockGroup::enchantmentMessage : LockGroup::recipeMessage,
                 player
         );
     }

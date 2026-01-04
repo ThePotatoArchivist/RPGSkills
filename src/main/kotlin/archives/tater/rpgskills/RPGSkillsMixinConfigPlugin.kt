@@ -15,6 +15,7 @@ class RPGSkillsMixinConfigPlugin : IMixinConfigPlugin {
     override fun shouldApplyMixin(targetClassName: String?, mixinClassName: String): Boolean = when {
         mixinClassName.contains("bettercombat") -> FabricLoader.getInstance().isModLoaded("bettercombat")
         mixinClassName.contains("spellengine") -> FabricLoader.getInstance().isModLoaded("spell_engine")
+        mixinClassName.contains("cataclysm") -> FabricLoader.getInstance().isModLoaded("cataclysm")
         else -> true
     }
 

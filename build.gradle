@@ -98,6 +98,8 @@ dependencies {
     modLocalRuntime modCompileOnly("maven.modrinth:spell-engine:${project.spell_engine_version}-fabric")
     modLocalRuntime "maven.modrinth:spell-power:${project.spell_power_version}-fabric"
 
+    modCompileOnly("maven.modrinth:l_enders-cataclysm:${project.cataclysm_version}")
+
     modLocalRuntime modCompileOnly("earth.terrarium.chipped:chipped-fabric-1.21.1:${project.chipped_version}")
 
     modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
