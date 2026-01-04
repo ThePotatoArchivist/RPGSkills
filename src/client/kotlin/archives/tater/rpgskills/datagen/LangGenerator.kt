@@ -37,6 +37,8 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(RPGSkillsCommands.LIST_BOSSES, "%s/%s bosses have been defeated: %s")
             add(RPGSkillsCommands.LIST_BOSSES_ALL, "There are %s bosses: %s")
             add(RPGSkillsCommands.RESET_BOSSES, "Reset defeated bosses")
+            add(RPGSkillsCommands.DESPAWN_SINGLE, "Despawned %s")
+            add(RPGSkillsCommands.DESPAWN_MULTIPLE, "Despawned %s entities")
             add(BossTrackerComponent.BOSS_DEFEAT_TITLE, "GREAT ENEMY FELLED")
             add(BossTrackerComponent.BOSS_DEFEAT_MESSAGE, "%s was vanquished!")
             add(BossTrackerComponent.ENEMIES_STRENGTHEN_MESSAGE, "Enemies became stronger")

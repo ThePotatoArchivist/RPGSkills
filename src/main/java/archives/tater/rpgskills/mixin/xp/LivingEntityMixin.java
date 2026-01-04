@@ -47,6 +47,6 @@ public abstract class LivingEntityMixin extends Entity {
         if (getWorld().isClient) return;
         DefeatSourceComponent.afterDamage((LivingEntity) (Object) this, source, amount);
         if (isDead())
-            BossTrackerComponent.onDeath((LivingEntity) (Object) this, source);
+            BossTrackerComponent.onDeath((LivingEntity) (Object) this);
     }
 }

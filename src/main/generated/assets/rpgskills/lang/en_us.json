@@ -2,6 +2,8 @@
   "attribute.name.rpgskills.bow_draw_time": "Bow Draw Time",
   "attribute.name.rpgskills.projectile_divergence": "Projectile Divergence",
   "category.rpgskills.rpgskills": "RPG Skills",
+  "commands.rpgskills.despawn.multiple": "Despawned %s entities",
+  "commands.rpgskills.despawn.single": "Despawned %s",
   "commands.rpgskills.skills.bosses.list": "%s/%s bosses have been defeated: %s",
   "commands.rpgskills.skills.bosses.list.all": "There are %s bosses: %s",
   "commands.rpgskills.skills.bosses.reset": "Reset defeated bosses",

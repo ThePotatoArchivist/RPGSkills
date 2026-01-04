@@ -12,8 +12,8 @@ import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType.getInteger
 import com.mojang.brigadier.arguments.IntegerArgumentType.integer
 import net.minecraft.command.CommandRegistryAccess
-import net.minecraft.command.argument.EntityArgumentType.getPlayer
-import net.minecraft.command.argument.EntityArgumentType.player
+import net.minecraft.command.argument.EntityArgumentType
+import net.minecraft.command.argument.EntityArgumentType.*
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.getRegistryEntry
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.registryEntry
 import net.minecraft.server.command.CommandManager
@@ -32,13 +32,15 @@ object RPGSkillsCommands : CommandRegistrationCallback {
     val LIST_BOSSES = Translation.arg("commands.$MOD_ID.skills.bosses.list")
     val LIST_BOSSES_ALL = Translation.arg("commands.$MOD_ID.skills.bosses.list.all")
     val RESET_BOSSES = Translation.unit("commands.$MOD_ID.skills.bosses.reset")
+    val DESPAWN_SINGLE = Translation.arg("commands.$MOD_ID.despawn.single")
+    val DESPAWN_MULTIPLE = Translation.arg("commands.$MOD_ID.despawn.multiple")
 
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
         registryAccess: CommandRegistryAccess,
         environment: CommandManager.RegistrationEnvironment
     ) {
-        dispatcher.apply {
+        with (dispatcher) {
             command("skills") {
                 subExec("list") { command ->
                     val skills = command.source.registryManager[Skill].streamEntriesOrdered(RPGSkillsTags.SKILL_ORDER).toList()
@@ -185,6 +187,21 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                         it.source.sendFeedback(RESET_BOSSES.text, false)
                         0
                     }
+                }
+            }
+
+            command("despawn") {
+                argumentExec("entity", entities()) { command ->
+                    val entities = getEntities(command, "entity")
+                    for (entity in entities)
+                        entity.discard()
+
+                    if (entities.size == 1)
+                        command.source.sendFeedback(DESPAWN_SINGLE.text(entities.first().displayName!!), true)
+                    else
+                        command.source.sendFeedback(DESPAWN_MULTIPLE.text(entities.size), true)
+
+                    entities.size
                 }
             }
         }

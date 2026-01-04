@@ -45,9 +45,8 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
 
     fun hasDefeated(entity: LivingEntity) = entity.type in defeated
 
-    fun onDefeated(entity: LivingEntity, source: DamageSource): Boolean {
+    fun onDefeated(entity: LivingEntity): Boolean {
         if (Registries.ENTITY_TYPE.getEntry(entity.type) !in increasesLevelCap) return false
-        if (source.isOf(DamageTypes.GENERIC_KILL))
         if (hasDefeated(entity)) return false
         _defeated.add(entity.type)
         updateLevelCap()
@@ -142,9 +141,9 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         }
 
         @JvmStatic
-        fun onDeath(entity: LivingEntity, source: DamageSource) {
+        fun onDeath(entity: LivingEntity) {
             update(entity.world.server!!) {
-                onDefeated(entity, source)
+                onDefeated(entity)
             }
         }
 
