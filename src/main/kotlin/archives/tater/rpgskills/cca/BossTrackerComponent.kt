@@ -4,11 +4,10 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.get
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
-import com.mojang.serialization.Codec
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
+import net.minecraft.entity.damage.DamageTypes
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.Monster
 import net.minecraft.nbt.NbtCompound
@@ -46,8 +45,9 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
 
     fun hasDefeated(entity: LivingEntity) = entity.type in defeated
 
-    fun onDefeated(entity: LivingEntity): Boolean {
+    fun onDefeated(entity: LivingEntity, source: DamageSource): Boolean {
         if (Registries.ENTITY_TYPE.getEntry(entity.type) !in increasesLevelCap) return false
+        if (source.isOf(DamageTypes.GENERIC_KILL))
         if (hasDefeated(entity)) return false
         _defeated.add(entity.type)
         updateLevelCap()
@@ -142,22 +142,25 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         }
 
         @JvmStatic
-        fun onDeath(entity: LivingEntity) {
+        fun onDeath(entity: LivingEntity, source: DamageSource) {
             update(entity.world.server!!) {
-                onDefeated(entity)
+                onDefeated(entity, source)
             }
         }
 
         @JvmStatic
         fun applyBuffs(entity: LivingEntity) {
-            if (entity !is Monster || entity.type isIn RPGSkillsTags.NOT_BUFFED) return
+            if (entity !is Monster) return
 
             val defeated = entity.world[BossTrackerComponent].defeatedCount
-            if (defeated <= 0) return
+            if (defeated < 0) return
 
-            for ((attribute, modifier) in RPGSkills.CONFIG.attributeIncreases) {
-                entity.getAttributeInstance(attribute)?.addPersistentModifier(modifier.build(BOSS_DEFEAT_SCALING, defeated.toDouble()))
-            }
+            if (entity isIn RPGSkillsTags.BOSS_ATTRIBUTE_AFFECTED)
+                for ((attribute, modifier) in RPGSkills.CONFIG.bossAttributeIncreases[defeated.coerceAtMost(RPGSkills.CONFIG.bossAttributeIncreases.size - 1)])
+                    entity.getAttributeInstance(attribute)?.addPersistentModifier(modifier.build(BOSS_DEFEAT_SCALING, 1.0))
+            else
+                for ((attribute, modifier) in RPGSkills.CONFIG.attributeIncreases)
+                    entity.getAttributeInstance(attribute)?.addPersistentModifier(modifier.build(BOSS_DEFEAT_SCALING, defeated.toDouble()))
 
             if (entity.health < entity.maxHealth)
                 entity.health = entity.maxHealth

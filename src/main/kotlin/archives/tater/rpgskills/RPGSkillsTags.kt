@@ -1,6 +1,5 @@
 package archives.tater.rpgskills
 
-import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
@@ -31,7 +30,7 @@ object RPGSkillsTags {
 
     val INCREASES_LEVEL_CAP = ofEntity("increases_level_cap")
     val IGNORES_SKILL_SOURCE = ofEntity("ignores_skill_source")
-    val NOT_BUFFED = ofEntity("not_buffed")
+    val BOSS_ATTRIBUTE_AFFECTED = ofEntity("boss_attribute_affected")
 
     val MID_STRUCTURES = ofStructure("skill/mid")
     val HARD_STRUCTURES = ofStructure("skill/hard")

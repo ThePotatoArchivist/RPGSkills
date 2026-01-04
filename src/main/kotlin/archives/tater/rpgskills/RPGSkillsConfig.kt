@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
+import net.minecraft.entity.attribute.EntityAttributeModifier.Operation
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKey
@@ -66,12 +67,35 @@ class RPGSkillsConfig {
         private set
     var attributeIncreasesRaw: Map<RegistryKey<EntityAttribute>, AnonymousAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_ATTACK_DAMAGE to AnonymousAttributeModifier(1.0),
-        EntityAttributes.GENERIC_MAX_HEALTH to AnonymousAttributeModifier(0.15, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE),
+        EntityAttributes.GENERIC_MAX_HEALTH to AnonymousAttributeModifier(0.15, Operation.ADD_MULTIPLIED_BASE),
     ).mapKeys { (id, _) -> id.key.orElseThrow() }
+        private set
+
+    var bossAttributeIncreasesRaw: List<Map<RegistryKey<EntityAttribute>, AnonymousAttributeModifier>> = listOf(
+        Triple(-45, -50, -75),
+        Triple(-25, -30, -72),
+        Triple(-10, -15, -65),
+        Triple(0, 0, -55),
+        Triple(5, 8, -35),
+        Triple(10, 15, -18),
+        Triple(15, 20, 0),
+        Triple(20, 25, 8),
+        Triple(25, 30, 15),
+        Triple(30, 35, 22),
+        Triple(35, 40, 30),
+    ).map { (health, armor, damage) -> mapOf(
+        EntityAttributes.GENERIC_MAX_HEALTH.key.orElseThrow() to AnonymousAttributeModifier(health / 100.0, Operation.ADD_MULTIPLIED_BASE),
+        EntityAttributes.GENERIC_ARMOR.key.orElseThrow() to AnonymousAttributeModifier(armor / 100.0, Operation.ADD_MULTIPLIED_BASE),
+        EntityAttributes.GENERIC_ATTACK_DAMAGE.key.orElseThrow() to AnonymousAttributeModifier(damage / 100.0, Operation.ADD_MULTIPLIED_BASE),
+    ) }
         private set
 
     val attributeIncreases: Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier> by lazy {
         attributeIncreasesRaw.mapKeys { (key, _) -> Registries.ATTRIBUTE.getEntry(key).orElseThrow() }
+    }
+
+    val bossAttributeIncreases: List<Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier>> by lazy {
+        bossAttributeIncreasesRaw.map { it.mapKeys { (key, _) -> Registries.ATTRIBUTE.getEntry(key).orElseThrow() } }
     }
 
     fun getStructurePoints(structure: RegistryEntry<Structure>) =
@@ -100,7 +124,8 @@ class RPGSkillsConfig {
             IntProvider.POSITIVE_CODEC.fieldOf("skill_points_from_breeding").forAccess(RPGSkillsConfig::breedingSkillPoints),
             intRangeCodec(min = 0).fieldOf("level_cap_base").forAccess(RPGSkillsConfig::baseLevelCap),
             intRangeCodec(min = 0).fieldOf("level_cap_increase_per_boss").forAccess(RPGSkillsConfig::levelCapIncreasePerBoss),
-            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.SHORT_CODEC).fieldOf("attribute_increase_per_boss").forAccess(RPGSkillsConfig::attributeIncreasesRaw),
+            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec()).fieldOf("attribute_increase_per_boss").forAccess(RPGSkillsConfig::attributeIncreasesRaw),
+            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec(Operation.ADD_MULTIPLIED_BASE)).listOf().fieldOf("attribute_increases_boss").forAccess(RPGSkillsConfig::bossAttributeIncreasesRaw),
         )
 
         override fun getDefault() = RPGSkillsConfig()

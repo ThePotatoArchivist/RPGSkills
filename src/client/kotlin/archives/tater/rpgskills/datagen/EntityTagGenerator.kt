@@ -70,8 +70,7 @@ class EntityTagGenerator(
             forceAddTag(RPGSkillsTags.FINAL_BOSS)
             forceAddTag(RPGSkillsTags.DLC_BOSS)
         }
-        with (getOrCreateTagBuilder(RPGSkillsTags.NOT_BUFFED)) {
-            forceAddTag(RPGSkillsTags.BASIC_BOSS)
+        with (getOrCreateTagBuilder(RPGSkillsTags.BOSS_ATTRIBUTE_AFFECTED)) { forceAddTag(RPGSkillsTags.BASIC_BOSS)
             forceAddTag(RPGSkillsTags.EARLY_BOSS)
             forceAddTag(RPGSkillsTags.MID_BOSS)
             forceAddTag(RPGSkillsTags.FINAL_BOSS)

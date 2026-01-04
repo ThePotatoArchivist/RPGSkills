@@ -51,7 +51,7 @@ data class Skill(
         companion object {
             val CODEC: Codec<Level> = RecordCodecBuilder.create {
                 it.group(
-                    Codec.unboundedMap(Registries.ATTRIBUTE.entryCodec, AnonymousAttributeModifier.SHORT_CODEC).optionalFieldOf("attributes", mapOf()).forGetter(Level::attributes),
+                    Codec.unboundedMap(Registries.ATTRIBUTE.entryCodec, AnonymousAttributeModifier.shortCodec()).optionalFieldOf("attributes", mapOf()).forGetter(Level::attributes),
                     RegistryFixedCodec.of(Job.key).listOf().optionalFieldOf("jobs", listOf()).forGetter(Level::jobs),
                 ).apply(it, ::Level)
             }
