@@ -82,6 +82,7 @@ class TestSkillsLockGenerator(
             recipes = LockList(
                 RegistryIngredient.ofItems {
                     +Items.PRISMARINE_BRICKS
+                    +Items.NETHERITE_HELMET
                 },
                 "You don't know how to assemble this prismarine",
             ),

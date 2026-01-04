@@ -6,9 +6,11 @@ import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.mixin.client.locking.HandledScreenAccessor
 import archives.tater.rpgskills.mixin.client.locking.ScreenAccessor
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.structure.MineshaftGenerator
 import net.minecraft.text.Text
 
 object CrossedArrowRenderer {
@@ -53,14 +55,27 @@ object CrossedArrowRenderer {
 
         context.drawTooltip(
             (screen as ScreenAccessor).textRenderer,
-            mutableListOf(
-                message(blockedGroup)
-            ).also {
-                RequirementTooltip.appendRequirements(blockedGroup, player, it)
-            },
+            getBlockMessage(blockedGroup, message, player),
             mouseX,
             mouseY
         )
+    }
+
+    private fun getBlockMessage(
+        blockedGroup: LockGroup,
+        message: (LockGroup) -> Text,
+        player: PlayerEntity
+    ): MutableList<Text> = mutableListOf(
+        message(blockedGroup)
+    ).also {
+        RequirementTooltip.appendRequirements(blockedGroup, player, it)
+    }
+
+    @JvmStatic
+    fun getBlockMessage(message: (LockGroup) -> Text): List<Text>? {
+        val blockedGroup = RPGSkillsClient.uiActionLockGroup ?: return null
+        val player = MinecraftClient.getInstance().player ?: return null
+        return getBlockMessage(blockedGroup, message, player)
     }
 }
 

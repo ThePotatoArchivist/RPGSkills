@@ -18,6 +18,7 @@
     "locking.LivingEntityMixin",
     "locking.RecipeUnlockerMixin",
     "locking.ServerPlayerInteractionManagerMixin",
+    "locking.SmithingScreenHandlerMixin",
     "scaling.MobEntityMixin",
     "xp.AdvancementRewardsMixin",
     "xp.AnimalEntityMixin",

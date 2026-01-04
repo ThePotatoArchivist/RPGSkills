@@ -10,22 +10,21 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.ForgingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.SmithingScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Mixin(ForgingScreen.class)
-public abstract class ForgingScreenHandler<T extends ScreenHandler> extends HandledScreen<T> {
+public abstract class ForgingScreenMixin<T extends ScreenHandler> extends HandledScreen<T> {
     @Unique
     private PlayerEntity player;
 
-    public ForgingScreenHandler(T handler, PlayerInventory inventory, Text title) {
+    public ForgingScreenMixin(T handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
 
@@ -42,6 +41,7 @@ public abstract class ForgingScreenHandler<T extends ScreenHandler> extends Hand
             at = @At("TAIL")
     )
     private void renderCrossTooltip(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if ((Object) this instanceof SmithingScreen) return;
         CrossedArrowRenderer.renderTooltip(
                 context,
                 this,

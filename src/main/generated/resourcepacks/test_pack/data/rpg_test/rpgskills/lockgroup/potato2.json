@@ -26,7 +26,8 @@
   },
   "recipes": {
     "entries": [
-      "minecraft:prismarine_bricks"
+      "minecraft:prismarine_bricks",
+      "minecraft:netherite_helmet"
     ],
     "message": "You don't know how to assemble this prismarine"
   },
