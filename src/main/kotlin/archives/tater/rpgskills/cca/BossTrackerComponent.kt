@@ -78,6 +78,21 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         key.sync(world)
     }
 
+    fun add(entity: EntityType<*>): Boolean {
+        if (!(entity isIn RPGSkillsTags.INCREASES_LEVEL_CAP)) return false
+        if (!_defeated.add(entity)) return false
+        updateLevelCap()
+        key.sync(world)
+        return true
+    }
+
+    fun remove(entity: EntityType<*>): Boolean {
+        if (!_defeated.remove(entity)) return false
+        updateLevelCap()
+        key.sync(world)
+        return true
+    }
+
     override fun readFromNbt(
         tag: NbtCompound,
         registryLookup: RegistryWrapper.WrapperLookup

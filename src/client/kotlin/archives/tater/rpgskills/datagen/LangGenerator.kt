@@ -23,20 +23,23 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
     FabricLanguageProvider(dataOutput, registryLookup) {
 
     override fun generateTranslations(registryLookup: RegistryWrapper.WrapperLookup, translationBuilder: TranslationBuilder) {
-        val s = $$"$s"
         with(translationBuilder) {
             add(RPGSkillsCommands.LIST_SKILLS_NONE, "There are no skills")
             add(RPGSkillsCommands.LIST_SKILLS, "There are %s skills: %s")
-            add(RPGSkillsCommands.GET_LEVEL, "%s has %3$s levels in skill %2$s")
-            add(RPGSkillsCommands.SET_LEVEL, "Set %3$s levels in skill %2$s on %1$s")
-            add(RPGSkillsCommands.ADD_LEVEL, "Gave %3$s levels in skill %2$s to %1$s")
-            add(RPGSkillsCommands.ADD_POINTS, "Gave %2$s level points to %s")
-            add(RPGSkillsCommands.SET_POINTS, "Set %2$s level points on %s")
+            add(RPGSkillsCommands.GET_LEVEL, $$"%s has %3$s levels in skill %2$s")
+            add(RPGSkillsCommands.SET_LEVEL, $$"Set %3$s levels in skill %2$s on %1$s")
+            add(RPGSkillsCommands.ADD_LEVEL, $$"Gave %3$s levels in skill %2$s to %1$s")
+            add(RPGSkillsCommands.ADD_POINTS, $$"Gave %2$s level points to %s")
+            add(RPGSkillsCommands.SET_POINTS, $$"Set %2$s level points on %s")
+            add(RPGSkillsCommands.GET_POINTS, "%s has %s points")
             add(RPGSkillsCommands.RESET_CLASS, "Reset class for %s")
             add(RPGSkillsCommands.SET_CLASS, "Set class for %s to %s")
             add(RPGSkillsCommands.LIST_BOSSES, "%s/%s bosses have been defeated: %s")
             add(RPGSkillsCommands.LIST_BOSSES_ALL, "There are %s bosses: %s")
             add(RPGSkillsCommands.RESET_BOSSES, "Reset defeated bosses")
+            add(RPGSkillsCommands.ADD_BOSS, "Added %s to defeated bosses")
+            add(RPGSkillsCommands.REMOVE_BOSS, "Removed %s from defeated bosses")
+            add(RPGSkillsCommands.INVALID_BOSS, "%s is not a boss")
             add(RPGSkillsCommands.DESPAWN_SINGLE, "Despawned %s")
             add(RPGSkillsCommands.DESPAWN_MULTIPLE, "Despawned %s entities")
             add(BossTrackerComponent.BOSS_DEFEAT_TITLE, "GREAT ENEMY FELLED")

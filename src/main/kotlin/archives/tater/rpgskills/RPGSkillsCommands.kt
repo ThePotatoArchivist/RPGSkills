@@ -12,10 +12,10 @@ import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType.getInteger
 import com.mojang.brigadier.arguments.IntegerArgumentType.integer
 import net.minecraft.command.CommandRegistryAccess
-import net.minecraft.command.argument.EntityArgumentType
 import net.minecraft.command.argument.EntityArgumentType.*
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.getRegistryEntry
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.registryEntry
+import net.minecraft.registry.RegistryKeys
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 
@@ -27,10 +27,14 @@ object RPGSkillsCommands : CommandRegistrationCallback {
     val SET_LEVEL = Translation.arg("commands.$MOD_ID.skills.level.set")
     val SET_POINTS = Translation.arg("commands.$MOD_ID.skills.levelpoints.set")
     val ADD_POINTS = Translation.arg("commands.$MOD_ID.skills.levelpoints.add")
+    val GET_POINTS = Translation.arg("commands.$MOD_ID.skills.levelpoints.get")
     val RESET_CLASS = Translation.arg("commands.$MOD_ID.skills.class.reset")
     val SET_CLASS = Translation.arg("commands.$MOD_ID.skills.class.set")
     val LIST_BOSSES = Translation.arg("commands.$MOD_ID.skills.bosses.list")
     val LIST_BOSSES_ALL = Translation.arg("commands.$MOD_ID.skills.bosses.list.all")
+    val ADD_BOSS = Translation.arg("commands.$MOD_ID.skills.bosses.add")
+    val REMOVE_BOSS = Translation.arg("commands.$MOD_ID.skills.bosses.remove")
+    val INVALID_BOSS = Translation.arg("commands.$MOD_ID.skills.bosses.invalid")
     val RESET_BOSSES = Translation.unit("commands.$MOD_ID.skills.bosses.reset")
     val DESPAWN_SINGLE = Translation.arg("commands.$MOD_ID.despawn.single")
     val DESPAWN_MULTIPLE = Translation.arg("commands.$MOD_ID.despawn.multiple")
@@ -187,21 +191,49 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                         it.source.sendFeedback(RESET_BOSSES.text, false)
                         0
                     }
+                    sub("add") {
+                        argumentExec("entity", registryEntry(registryAccess, RegistryKeys.ENTITY_TYPE)) {
+                            val entity = getRegistryEntry(it, "entity", RegistryKeys.ENTITY_TYPE)
+                            if (!(entity.value isIn RPGSkillsTags.INCREASES_LEVEL_CAP)) {
+                                it.source.sendError(INVALID_BOSS.text(entity.value.name))
+                                return@argumentExec 0
+                            }
+                            BossTrackerComponent.update(it.source.server) {
+                                add(entity.value)
+                            }
+                            it.source.sendFeedback(ADD_BOSS.text(entity.value.name), true)
+                            1
+                        }
+                    }
+                    sub("remove") {
+                        argumentExec("entity", registryEntry(registryAccess, RegistryKeys.ENTITY_TYPE)) {
+                            val entity = getRegistryEntry(it, "entity", RegistryKeys.ENTITY_TYPE)
+                            if (!(entity.value isIn RPGSkillsTags.INCREASES_LEVEL_CAP)) {
+                                it.source.sendError(INVALID_BOSS.text(entity.value.name))
+                                return@argumentExec 0
+                            }
+                            BossTrackerComponent.update(it.source.server) {
+                                remove(entity.value)
+                            }
+                            it.source.sendFeedback(REMOVE_BOSS.text(entity.value.name), true)
+                            1
+                        }
+                    }
                 }
             }
 
             command("despawn") {
-                argumentExec("entity", entities()) { command ->
-                    val entities = getEntities(command, "entity")
-                    for (entity in entities)
+                argumentExec("targets", entities()) {
+                    val targets = getEntities(it, "targets")
+                    for (entity in targets)
                         entity.discard()
 
-                    if (entities.size == 1)
-                        command.source.sendFeedback(DESPAWN_SINGLE.text(entities.first().displayName!!), true)
+                    if (targets.size == 1)
+                        it.source.sendFeedback(DESPAWN_SINGLE.text(targets.first().displayName!!), true)
                     else
-                        command.source.sendFeedback(DESPAWN_MULTIPLE.text(entities.size), true)
+                        it.source.sendFeedback(DESPAWN_MULTIPLE.text(targets.size), true)
 
-                    entities.size
+                    targets.size
                 }
             }
         }
