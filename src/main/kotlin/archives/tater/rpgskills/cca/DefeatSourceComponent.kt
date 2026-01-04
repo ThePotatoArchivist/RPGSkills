@@ -50,14 +50,14 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
             .coerceAtMost(1f)
     }
 
-    fun getSkillPointAmounts(): Map<UUID, Int> {
+    fun getSkillPointAmounts(firstDefeat: Boolean): Map<UUID, Int> {
         val source = if (entity isIn RPGSkillsTags.IGNORES_SKILL_SOURCE)
             null
         else
             skillSource.getComponent(entity.world) ?: return mapOf()
 
         return skillPointProportions.mapValues { (uuid, proportion) ->
-            val points = (proportion * RPGSkills.CONFIG.getEntityPoints(entity)).toInt()
+            val points = (proportion * RPGSkills.CONFIG.getEntityPoints(entity, firstDefeat)).toInt()
             source?.removeSkillPoints(uuid, points) ?: points
         }
     }
@@ -101,7 +101,7 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
             if (!entity.isDead) return
 
             val world = entity.world as? ServerWorld ?: return
-            for ((playerUuid, amount) in entity[DefeatSourceComponent].getSkillPointAmounts())
+            for ((playerUuid, amount) in entity[DefeatSourceComponent].getSkillPointAmounts(!world[BossTrackerComponent].hasDefeated(entity)))
                 SkillPointOrbEntity.spawnOrbs(world, world.getPlayerByUuid(playerUuid) ?: continue, entity.pos, amount)
         }
     }

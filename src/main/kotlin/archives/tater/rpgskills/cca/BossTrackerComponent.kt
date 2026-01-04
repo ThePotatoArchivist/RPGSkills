@@ -44,9 +44,11 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
     }
     val totalCount get() = increasesLevelCap.size()
 
+    fun hasDefeated(entity: LivingEntity) = entity.type in defeated
+
     fun onDefeated(entity: LivingEntity): Boolean {
         if (Registries.ENTITY_TYPE.getEntry(entity.type) !in increasesLevelCap) return false
-        if (entity.type in _defeated) return false
+        if (hasDefeated(entity)) return false
         _defeated.add(entity.type)
         updateLevelCap()
         key.sync(world)

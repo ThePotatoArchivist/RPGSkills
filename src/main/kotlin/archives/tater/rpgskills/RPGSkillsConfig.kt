@@ -5,6 +5,7 @@ import archives.tater.rpgskills.util.CodecConfig
 import archives.tater.rpgskills.util.MutationCodec
 import archives.tater.rpgskills.util.ceilDiv
 import archives.tater.rpgskills.util.forAccess
+import archives.tater.rpgskills.util.intRangeCodec
 import archives.tater.rpgskills.util.isIn
 import archives.tater.rpgskills.util.recordMutationCodec
 import com.mojang.serialization.Codec
@@ -47,6 +48,8 @@ class RPGSkillsConfig {
         RPGSkillsTags.DLC_BOSS to 8000, // TODO tweak value
     )
         private set
+    var maxDefaultEntitySkillPoints: Int = 100
+        private set
     var defaultEntitySkillPointDivisor: Int = 2
         private set
     var blockSkillPointDivisor: Int = 2
@@ -74,9 +77,9 @@ class RPGSkillsConfig {
     fun getStructurePoints(structure: RegistryEntry<Structure>) =
         structureSkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { structure isIn tag } } ?: defaultStructureSkillPoints
 
-    fun getEntityPoints(entity: LivingEntity) =
-        entitySkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { entity isIn tag } }
-            ?: (entity.getXpToDrop(entity.world as ServerWorld, null) ceilDiv defaultEntitySkillPointDivisor)
+    fun getEntityPoints(entity: LivingEntity, firstDefeat: Boolean) =
+        (if (firstDefeat) entitySkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { entity isIn tag } } else null)
+            ?: (entity.getXpToDrop(entity.world as ServerWorld, null) ceilDiv defaultEntitySkillPointDivisor).coerceAtMost(maxDefaultEntitySkillPoints)
 
     fun getBlockPoints(experiencePoints: Int) = experiencePoints ceilDiv blockSkillPointDivisor
 
@@ -84,18 +87,19 @@ class RPGSkillsConfig {
 
     companion object : CodecConfig<RPGSkillsConfig>(RPGSkills.MOD_ID, RPGSkills.logger) {
         override val codec: MutationCodec<RPGSkillsConfig> = recordMutationCodec(
-            Codec.INT.fieldOf("skill_points_chunk").forAccess(RPGSkillsConfig::chunkSkillPoints),
-            Codec.INT.fieldOf("skill_points_spawner").forAccess(RPGSkillsConfig::spawnerSkillPoints),
+            intRangeCodec(min = 0).fieldOf("skill_points_chunk").forAccess(RPGSkillsConfig::chunkSkillPoints),
+            intRangeCodec(min = 0).fieldOf("skill_points_spawner").forAccess(RPGSkillsConfig::spawnerSkillPoints),
             Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.STRUCTURE), Codec.INT).fieldOf("skill_points_structure").forAccess(RPGSkillsConfig::structureSkillPoints),
-            Codec.INT.fieldOf("skill_points_structure_default").forAccess(RPGSkillsConfig::defaultStructureSkillPoints),
+            intRangeCodec(min = 0).fieldOf("skill_points_structure_default").forAccess(RPGSkillsConfig::defaultStructureSkillPoints),
             Codec.unboundedMap(TagKey.unprefixedCodec(RegistryKeys.ENTITY_TYPE), Codec.INT).fieldOf("skill_points_entity").forAccess(RPGSkillsConfig::entitySkillPoints),
-            Codec.INT.fieldOf("skill_point_divisor_entity_default").forAccess(RPGSkillsConfig::defaultEntitySkillPointDivisor),
-            Codec.INT.fieldOf("skill_point_divisor_block").forAccess(RPGSkillsConfig::blockSkillPointDivisor),
-            Codec.INT.fieldOf("skill_point_divisor_advancement").forAccess(RPGSkillsConfig::advancementSkillPointDivisor),
+            intRangeCodec(min = 0).fieldOf("skill_point_max_entity_default").forAccess(RPGSkillsConfig::maxDefaultEntitySkillPoints),
+            intRangeCodec(min = 1).fieldOf("skill_point_divisor_entity_default").forAccess(RPGSkillsConfig::defaultEntitySkillPointDivisor),
+            intRangeCodec(min = 1).fieldOf("skill_point_divisor_block").forAccess(RPGSkillsConfig::blockSkillPointDivisor),
+            intRangeCodec(min = 1).fieldOf("skill_point_divisor_advancement").forAccess(RPGSkillsConfig::advancementSkillPointDivisor),
             IntProvider.POSITIVE_CODEC.fieldOf("skill_points_from_fishing").forAccess(RPGSkillsConfig::fishingSkillPoints),
             IntProvider.POSITIVE_CODEC.fieldOf("skill_points_from_breeding").forAccess(RPGSkillsConfig::breedingSkillPoints),
-            Codec.INT.fieldOf("level_cap_base").forAccess(RPGSkillsConfig::baseLevelCap),
-            Codec.INT.fieldOf("level_cap_increase_per_boss").forAccess(RPGSkillsConfig::levelCapIncreasePerBoss),
+            intRangeCodec(min = 0).fieldOf("level_cap_base").forAccess(RPGSkillsConfig::baseLevelCap),
+            intRangeCodec(min = 0).fieldOf("level_cap_increase_per_boss").forAccess(RPGSkillsConfig::levelCapIncreasePerBoss),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.SHORT_CODEC).fieldOf("attribute_increase_per_boss").forAccess(RPGSkillsConfig::attributeIncreasesRaw),
         )
 
