@@ -46,6 +46,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
     ) {
         with (dispatcher) {
             command("skills") {
+                requires { it.hasPermissionLevel(2) }
                 subExec("list") { command ->
                     val skills = command.source.registryManager[Skill].streamEntriesOrdered(RPGSkillsTags.SKILL_ORDER).toList()
 
@@ -223,6 +224,7 @@ object RPGSkillsCommands : CommandRegistrationCallback {
             }
 
             command("despawn") {
+                requires { it.hasPermissionLevel(2) }
                 argumentExec("targets", entities()) {
                     val targets = getEntities(it, "targets")
                     for (entity in targets)
