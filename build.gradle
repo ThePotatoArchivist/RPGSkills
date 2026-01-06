@@ -45,6 +45,10 @@ repositories {
         name = "TerraformersMC"
         url = "https://maven.terraformersmc.com/"
     }
+    maven {
+        name "Greenhouse Maven"
+        url "https://maven.greenhouse.lgbt/releases"
+    }
 }
 
 loom {
@@ -99,6 +103,8 @@ dependencies {
     modLocalRuntime "maven.modrinth:spell-power:${project.spell_power_version}-fabric"
 
     modCompileOnly("maven.modrinth:l_enders-cataclysm:${project.cataclysm_version}")
+
+    modLocalRuntime modCompileOnly("umpaz.brewinandchewin:BrewinAndChewin-fabric:${project.brewinandchewin_version}")
 
     modLocalRuntime modCompileOnly("earth.terrarium.chipped:chipped-fabric-1.21.1:${project.chipped_version}")
 
