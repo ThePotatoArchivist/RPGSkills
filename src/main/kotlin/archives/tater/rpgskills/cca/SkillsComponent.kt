@@ -6,7 +6,6 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.*
-import net.fabricmc.fabric.api.networking.v1.PacketSender
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -20,7 +19,7 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents
-import org.apache.logging.log4j.core.jmx.Server
+import net.minecraft.util.Identifier
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
@@ -76,8 +75,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     private val maxLevel get() = player.world[BossTrackerComponent].maxLevel.coerceAtMost(MAX_LEVEL)
 
-    private var modifiers: HashMultimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier> =
-        HashMultimap.create()
+    private var modifiers: Map<RegistryEntry<EntityAttribute>, List<Identifier>> = mapOf()
 
     private fun sync() {
         key.sync(player)
@@ -122,10 +120,15 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     private fun updateAttributes() {
         if (player.world.isClient) return
-        player.attributes.removeModifiers(modifiers)
-        modifiers = getAttributeModifiers().also {
-            player.attributes.addTemporaryModifiers(it)
+        modifiers.forEach { (attribute, modifiers) ->
+            player.getAttributeInstance(attribute)?.run {
+                for (modifier in modifiers)
+                    removeModifier(modifier)
+            }
         }
+        modifiers = getAttributeModifiers().also {
+            player.attributes.addPersistentModifiers(it)
+        }.asMap().mapValues { (_, values) -> values.map { it.id } }
     }
 
     private fun updateJobs() {
@@ -166,6 +169,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).mutate().fieldFor("skills", SkillsComponent::_skills),
             Codec.INT.fieldOf("spent").forAccess(SkillsComponent::spentLevels),
             Codec.INT.fieldOf("points").forAccess(SkillsComponent::_points),
+            Codec.unboundedMap(EntityAttribute.CODEC, Identifier.CODEC.listOf()).fieldOf("attribute_modifiers").forAccess(SkillsComponent::modifiers),
         )
 
         override val key: ComponentKey<SkillsComponent> = ComponentRegistry.getOrCreate<SkillsComponent>(RPGSkills.id("skills"), SkillsComponent::class.java)

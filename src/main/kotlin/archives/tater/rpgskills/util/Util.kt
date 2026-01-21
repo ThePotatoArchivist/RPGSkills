@@ -3,23 +3,25 @@
 package archives.tater.rpgskills.util
 
 import archives.tater.rpgskills.RPGSkills
-import com.google.common.collect.HashMultimap
-import com.mojang.serialization.Codec
-import com.mojang.serialization.DataResult
-import com.mojang.serialization.DynamicOps
-import com.mojang.serialization.MapCodec
-import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
+import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
+import com.mojang.serialization.DynamicOps
+import com.mojang.serialization.MapCodec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.advancement.criterion.BredAnimalsCriterion
 import net.minecraft.advancement.criterion.ItemCriterion
 import net.minecraft.advancement.criterion.OnKilledCriterion
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
+import net.minecraft.entity.attribute.AttributeContainer
+import net.minecraft.entity.attribute.EntityAttribute
+import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -40,6 +42,8 @@ import net.minecraft.text.Text
 import net.minecraft.text.Texts
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import org.joml.Vector2i
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
@@ -321,3 +325,12 @@ fun <K, V> sequencedMapCodec(key: MapCodec<K>, value: MapCodec<V>): Codec<Sequen
             { LinkedHashMap<K, V>(it.size).apply { for ((key, value) in it) set(key, value) } },
             { it.entries.map { (key, value) -> key to value } }
         )
+
+fun AttributeContainer.addPersistentModifiers(modifiersMap: Multimap<RegistryEntry<EntityAttribute>, EntityAttributeModifier>) {
+    modifiersMap.forEach { attribute, modifier ->
+        getCustomInstance(attribute)?.run {
+            removeModifier(modifier.id())
+            addPersistentModifier(modifier)
+        }
+    }
+}
