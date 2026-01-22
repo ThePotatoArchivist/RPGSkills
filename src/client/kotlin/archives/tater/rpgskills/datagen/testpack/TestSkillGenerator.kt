@@ -44,6 +44,7 @@ class TestSkillGenerator(
                 levels = listOf(
                     Skill.Level(mapOf(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),
+                        EntityAttributes.GENERIC_MAX_HEALTH to AnonymousAttributeModifier(6.0, Operation.ADD_VALUE),
                     ), TestJobGenerator.OTHERS.subList(0, 3).map { registerable[it] }),
                     Skill.Level(mapOf(
                         EntityAttributes.GENERIC_MOVEMENT_SPEED to AnonymousAttributeModifier(0.1, Operation.ADD_MULTIPLIED_BASE),

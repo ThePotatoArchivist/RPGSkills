@@ -54,7 +54,7 @@ class SkillScreen(
                     hasContent = true
                 }
 
-                player.registryManager[LockGroup].streamEntriesOrdered(RPGSkillsTags.LOCK_GROUP_ORDER)
+                player.world.relreg_reloadableRegistries()[LockGroup].streamEntries()
                     .filter { lockEntry -> lockEntry.value.requirements.any { it[skill] == levelAmount } }
                     .sorted(compareBy { it.value.requirementsContaining(skill, levelAmount).sumOf { requirement -> requirement.size } })
                     .forEach {

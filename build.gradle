@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.13-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom-remap' version '1.14-SNAPSHOT'
 	id 'maven-publish'
 	id "org.jetbrains.kotlin.jvm" version "2.2.21"
 }
@@ -49,6 +49,7 @@ repositories {
         name "Greenhouse Maven"
         url "https://maven.greenhouse.lgbt/releases"
     }
+	maven { url 'https://jitpack.io' }
 }
 
 loom {
@@ -87,6 +88,8 @@ dependencies {
 	modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-world:${project.cca_version}"
 	modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-chunk:${project.cca_version}"
 	modImplementation "org.ladysnake.cardinal-components-api:cardinal-components-block:${project.cca_version}"
+
+	modImplementation include("com.github.ThePotatoArchivist:RelReg:${project.relreg_version}")
 
     modLocalRuntime modCompileOnly("io.wispforest:accessories-fabric:${project.accessories_version}")
     modLocalRuntime "maven.modrinth:accessories-compat-layer:${project.accessories_compat_version}"

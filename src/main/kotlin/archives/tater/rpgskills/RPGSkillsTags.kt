@@ -40,5 +40,4 @@ object RPGSkillsTags {
 
     val SKILL_ORDER = of(Skill, "order")
     val CLASS_ORDER = of(SkillClass, "order")
-    val LOCK_GROUP_ORDER = of(LockGroup, "order")
 }

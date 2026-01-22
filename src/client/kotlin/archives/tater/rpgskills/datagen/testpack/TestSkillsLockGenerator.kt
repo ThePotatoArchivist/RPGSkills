@@ -102,6 +102,7 @@ class TestSkillsLockGenerator(
                 RegistryIngredient.ofItems {
                     +ItemTags.BUTTONS
                     +Items.RED_CONCRETE
+                    +Items.BLUE_CONCRETE
                 },
                 "You don't know what kind of button this is",
             ),

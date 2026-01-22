@@ -8,6 +8,7 @@
   "items": {
     "entries": [
       "minecraft:red_concrete",
+      "minecraft:blue_concrete",
       "#minecraft:buttons"
     ],
     "message": "You don't know what kind of button this is"

@@ -3,6 +3,7 @@
   "levels": {
     "1": {
       "attributes": {
+        "minecraft:generic.max_health": 6.0,
         "minecraft:generic.movement_speed": {
           "amount": 0.1,
           "operation": "add_multiplied_base"

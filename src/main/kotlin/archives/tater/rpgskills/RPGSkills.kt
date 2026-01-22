@@ -1,5 +1,6 @@
 package archives.tater.rpgskills
 
+import archives.tater.relreg.api.ReloadableRegistries
 import archives.tater.rpgskills.condition.RPGSkillsConditions
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.LockGroup
@@ -44,7 +45,7 @@ object RPGSkills : ModInitializer {
         RPGSkillsCriteria.register()
 
 		DynamicRegistries.registerSynced(Skill.key, Skill.CODEC)
-		DynamicRegistries.registerSynced(LockGroup.key, LockGroup.CODEC)
+		ReloadableRegistries.registerSynced(LockGroup.key, LockGroup.CODEC)
 		DynamicRegistries.registerSynced(SkillClass.key, SkillClass.CODEC)
         DynamicRegistries.registerSynced(Job.key, Job.CODEC)
 
