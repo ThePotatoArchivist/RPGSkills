@@ -11,6 +11,7 @@ import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.client.gui.SkillXpBar
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.reloadableRegistries
 import archives.tater.rpgskills.util.streamEntriesOrdered
 import archives.tater.rpgskills.util.value
 import net.minecraft.client.gui.DrawContext
@@ -54,7 +55,7 @@ class SkillScreen(
                     hasContent = true
                 }
 
-                player.world.relreg_reloadableRegistries()[LockGroup].streamEntries()
+                player.world.reloadableRegistries[LockGroup].streamEntries()
                     .filter { lockEntry -> lockEntry.value.requirements.any { it[skill] == levelAmount } }
                     .sorted(compareBy { it.value.requirementsContaining(skill, levelAmount).sumOf { requirement -> requirement.size } })
                     .forEach {

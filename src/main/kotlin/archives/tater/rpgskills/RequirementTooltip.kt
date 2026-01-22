@@ -8,6 +8,7 @@ import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
 import archives.tater.rpgskills.util.joinToText
+import archives.tater.rpgskills.util.reloadableRegistries
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
@@ -79,7 +80,7 @@ object RequirementTooltip {
 
     @JvmStatic
     fun appendTooltip(stack: ItemStack, player: PlayerEntity, tooltip: MutableList<Text>, keyPressed: Boolean, keybinding: Text) {
-        val registries = player.world.relreg_reloadableRegistries()
+        val registries = player.world.reloadableRegistries
         val useLock = LockGroup.useGroupOf(registries, stack)
         val placeLock = LockGroup.placeGroupOf(registries, stack)
         val craftLock = LockGroup.craftGroupOf(registries, stack)

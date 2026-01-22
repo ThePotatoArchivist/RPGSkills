@@ -2,6 +2,7 @@
 
 package archives.tater.rpgskills.util
 
+import archives.tater.relreg.api.HasReloadableRegistries
 import archives.tater.rpgskills.RPGSkills
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
@@ -334,3 +335,5 @@ fun AttributeContainer.addPersistentModifiers(modifiersMap: Multimap<RegistryEnt
         }
     }
 }
+
+inline val HasReloadableRegistries.reloadableRegistries: DynamicRegistryManager get() = relreg_reloadableRegistries()

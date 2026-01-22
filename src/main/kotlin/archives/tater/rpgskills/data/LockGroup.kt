@@ -131,7 +131,7 @@ data class LockGroup(
             RECIPE_CACHE[registries][stack.item]?.value
 
         private fun <T> findLocked(player: PlayerEntity, cache: RegistryCache<T, LockGroup>, value: T) =
-            cache[player.world.relreg_reloadableRegistries()][value]?.value?.takeIf { !it.isSatisfiedBy(player) }
+            cache[player.world.reloadableRegistries][value]?.value?.takeIf { !it.isSatisfiedBy(player) }
 
         @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, ITEM_CACHE, stack.item)
         @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = findLocked(player, BLOCK_CACHE, state.block)
