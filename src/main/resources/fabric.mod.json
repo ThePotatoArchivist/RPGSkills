@@ -2,14 +2,14 @@
 	"schemaVersion": 1,
 	"id": "rpgskills",
 	"version": "${version}",
-	"name": "RPG Skills",
+	"name": "Potato's Chips 'n' Skills",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"Me!"
+		"ThePotatoArchivist"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://modrinth.com/project/chipsnskills",
+		"sources": "https://github.com/ThePotatoArchivist/RPGSkills"
 	},
 	"license": "LGPL-3.0-or-later",
 	"icon": "assets/rpgskills/icon.png",
