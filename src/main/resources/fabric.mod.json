@@ -3,7 +3,7 @@
 	"id": "rpgskills",
 	"version": "${version}",
 	"name": "Potato's Chips 'n' Skills",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "A datapackable RPG skills & leveling system",
 	"authors": [
 		"ThePotatoArchivist"
 	],
