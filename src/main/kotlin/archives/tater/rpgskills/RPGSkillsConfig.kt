@@ -26,6 +26,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.intprovider.IntProvider
 import net.minecraft.util.math.intprovider.UniformIntProvider
 import net.minecraft.world.gen.structure.Structure
+import java.util.Optional
 
 class RPGSkillsConfig {
     var chunkSkillPoints: Int = 7
@@ -64,6 +65,8 @@ class RPGSkillsConfig {
     var baseLevelCap: Int = 10
         private set
     var levelCapIncreasePerBoss: Int = 10
+        private set
+    var capRemoveBossCount: Int = -1
         private set
     var attributeIncreasesRaw: Map<RegistryKey<EntityAttribute>, AnonymousAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_ATTACK_DAMAGE to AnonymousAttributeModifier(1.0),
@@ -124,6 +127,7 @@ class RPGSkillsConfig {
             IntProvider.POSITIVE_CODEC.fieldOf("skill_points_from_breeding").forAccess(RPGSkillsConfig::breedingSkillPoints),
             intRangeCodec(min = 0).fieldOf("level_cap_base").forAccess(RPGSkillsConfig::baseLevelCap),
             intRangeCodec(min = 0).fieldOf("level_cap_increase_per_boss").forAccess(RPGSkillsConfig::levelCapIncreasePerBoss),
+            intRangeCodec(min = -1).fieldOf("level_cap_remove_boss_count").forAccess(RPGSkillsConfig::capRemoveBossCount),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec()).fieldOf("attribute_increase_per_boss").forAccess(RPGSkillsConfig::attributeIncreasesRaw),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec(Operation.ADD_MULTIPLIED_BASE)).listOf().fieldOf("attribute_increases_boss").forAccess(RPGSkillsConfig::bossAttributeIncreasesRaw),
         )

@@ -20,6 +20,7 @@ import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Identifier
+import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent

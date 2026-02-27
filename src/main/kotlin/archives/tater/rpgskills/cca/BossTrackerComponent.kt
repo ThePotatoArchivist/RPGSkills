@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsConfig
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.get
@@ -34,14 +35,16 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
 
     var maxLevel: Int = if (world.isClient) Int.MAX_VALUE else RPGSkills.CONFIG.baseLevelCap
         private set
+    val hasCap get() = maxLevel < Int.MAX_VALUE
 
-    val increasesLevelCap by lazy {
+    val increasesLevelCap: RegistryEntryList<EntityType<*>> by lazy {
         world.registryManager[RegistryKeys.ENTITY_TYPE]
             .getEntryList(RPGSkillsTags.INCREASES_LEVEL_CAP)
             .getOrNull()
             ?: RegistryEntryList.empty()
     }
     val totalCount get() = increasesLevelCap.size()
+    val requiredCount get() = RPGSkills.CONFIG.capRemoveBossCount.takeIf { it in 0..totalCount } ?: totalCount
 
     fun hasDefeated(entity: LivingEntity) = entity.type in defeated
 
@@ -49,6 +52,7 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         if (Registries.ENTITY_TYPE.getEntry(entity.type) !in increasesLevelCap) return false
         if (hasDefeated(entity)) return false
         _defeated.add(entity.type)
+        val hadCap = hasCap
         updateLevelCap()
         key.sync(world)
 
@@ -60,13 +64,17 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         world.server?.playerManager?.apply {
             broadcast(BOSS_DEFEAT_MESSAGE.text(entity.type.name), false)
             broadcast(ENEMIES_STRENGTHEN_MESSAGE.text, false)
-            broadcast(if (maxLevel < Int.MAX_VALUE) CAP_RAISE_MESSAGE.text(maxLevel) else CAP_REMOVED_MESSAGE.text, false)
+            when {
+                !hadCap -> {}
+                hasCap -> broadcast(CAP_RAISE_MESSAGE.text(maxLevel), false)
+                else -> broadcast(CAP_REMOVED_MESSAGE.text, false)
+            }
         }
         return true
     }
 
     private fun updateLevelCap() {
-        maxLevel = if (defeatedCount >= increasesLevelCap.size())
+        maxLevel = if (defeatedCount >= requiredCount)
             Int.MAX_VALUE
         else
             RPGSkills.CONFIG.baseLevelCap + RPGSkills.CONFIG.levelCapIncreasePerBoss * defeatedCount
