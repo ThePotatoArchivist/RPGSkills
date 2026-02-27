@@ -49,9 +49,9 @@ class EntityTagGenerator(
             addOptional(cataclysmId("ancient_remnant"))
             addOptional(cataclysmId("scylla"))
             addOptional(cataclysmId("maledictus"))
-            addOptional(Identifier.of("fdbossess", "chesed"))
-            addOptional(Identifier.of("fdbossess", "malkuth"))
-            addOptional(Identifier.of("fdbossess", "geburah"))
+            addOptional(Identifier.of("fdbosses", "chesed"))
+            addOptional(Identifier.of("fdbosses", "malkuth"))
+            addOptional(Identifier.of("fdbosses", "geburah"))
         }
         with(getOrCreateTagBuilder(RPGSkillsTags.FINAL_BOSS)) {
             addOptional(cataclysmId("ignis"))

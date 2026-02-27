@@ -21,15 +21,15 @@
       "required": false
     },
     {
-      "id": "fdbossess:chesed",
+      "id": "fdbosses:chesed",
       "required": false
     },
     {
-      "id": "fdbossess:malkuth",
+      "id": "fdbosses:malkuth",
       "required": false
     },
     {
-      "id": "fdbossess:geburah",
+      "id": "fdbosses:geburah",
       "required": false
     }
   ]
