@@ -19,6 +19,18 @@
     {
       "id": "cataclysm:maledictus",
       "required": false
+    },
+    {
+      "id": "fdbossess:chesed",
+      "required": false
+    },
+    {
+      "id": "fdbossess:malkuth",
+      "required": false
+    },
+    {
+      "id": "fdbossess:geburah",
+      "required": false
     }
   ]
 }

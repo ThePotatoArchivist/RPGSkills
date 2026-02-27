@@ -49,32 +49,31 @@ class EntityTagGenerator(
             addOptional(cataclysmId("ancient_remnant"))
             addOptional(cataclysmId("scylla"))
             addOptional(cataclysmId("maledictus"))
+            addOptional(Identifier.of("fdbossess", "chesed"))
+            addOptional(Identifier.of("fdbossess", "malkuth"))
+            addOptional(Identifier.of("fdbossess", "geburah"))
         }
         with(getOrCreateTagBuilder(RPGSkillsTags.FINAL_BOSS)) {
             addOptional(cataclysmId("ignis"))
         }
-        with(getOrCreateTagBuilder(RPGSkillsTags.DLC_BOSS)) {
-            addOptional(Identifier.of("fdbossess", "chesed"))
+        with (getOrCreateTagBuilder(RPGSkillsTags.BOSS)) {
+            addTag(RPGSkillsTags.EARLY_BOSS)
+            addTag(RPGSkillsTags.MID_BOSS)
+            addTag(RPGSkillsTags.FINAL_BOSS)
         }
         with(getOrCreateTagBuilder(RPGSkillsTags.IGNORES_SKILL_SOURCE)) {
-            forceAddTag(RPGSkillsTags.MINIBOSS)
-            forceAddTag(RPGSkillsTags.BASIC_BOSS)
-            forceAddTag(RPGSkillsTags.EARLY_BOSS)
-            forceAddTag(RPGSkillsTags.MID_BOSS)
-            forceAddTag(RPGSkillsTags.FINAL_BOSS)
-            forceAddTag(RPGSkillsTags.DLC_BOSS)
+            addTag(RPGSkillsTags.MINIBOSS)
+            addTag(RPGSkillsTags.BASIC_BOSS)
+            addTag(RPGSkillsTags.BOSS)
         }
         with(getOrCreateTagBuilder(RPGSkillsTags.INCREASES_LEVEL_CAP)) {
-            forceAddTag(RPGSkillsTags.EARLY_BOSS)
-            forceAddTag(RPGSkillsTags.MID_BOSS)
-            forceAddTag(RPGSkillsTags.FINAL_BOSS)
-            forceAddTag(RPGSkillsTags.DLC_BOSS)
+            addTag(RPGSkillsTags.BOSS)
         }
-        with (getOrCreateTagBuilder(RPGSkillsTags.BOSS_ATTRIBUTE_AFFECTED)) { forceAddTag(RPGSkillsTags.BASIC_BOSS)
-            forceAddTag(RPGSkillsTags.EARLY_BOSS)
-            forceAddTag(RPGSkillsTags.MID_BOSS)
-            forceAddTag(RPGSkillsTags.FINAL_BOSS)
-            forceAddTag(RPGSkillsTags.DLC_BOSS)
+        with(getOrCreateTagBuilder(RPGSkillsTags.REPEATED_DEFEAT_IGNORES_CUSTOM_SKILL_DROP)) {
+            addTag(RPGSkillsTags.BOSS)
+        }
+        with (getOrCreateTagBuilder(RPGSkillsTags.BOSS_ATTRIBUTE_AFFECTED)) {
+            addTag(RPGSkillsTags.BOSS)
         }
     }
 }

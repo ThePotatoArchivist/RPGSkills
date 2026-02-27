@@ -47,7 +47,6 @@ class RPGSkillsConfig {
         RPGSkillsTags.EARLY_BOSS to 500,
         RPGSkillsTags.MID_BOSS to 800,
         RPGSkillsTags.FINAL_BOSS to 4000,
-        RPGSkillsTags.DLC_BOSS to 8000, // TODO tweak value
     )
         private set
     var maxDefaultEntitySkillPoints: Int = 100
@@ -104,8 +103,8 @@ class RPGSkillsConfig {
     fun getStructurePoints(structure: RegistryEntry<Structure>) =
         structureSkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { structure isIn tag } } ?: defaultStructureSkillPoints
 
-    fun getEntityPoints(entity: LivingEntity, firstDefeat: Boolean) =
-        (if (firstDefeat) entitySkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { entity isIn tag } } else null)
+    fun getEntityPoints(entity: LivingEntity, ignoreCustom: Boolean) =
+        (if (!ignoreCustom) entitySkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { entity isIn tag } } else null)
             ?: (entity.getXpToDrop(entity.world as ServerWorld, null) ceilDiv defaultEntitySkillPointDivisor).coerceAtMost(maxDefaultEntitySkillPoints)
 
     fun getBlockPoints(experiencePoints: Int) = experiencePoints ceilDiv blockSkillPointDivisor
