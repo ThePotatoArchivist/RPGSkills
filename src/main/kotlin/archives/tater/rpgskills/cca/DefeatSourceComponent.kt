@@ -30,6 +30,8 @@ import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
 import kotlin.collections.iterator
 
 class DefeatSourceComponent(val entity: MobEntity) : Component {
@@ -112,9 +114,11 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
             if (damageTaken == 0f || entity !is MobEntity) return
             val player = source.attacker as? PlayerEntity ?: return
             entity[DefeatSourceComponent][player] += damageTaken
+        }
 
-            if (!entity.isDead) return
-
+        @JvmStatic
+        fun onDeath(entity: LivingEntity) {
+            if (entity !is MobEntity) return
             val world = entity.world as? ServerWorld ?: return
             for ((player, amount) in entity[DefeatSourceComponent].getSkillPointAmounts(
                 entity isIn RPGSkillsTags.REPEATED_DEFEAT_IGNORES_CUSTOM_SKILL_DROP && !world[BossTrackerComponent].hasDefeated(entity)

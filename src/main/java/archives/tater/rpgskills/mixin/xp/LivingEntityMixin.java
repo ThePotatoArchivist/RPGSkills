@@ -46,7 +46,9 @@ public abstract class LivingEntityMixin extends Entity {
     private void afterDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (getWorld().isClient) return;
         DefeatSourceComponent.afterDamage((LivingEntity) (Object) this, source, amount);
-        if (isDead())
+        if (isDead()) {
+            DefeatSourceComponent.onDeath((LivingEntity) (Object) this);
             BossTrackerComponent.onDeath((LivingEntity) (Object) this);
+        }
     }
 }

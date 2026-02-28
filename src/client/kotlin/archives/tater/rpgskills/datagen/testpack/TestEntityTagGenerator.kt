@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.entity.EntityType
 import net.minecraft.registry.RegistryWrapper
+import umpaz.brewinandchewin.common.tag.BnCTags
 import java.util.concurrent.CompletableFuture
 
 class TestEntityTagGenerator(
@@ -14,6 +15,9 @@ class TestEntityTagGenerator(
     override fun configure(wrapperLookup: RegistryWrapper.WrapperLookup?) {
         with (getOrCreateTagBuilder(RPGSkillsTags.INCREASES_LEVEL_CAP)) {
             add(EntityType.ENDER_DRAGON, EntityType.WITHER)
+        }
+        with (getOrCreateTagBuilder(RPGSkillsTags.PROXIMITY_DEFEAT)) {
+            add(EntityType.ENDER_DRAGON)
         }
     }
 

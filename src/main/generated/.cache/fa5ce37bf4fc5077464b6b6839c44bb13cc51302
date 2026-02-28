@@ -1,4 +1,4 @@
-// 1.21.1	2026-02-27T16:50:21.444231805	Potato's Chips 'n' Skills/Tags for minecraft:entity_type
+// 1.21.1	2026-02-27T23:54:09.137471588	Potato's Chips 'n' Skills/Tags for minecraft:entity_type
 1744d1d3758974be4e9a43d88b6af83af48e66fc data/rpgskills/tags/entity_type/repeated_defeat_ignores_custom_skill_drop.json
 1744d1d3758974be4e9a43d88b6af83af48e66fc data/rpgskills/tags/entity_type/increases_level_cap.json
 0cbd5aabd59d130db4a6a0f07bc0c04b31e66b60 data/rpgskills/tags/entity_type/ignores_skill_source.json
@@ -6,7 +6,7 @@ c6304b7e4d04459824f39e9101ab5025473e5642 data/rpgskills/tags/entity_type/bosses/
 1744d1d3758974be4e9a43d88b6af83af48e66fc data/rpgskills/tags/entity_type/boss_attribute_affected.json
 02b6a7799286f073bd43ecf20b3eab2e16d73deb data/rpgskills/tags/entity_type/bosses/basic.json
 131ba28ae1bf60d5120b12304ec5308974c4ec6f data/rpgskills/tags/entity_type/bosses/miniboss.json
-313012e3e4875ce47d40e9e9bf51973c545eb31c data/rpgskills/tags/entity_type/bosses/mid.json
 a060d789fd17db1a7ac0e141958107ca1780f474 data/rpgskills/tags/entity_type/bosses/early.json
+313012e3e4875ce47d40e9e9bf51973c545eb31c data/rpgskills/tags/entity_type/bosses/mid.json
 07a195e825214ddca66507106705e8c92f6c7c61 data/rpgskills/tags/entity_type/proximity_defeat.json
 13942921f7cc8bf6cf3f47f0034989bd52dae91e data/rpgskills/tags/entity_type/boss.json
