@@ -75,5 +75,10 @@ class EntityTagGenerator(
         with (getOrCreateTagBuilder(RPGSkillsTags.BOSS_ATTRIBUTE_AFFECTED)) {
             addTag(RPGSkillsTags.BOSS)
         }
+        with (getOrCreateTagBuilder(RPGSkillsTags.PROXIMITY_DEFEAT)) {
+            addOptional(Identifier.of("fdbosses", "chesed"))
+            addOptional(Identifier.of("fdbosses", "malkuth"))
+            addOptional(Identifier.of("fdbosses", "geburah"))
+        }
     }
 }

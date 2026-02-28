@@ -13,16 +13,20 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.advancement.AdvancementRewards
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.ai.TargetPredicate
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation
 import net.minecraft.entity.attribute.EntityAttributes
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.Box
 import net.minecraft.util.math.intprovider.IntProvider
 import net.minecraft.util.math.intprovider.UniformIntProvider
 import net.minecraft.world.gen.structure.Structure
@@ -66,6 +70,8 @@ class RPGSkillsConfig {
     var levelCapIncreasePerBoss: Int = 10
         private set
     var capRemoveBossCount: Int = -1
+        private set
+    var proximityDefeatRange: Int = 100
         private set
     var attributeIncreasesRaw: Map<RegistryKey<EntityAttribute>, AnonymousAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_ATTACK_DAMAGE to AnonymousAttributeModifier(1.0),
@@ -111,6 +117,10 @@ class RPGSkillsConfig {
 
     fun getAdvancementPoints(rewards: AdvancementRewards) = rewards.experience ceilDiv advancementSkillPointDivisor
 
+    fun getPlayersInProximity(entity: LivingEntity): List<ServerPlayerEntity> =
+        entity.world.getPlayers(TargetPredicate.DEFAULT, entity, Box.of(entity.pos, 2.0 * proximityDefeatRange, 2.0 * proximityDefeatRange, 2.0 * proximityDefeatRange))
+            .map { it as ServerPlayerEntity }
+
     companion object : CodecConfig<RPGSkillsConfig>(RPGSkills.MOD_ID, RPGSkills.logger) {
         override val codec: MutationCodec<RPGSkillsConfig> = recordMutationCodec(
             intRangeCodec(min = 0).fieldOf("skill_points_chunk").forAccess(RPGSkillsConfig::chunkSkillPoints),
@@ -127,6 +137,7 @@ class RPGSkillsConfig {
             intRangeCodec(min = 0).fieldOf("level_cap_base").forAccess(RPGSkillsConfig::baseLevelCap),
             intRangeCodec(min = 0).fieldOf("level_cap_increase_per_boss").forAccess(RPGSkillsConfig::levelCapIncreasePerBoss),
             intRangeCodec(min = -1).fieldOf("level_cap_remove_boss_count").forAccess(RPGSkillsConfig::capRemoveBossCount),
+            intRangeCodec(min = 0).fieldOf("proximity_defeat_range").forAccess(RPGSkillsConfig::proximityDefeatRange),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec()).fieldOf("attribute_increase_per_boss").forAccess(RPGSkillsConfig::attributeIncreasesRaw),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec(Operation.ADD_MULTIPLIED_BASE)).listOf().fieldOf("attribute_increases_boss").forAccess(RPGSkillsConfig::bossAttributeIncreasesRaw),
         )

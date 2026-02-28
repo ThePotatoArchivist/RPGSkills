@@ -5,6 +5,7 @@ import archives.tater.rpgskills.RPGSkillsConfig
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.get
+import net.minecraft.command.argument.UuidArgumentType.uuid
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
@@ -18,6 +19,7 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.server.MinecraftServer
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Formatting
 import net.minecraft.world.World
 import org.ladysnake.cca.api.v3.component.Component
@@ -57,9 +59,8 @@ class BossTrackerComponent(private val world: World) : Component, AutoSyncedComp
         key.sync(world)
 
         if (entity is MobEntity)
-            for (uuid in entity[DefeatSourceComponent].attackers.keys)
-                world.server?.playerManager?.getPlayer(uuid)?.networkHandler
-                    ?.sendPacket(TitleS2CPacket(BOSS_DEFEAT_TITLE.text))
+            for (player in entity[DefeatSourceComponent].getRewarded())
+                player.networkHandler.sendPacket(TitleS2CPacket(BOSS_DEFEAT_TITLE.text))
 
         world.server?.playerManager?.apply {
             broadcast(BOSS_DEFEAT_MESSAGE.text(entity.type.name), false)

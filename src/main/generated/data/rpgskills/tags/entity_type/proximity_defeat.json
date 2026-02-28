@@ -1,0 +1,16 @@
+{
+  "values": [
+    {
+      "id": "fdbosses:chesed",
+      "required": false
+    },
+    {
+      "id": "fdbosses:malkuth",
+      "required": false
+    },
+    {
+      "id": "fdbosses:geburah",
+      "required": false
+    }
+  ]
+}

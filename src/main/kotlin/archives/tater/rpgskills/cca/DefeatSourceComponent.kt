@@ -1,13 +1,16 @@
 package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsConfig
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.data.SkillSource
 import archives.tater.rpgskills.entity.SkillPointOrbEntity
 import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.get
 import com.mojang.serialization.Codec
+import net.minecraft.command.argument.UuidArgumentType.uuid
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.ai.TargetPredicate
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.mob.MobEntity
@@ -15,11 +18,14 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.structure.StructureStart
 import net.minecraft.util.Uuids
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Box
 import net.minecraft.util.math.ChunkPos
+import net.spell_engine.api.datagen.SpellBuilder.Impacts.damage
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
@@ -31,6 +37,12 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
     val attackers: Map<UUID, Float> get() = _attackers
 
     var skillSource: SkillSource = SkillSource.EmptySource
+
+    fun getRewarded() = if (entity isIn RPGSkillsTags.PROXIMITY_DEFEAT) {
+        RPGSkills.CONFIG.getPlayersInProximity(entity).map { it }
+    } else {
+        attackers.keys.mapNotNull { entity.world.server?.playerManager?.getPlayer(it) }
+    }
 
     operator fun get(player: PlayerEntity) = attackers.getOrDefault(player.uuid, 0f)
     operator fun set(player: PlayerEntity, value: Float) {
@@ -45,20 +57,23 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
         CODEC.encode(this, tag).logIfError()
     }
 
-    val skillPointProportions get() = attackers.mapValues { (_, damage) ->
-        (damage / entity.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH).toFloat())
-            .coerceAtMost(1f)
-    }
+    fun getSkillPointProportions(): Map<out PlayerEntity, Float> = if (entity isIn RPGSkillsTags.PROXIMITY_DEFEAT)
+        RPGSkills.CONFIG.getPlayersInProximity(entity).associateWith { 1f }
+    else
+        attackers.entries.associateNotNull { (uuid, damage) ->
+            entity.world.getPlayerByUuid(uuid)?.to((damage / entity.getAttributeBaseValue(EntityAttributes.GENERIC_MAX_HEALTH).toFloat())
+                .coerceAtMost(1f))
+        }
 
-    fun getSkillPointAmounts(ignoreCustom: Boolean): Map<UUID, Int> {
+    fun getSkillPointAmounts(ignoreCustom: Boolean): Map<PlayerEntity, Int> {
         val source = if (entity isIn RPGSkillsTags.IGNORES_SKILL_SOURCE)
             null
         else
             skillSource.getComponent(entity.world) ?: return mapOf()
 
-        return skillPointProportions.mapValues { (uuid, proportion) ->
+        return getSkillPointProportions().mapValues { (player, proportion) ->
             val points = (proportion * RPGSkills.CONFIG.getEntityPoints(entity, ignoreCustom)).toInt()
-            source?.removeSkillPoints(uuid, points) ?: points
+            source?.removeSkillPoints(player, points) ?: points
         }
     }
 
@@ -101,10 +116,10 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
             if (!entity.isDead) return
 
             val world = entity.world as? ServerWorld ?: return
-            for ((playerUuid, amount) in entity[DefeatSourceComponent].getSkillPointAmounts(
+            for ((player, amount) in entity[DefeatSourceComponent].getSkillPointAmounts(
                 entity isIn RPGSkillsTags.REPEATED_DEFEAT_IGNORES_CUSTOM_SKILL_DROP && !world[BossTrackerComponent].hasDefeated(entity)
             ))
-                SkillPointOrbEntity.spawnOrbs(world, world.getPlayerByUuid(playerUuid) ?: continue, entity.pos, amount)
+                SkillPointOrbEntity.spawnOrbs(world, player, entity.pos, amount)
         }
     }
 }
