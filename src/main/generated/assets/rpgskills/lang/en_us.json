@@ -21,6 +21,7 @@
   "commands.rpgskills.skills.list": "There are %s skills: %s",
   "commands.rpgskills.skills.list.none": "There are no skills",
   "item.rpgskills.respec_item": "Respec Item",
+  "item.rpgskills.skill_nugget": "Skill Nugget",
   "key.rpgskills.screen.jobs": "Open Jobs",
   "key.rpgskills.screen.skills": "Open Skills",
   "key.rpgskills.tooltip.requirements": "Show Item Requirements",

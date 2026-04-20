@@ -17,5 +17,7 @@ object RPGSkillsItems {
         rarity(Rarity.RARE)
     }))
 
+    val SKILL_NUGGET = register("skill_nugget", SkillNuggetItem(Item.Settings()))
+
     fun register() {}
 }

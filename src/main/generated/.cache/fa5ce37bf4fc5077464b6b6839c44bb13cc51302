@@ -1,4 +1,4 @@
-// 1.21.1	2026-04-19T23:46:19.932787629	Potato's Chips 'n' Skills/Tags for minecraft:entity_type
+// 1.21.1	2026-04-19T23:55:09.043219734	Potato's Chips 'n' Skills/Tags for minecraft:entity_type
 1744d1d3758974be4e9a43d88b6af83af48e66fc data/rpgskills/tags/entity_type/repeated_defeat_ignores_custom_skill_drop.json
 1744d1d3758974be4e9a43d88b6af83af48e66fc data/rpgskills/tags/entity_type/increases_level_cap.json
 0cbd5aabd59d130db4a6a0f07bc0c04b31e66b60 data/rpgskills/tags/entity_type/ignores_skill_source.json

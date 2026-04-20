@@ -103,6 +103,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(RPGSkillsAttributes.BOW_DRAW_TIME, "Bow Draw Time")
             add(RPGSkillsAttributes.PROJECTILE_DIVERGENCE, "Projectile Divergence")
             add(RPGSkillsItems.RESPEC_ITEM, "Respec Item")
+            add(RPGSkillsItems.SKILL_NUGGET, "Skill Nugget")
         }
     }
 }

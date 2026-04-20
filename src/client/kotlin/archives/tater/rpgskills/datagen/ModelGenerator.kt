@@ -14,5 +14,6 @@ class ModelGenerator(output: FabricDataOutput) : FabricModelProvider(output) {
 
     override fun generateItemModels(itemModelGenerator: ItemModelGenerator) {
         itemModelGenerator.register(RPGSkillsItems.RESPEC_ITEM, Models.GENERATED)
+        itemModelGenerator.register(RPGSkillsItems.SKILL_NUGGET, Models.GENERATED)
     }
 }
