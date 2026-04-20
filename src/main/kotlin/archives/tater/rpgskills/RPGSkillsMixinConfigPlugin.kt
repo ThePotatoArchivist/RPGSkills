@@ -16,6 +16,9 @@ class RPGSkillsMixinConfigPlugin : IMixinConfigPlugin {
         mixinClassName.contains("bettercombat") -> FabricLoader.getInstance().isModLoaded("bettercombat")
         mixinClassName.contains("spellengine") -> FabricLoader.getInstance().isModLoaded("spell_engine")
         mixinClassName.contains("cataclysm") -> FabricLoader.getInstance().isModLoaded("cataclysm")
+        mixinClassName.contains("penchant") -> FabricLoader.getInstance().isModLoaded("penchant")
+        mixinClassName.contains("brewinandchewin") -> FabricLoader.getInstance().isModLoaded("brewinandchewin")
+        mixinClassName.contains("chipped") -> FabricLoader.getInstance().isModLoaded("chipped")
         else -> true
     }
 

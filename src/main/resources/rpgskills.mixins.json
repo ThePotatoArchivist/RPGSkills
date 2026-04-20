@@ -11,6 +11,7 @@
     "attribute.CrossbowItemMixin",
     "attribute.LivingEntityMixin",
     "compat.cataclysm.WeaponFusionMenuMixin",
+    "compat.penchant.PenchantmentMenuMixin",
     "compat.spellengine.SpellHelperMixin",
     "job.AbstractCriterionMixin",
     "job.AdvancementCriterionAccessor",

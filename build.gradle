@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.13-SNAPSHOT'
+	id 'fabric-loom' version '1.16-SNAPSHOT'
 	id 'maven-publish'
 	id "org.jetbrains.kotlin.jvm" version "2.2.21"
 }
@@ -49,6 +49,13 @@ repositories {
         name "Greenhouse Maven"
         url "https://maven.greenhouse.lgbt/releases"
     }
+	maven {
+		name "JitPack"
+		url 'https://jitpack.io'
+	}
+	repositories {
+		maven { url 'https://repo.sleeping.town/' }
+	}
 }
 
 loom {
@@ -103,6 +110,8 @@ dependencies {
     modLocalRuntime "maven.modrinth:spell-power:${project.spell_power_version}-fabric"
 
     modCompileOnly("maven.modrinth:l_enders-cataclysm:${project.cataclysm_version}")
+
+	modLocalRuntime modCompileOnly("io.github.thepotatoarchivist:penchant:${project.penchant_version}")
 
     modLocalRuntime modCompileOnly("umpaz.brewinandchewin:BrewinAndChewin-fabric:${project.brewinandchewin_version}")
 
