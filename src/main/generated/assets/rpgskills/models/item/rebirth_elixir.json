@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "rpgskills:item/respec_item"
+    "layer0": "rpgskills:item/rebirth_elixir"
   }
 }

@@ -102,7 +102,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(RPGSkillsClient.REQUIREMENTS_KEY_TRANSLATION, "Show Item Requirements")
             add(RPGSkillsAttributes.BOW_DRAW_TIME, "Bow Draw Time")
             add(RPGSkillsAttributes.PROJECTILE_DIVERGENCE, "Projectile Divergence")
-            add(RPGSkillsItems.RESPEC_ITEM, "Respec Item")
+            add(RPGSkillsItems.REBIRTH_ELIXIR, "Elixir of Rebirth")
             add(RPGSkillsItems.SKILL_NUGGET, "Skill Nugget")
         }
     }
