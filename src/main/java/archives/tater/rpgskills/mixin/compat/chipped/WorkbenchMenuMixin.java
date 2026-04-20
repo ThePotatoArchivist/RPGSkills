@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.mixin.advancement.chipped;
+package archives.tater.rpgskills.mixin.compat.chipped;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import org.spongepowered.asm.mixin.Final;

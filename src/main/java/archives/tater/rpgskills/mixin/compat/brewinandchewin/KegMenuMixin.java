@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.mixin.advancement.brewinandchewin;
+package archives.tater.rpgskills.mixin.compat.brewinandchewin;
 
 import archives.tater.rpgskills.criteria.ResultSlot;
 
