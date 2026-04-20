@@ -12,7 +12,7 @@ import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.network.ClientPlayerEntity
 
-object SkillBarRenderer : ClientPlayNetworking.PlayPayloadHandler<SkillPointIncreasePayload> {
+object SkillBarRenderer {
     private var showTicks = 0
 
     private const val MAX_SHOW_TICKS = 40 // TODO
@@ -55,10 +55,6 @@ object SkillBarRenderer : ClientPlayNetworking.PlayPayloadHandler<SkillPointIncr
 
     fun setShown() {
         showTicks = MAX_SHOW_TICKS
-    }
-
-    override fun receive(payload: SkillPointIncreasePayload?, context: ClientPlayNetworking.Context) {
-        setShown()
     }
 
     fun register() {

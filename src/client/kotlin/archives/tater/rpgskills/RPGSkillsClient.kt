@@ -1,7 +1,7 @@
 package archives.tater.rpgskills
 
 import archives.tater.rpgskills.RPGSkills.MOD_ID
-import archives.tater.rpgskills.client.gui.JobCompletedToast
+import archives.tater.rpgskills.client.gui.toast.JobCompletedToast
 import archives.tater.rpgskills.client.gui.screen.ClassScreen
 import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
@@ -12,7 +12,9 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.cca.SkillsComponent
+import archives.tater.rpgskills.client.RPGSkillsClientState
 import archives.tater.rpgskills.client.ScreenKeyBinding
+import archives.tater.rpgskills.client.gui.toast.SkillMenuToast
 import archives.tater.rpgskills.entity.RPGSkillsEntities
 import archives.tater.rpgskills.networking.ChooseClassPayload
 import archives.tater.rpgskills.networking.JobCompletedPayload
@@ -32,13 +34,9 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
-import net.minecraft.command.argument.EntityArgumentType.player
-import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
-import com.teamresourceful.resourcefullib.client.utils.ScreenUtils
 import org.lwjgl.glfw.GLFW
-import java.awt.im.InputContext
 import kotlin.jvm.optionals.getOrNull
 
 object RPGSkillsClient : ClientModInitializer {
@@ -74,6 +72,8 @@ object RPGSkillsClient : ClientModInitializer {
 
     val JOB_SKILL_CACHE = RegistryCache(Skill.key) { skill -> skill.value.levels.flatMap { level -> level.jobs } }
 
+    val STATE = RPGSkillsClientState.load()
+
 	override fun onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 		EntityRendererRegistry.register(RPGSkillsEntities.SKILL_POINT_ORB, ::SkillPointOrbEntityRenderer)
@@ -90,7 +90,10 @@ object RPGSkillsClient : ClientModInitializer {
 				context.client().setScreen(ClassScreen(player))
 		}
 
-        ClientPlayNetworking.registerGlobalReceiver(SkillPointIncreasePayload.id, SkillBarRenderer)
+        ClientPlayNetworking.registerGlobalReceiver(SkillPointIncreasePayload.id) { _, context ->
+            STATE.skillMenuHint.show(context.client())
+            SkillBarRenderer.setShown()
+        }
 
         ClientPlayNetworking.registerGlobalReceiver(JobCompletedPayload.ID) { payload, context ->
             val player = context.player()
@@ -106,10 +109,12 @@ object RPGSkillsClient : ClientModInitializer {
             animationCounter++
 			if (skillsKey.wasPressed)
 				client.player?.let {
+                    STATE.skillMenuHint?.hide()
 					client.setScreen(SkillsScreen(it))
 				}
             if (jobsKey.wasPressed)
                 client.player?.let {
+                    STATE.jobMenuHint?.hide()
                     client.setScreen(JobsScreen(it))
                 }
 		}

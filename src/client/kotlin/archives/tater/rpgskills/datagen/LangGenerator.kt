@@ -5,11 +5,13 @@ import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
 import archives.tater.rpgskills.cca.BossTrackerComponent
-import archives.tater.rpgskills.client.gui.JobCompletedToast
+import archives.tater.rpgskills.client.gui.toast.JobCompletedToast
 import archives.tater.rpgskills.client.gui.screen.ClassScreen
 import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
+import archives.tater.rpgskills.client.gui.toast.JobMenuToast
+import archives.tater.rpgskills.client.gui.toast.SkillMenuToast
 import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.item.RPGSkillsItems
@@ -82,6 +84,8 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(AbstractJobWidget.TASK_COUNT, "%sx")
             add(AbstractJobWidget.TASK, "%s %s")
             add(JobCompletedToast.TITLE, "Job Complete!")
+            add(SkillMenuToast.TITLE, "Press [%s] to spend your level on a skill")
+            add(JobMenuToast.TITLE, "Press [%s] to see your jobs")
             add(LockGroup.DEFAULT_ITEM_NAME, "Unknown Item")
             add(LockGroup.DEFAULT_ITEM_MESSAGE, "You don't know how to use this item")
             add(LockGroup.DEFAULT_BLOCK_MESSAGE, "You don't know how to use this block")

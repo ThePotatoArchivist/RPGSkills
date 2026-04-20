@@ -78,5 +78,7 @@
   "screen.widget.rpgskills.skill.tooltip": "Click to view unlocks",
   "screen.widget.rpgskills.skilltab.tooltip": "Level %s",
   "toast.rpgskills.job_complete": "Job Complete!",
+  "toast.rpgskills.job_menu": "Press [%s] to see your jobs",
+  "toast.rpgskills.skill_menu": "Press [%s] to spend your level on a skill",
   "widget.rpgskills.skill_display.level": "Level"
 }

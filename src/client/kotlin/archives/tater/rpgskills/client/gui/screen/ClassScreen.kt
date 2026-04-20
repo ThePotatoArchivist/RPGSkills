@@ -1,7 +1,10 @@
 package archives.tater.rpgskills.client.gui.screen
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsTags
+import archives.tater.rpgskills.client.gui.toast.JobMenuToast
+import archives.tater.rpgskills.client.gui.toast.SkillMenuToast
 import archives.tater.rpgskills.client.gui.widget.ClassNavButtonWidget
 import archives.tater.rpgskills.client.gui.widget.SkillDisplayWidget
 import archives.tater.rpgskills.client.gui.widget.WrappedTextWidget
@@ -63,10 +66,11 @@ class ClassScreen(
             client?.setScreen(confirmScreen(
                 CHOICE.text(selectedClass.value.name),
                 WARNING.text
-            ) {
-                if (it) {
+            ) { confirmed ->
+                if (confirmed) {
                     ClientPlayNetworking.send(ClassChoicePayload(selectedClass))
                     close()
+                    RPGSkillsClient.STATE.jobMenuHint.show(client!!)
                 } else
                     client?.setScreen(this)
             })
