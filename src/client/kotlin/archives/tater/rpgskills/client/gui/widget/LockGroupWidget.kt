@@ -34,19 +34,15 @@ import dev.emi.emi.api.stack.EmiStack
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, level: Int, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
 
-    private val additionalRequirements = lockGroup.requirementsContaining(skill, level)
-        .mapIndexedNotNull { index, requirement ->
-            requirement.entries
-                .filter { it.key != skill }
-                .takeUnless { it.isEmpty() }
-                ?.let {
-                    RequirementTooltip.getRequirement(it, player, tooltip = false).apply {
-                        withColor(getColor(index))
-                    }
-                }
+    private val additionalRequirements = lockGroup.requirements
+        .filter { requirement -> requirement[skill] != level }
+        .mapIndexed { index, requirement ->
+            RequirementTooltip.getRequirement(requirement.entries, player, tooltip = false).apply {
+                withColor(getColor(index))
+            }
         }
         .takeUnless { it.isEmpty() }
-        ?.joinToText(WidgetTexts.OR.text)
+        ?.joinToText(WidgetTexts.AND.text)
 
     private val requireTooltip = buildList {
         RequirementTooltip.appendRequirements(lockGroup, player, this)
@@ -204,7 +200,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         val CAN_PLACE = of("can_place")
         val CAN_ENCHANT = of("can_enchant")
         val CAN_CRAFT = of("can_craft")
-        val OR = unit("or")
+        val AND = unit("and")
 
         data class SectionTitle(val normal: UnitTranslation, val additional: ArgTranslation) {
             fun getText(additional: Text?) =

@@ -42,17 +42,8 @@ data class LockGroup(
     val enchantments: LockList<RegistryIngredient.Composite<Enchantment>> = LockList.empty(),
     val recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty()
 ) {
-    constructor(
-        requirements: Map<RegistryEntry<Skill>, Int>,
-        items: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
-        blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
-        entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
-        enchantments: LockList<RegistryIngredient.Composite<Enchantment>> = LockList.empty(),
-        recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
-    ) : this(listOf(requirements), items, blocks, entities, enchantments, recipes)
-
-    fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.any {
-        it.all { (skill, level) ->
+    fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.all {
+        it.any { (skill, level) ->
             levels.getOrDefault(skill, 0) >= level
         }
     }
@@ -64,8 +55,6 @@ data class LockGroup(
     fun entityMessage() = entities.message?.let(Text::literal) ?: DEFAULT_ENTITY_MESSAGE.text()
     fun enchantmentMessage() = enchantments.message?.let(Text::literal) ?: DEFAULT_ENCHANTMENT_MESSAGE.text()
     fun recipeMessage() = recipes.message?.let(Text::literal) ?: DEFAULT_RECIPE_MESSAGE.text()
-
-    fun requirementsContaining(skill: RegistryEntry<Skill>, level: Int) = requirements.filter { it[skill] == level }
 
     @JvmRecord
     data class LockList<T>(
@@ -103,7 +92,7 @@ data class LockGroup(
         val DEFAULT_RECIPE_MESSAGE = Translation.unit("rpgskills.lockgroup.recipe.message.default")
 
         val CODEC: Codec<LockGroup> = RecordCodecBuilder.create { it.group(
-            Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).singleOrList().fieldOf("requirements").forGetter(LockGroup::requirements),
+            Codec.unboundedMap(RegistryFixedCodec.of(Skill.key), Codec.INT).listOf().fieldOf("requirements").forGetter(LockGroup::requirements),
             LockList.createShortCodec(RegistryKeys.ITEM).optionalFieldOf("items", LockList.empty()).forGetter(LockGroup::items),
             LockList.createShortCodec(RegistryKeys.BLOCK).optionalFieldOf("blocks", LockList.empty()).forGetter(LockGroup::blocks),
             LockList.createShortCodec(RegistryKeys.ENTITY_TYPE).optionalFieldOf("entities", LockList.empty()).forGetter(LockGroup::entities),

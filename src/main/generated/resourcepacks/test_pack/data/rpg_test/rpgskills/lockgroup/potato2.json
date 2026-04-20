@@ -31,8 +31,15 @@
     ],
     "message": "You don't know how to assemble this prismarine"
   },
-  "requirements": {
-    "rpg_test:cow": 2,
-    "rpg_test:potato": 2
-  }
+  "requirements": [
+    {
+      "rpg_test:potato": 2
+    },
+    {
+      "rpg_test:cow": 2
+    },
+    {
+      "rpg_test:grass": 2
+    }
+  ]
 }

@@ -34,7 +34,7 @@ object RequirementTooltip {
     fun getRequirement(requirement: Collection<Map.Entry<RegistryEntry<Skill>, Int>>, player: PlayerEntity, tooltip: Boolean = true): MutableText {
         val skills = player[SkillsComponent]
 
-        return requirement.toList().joinToText (Text.literal(" + ").formatted(Formatting.DARK_GRAY)) { (skill, level) ->
+        return requirement.toList().joinToText (OR.text().formatted(Formatting.DARK_GRAY)) { (skill, level) ->
             Text.empty().apply {
                 append(skill.name)
                 append(Text.literal(" $level").apply {
@@ -66,9 +66,7 @@ object RequirementTooltip {
         text.accept(getTitle(lockGroup, player, title, tooltip))
         lockGroup.requirements.forEachIndexed { index, requirement ->
             text.accept(Text.empty().apply { // Prevent bug with rpg series spell engine
-                append(REQUIREMENT.text(getRequirement(requirement.entries, player, tooltip)).apply {
-                    if (index + 1 < lockGroup.requirements.size) append(OR.text)
-                })
+                append(REQUIREMENT.text(getRequirement(requirement.entries, player, tooltip))) // TODO check?
             })
         }
     }

@@ -5,11 +5,11 @@
   "mixins": [
     "advancement.ItemStackMixin",
     "advancement.SlotMixin",
-    "advancement.brewinandchewin.KegMenuMixin",
-    "advancement.chipped.WorkbenchMenuMixin",
     "attribute.BowItemMixin",
     "attribute.CrossbowItemMixin",
     "attribute.LivingEntityMixin",
+    "compat.brewinandchewin.KegMenuMixin",
+    "compat.chipped.WorkbenchMenuMixin",
     "compat.cataclysm.WeaponFusionMenuMixin",
     "compat.penchant.PenchantmentMenuMixin",
     "compat.spellengine.SpellHelperMixin",

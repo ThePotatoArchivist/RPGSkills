@@ -23,9 +23,9 @@ class TestSkillsLockGenerator(
 ) : LockGroupProvider(dataOutput, registriesFuture) {
     override fun configure(provider: BiConsumer<Identifier, LockGroup>, registries: RegistryWrapper.WrapperLookup) {
         provider.accept(testPackId("potato1"), LockGroup(
-            requirements = mapOf(
+            requirements = listOf(mapOf(
                 TestSkillGenerator.POTATO_SKILL.entry to 1
-            ),
+            )),
             items = LockList(
                 RegistryIngredient.ofItems {
                     +Items.POTATO
@@ -48,9 +48,10 @@ class TestSkillsLockGenerator(
             ),
         ))
         provider.accept(testPackId("potato2"), LockGroup(
-            requirements = mapOf(
-                TestSkillGenerator.POTATO_SKILL.entry to 2,
-                TestSkillGenerator.COW_SKILL.entry to 2,
+            requirements = listOf(
+                mapOf(TestSkillGenerator.POTATO_SKILL.entry to 2),
+                mapOf(TestSkillGenerator.COW_SKILL.entry to 2),
+                mapOf(TestSkillGenerator.GRASS_SKILL.entry to 2),
             ),
             items = LockList(
                 RegistryIngredient.ofItems {
@@ -119,9 +120,9 @@ class TestSkillsLockGenerator(
             ),
         ))
         provider.accept(testPackId("potato4"), LockGroup(
-            requirements = mapOf(
+            requirements = listOf(mapOf(
                 TestSkillGenerator.POTATO_SKILL.entry to 2,
-            ),
+            )),
             items = LockList(
                 RegistryIngredient.ofItems {
                     +Items.BARRIER
