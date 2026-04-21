@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.16-SNAPSHOT'
+	id 'fabric-loom' version '1.15-SNAPSHOT'
 	id 'maven-publish'
 	id "org.jetbrains.kotlin.jvm" version "2.2.21"
 }
@@ -111,7 +111,7 @@ dependencies {
 
     modCompileOnly("maven.modrinth:l_enders-cataclysm:${project.cataclysm_version}")
 
-	modLocalRuntime modCompileOnly("io.github.thepotatoarchivist:penchant:${project.penchant_version}")
+	modLocalRuntime modCompileOnly("com.github.ThePotatoArchivist:Penchant:${project.penchant_version}")
 
     modLocalRuntime modCompileOnly("umpaz.brewinandchewin:BrewinAndChewin-fabric:${project.brewinandchewin_version}")
 
