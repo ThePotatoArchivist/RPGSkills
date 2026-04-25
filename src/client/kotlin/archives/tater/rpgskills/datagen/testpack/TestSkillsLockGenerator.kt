@@ -9,10 +9,12 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.block.Blocks
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.ItemEnchantmentsComponent
+import net.minecraft.component.type.PotionContentsComponent
 import net.minecraft.enchantment.Enchantments
 import net.minecraft.entity.EntityType
 import net.minecraft.item.Instruments
 import net.minecraft.item.Items
+import net.minecraft.potion.Potions
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
@@ -125,13 +127,11 @@ class TestSkillsLockGenerator(
                 "You don't know how to assemble this button",
             ),
             itemComponents = mapOf(
-                Items.ENCHANTED_BOOK to ComponentValues(DataComponentTypes.STORED_ENCHANTMENTS, setOf(
-                    ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT).apply {
-                        add(registries.getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Enchantments.FIRE_ASPECT), 1)
-                    }.build()
-                )),
                 Items.GOAT_HORN to ComponentValues(DataComponentTypes.INSTRUMENT, setOf(
                     registries.getWrapperOrThrow(RegistryKeys.INSTRUMENT).getOrThrow(Instruments.ADMIRE_GOAT_HORN)
+                )),
+                Items.POTION to ComponentValues(DataComponentTypes.POTION_CONTENTS, setOf(
+                    PotionContentsComponent(Potions.FIRE_RESISTANCE)
                 ))
             )
         ))

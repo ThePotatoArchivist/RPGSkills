@@ -6,20 +6,18 @@
     "message": "How to press?"
   },
   "item_components": {
-    "minecraft:enchanted_book": {
-      "type": "minecraft:stored_enchantments",
-      "values": [
-        {
-          "levels": {
-            "minecraft:fire_aspect": 1
-          }
-        }
-      ]
-    },
     "minecraft:goat_horn": {
       "type": "minecraft:instrument",
       "values": [
         "minecraft:admire_goat_horn"
+      ]
+    },
+    "minecraft:potion": {
+      "type": "minecraft:potion_contents",
+      "values": [
+        {
+          "potion": "minecraft:fire_resistance"
+        }
       ]
     }
   },
