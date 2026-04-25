@@ -165,8 +165,8 @@ data class LockGroup(
             cache[registries][value]?.value
 
         private fun itemGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack): LockGroup? =
-            find(ITEM_CACHE, registries, stack.item)
-                ?: ItemComponentCache[registries][stack.item]?.let { it[stack] }?.value
+            ItemComponentCache[registries][stack.item]?.get(stack)?.value
+                ?: find(ITEM_CACHE, registries, stack.item)
 
         fun useGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) =
             itemGroupOf(registries, stack)?.takeIf { isUsedItem(stack.item) }
