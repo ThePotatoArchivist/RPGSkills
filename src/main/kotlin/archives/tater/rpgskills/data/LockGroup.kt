@@ -117,20 +117,23 @@ data class LockGroup(
         private val RECIPE_CACHE = RegistryCache(key) { it.value.recipes.entries.matchingValues }
 
         object ItemComponentCache {
-            @JvmRecord data class TypeEntry<T>(val type: ComponentType<T>, val entries: MutableMap<T, Entry> = mutableMapOf()) {
-                fun add(components: ComponentValues<T>, group: RegistryEntry.Reference<LockGroup>, stacks: Collection<ItemStack>) {
+            @JvmRecord
+            data class TypeEntry<T>(val type: ComponentType<T>, val entries: MutableMap<T, Entry> = mutableMapOf()) {
+                fun add(components: ComponentValues<T>, group: RegistryEntry.Reference<LockGroup>, item: Item, stacks: Collection<ItemStack>) {
                     for (value in components.values) {
-                        entries[value] = Entry(group, stacks.find { it[type] == value } ?: ItemStack.EMPTY)
+                        entries[value] = Entry(group, stacks.find { it[type] == value } ?: item.defaultStack.apply {
+                            this[type] = value
+                        })
                     }
                 }
 
                 @Suppress("UNCHECKED_CAST")
-                fun addChecked(components: ComponentValues<*>, group: RegistryEntry.Reference<LockGroup>, stacks: Collection<ItemStack>) {
+                fun addChecked(components: ComponentValues<*>, group: RegistryEntry.Reference<LockGroup>, item: Item, stacks: Collection<ItemStack>) {
                     if (components.type != type) {
                         RPGSkills.logger.error("Cannot filter an item by both {} and {}", type, components.type)
                         return
                     }
-                    add(components as ComponentValues<T>, group, stacks)
+                    add(components as ComponentValues<T>, group, item, stacks)
                 }
 
                 operator fun get(holder: ComponentHolder) = entries[holder[type]]?.group
@@ -149,7 +152,7 @@ data class LockGroup(
                     for (lockGroup in registryManager.getWrapperOrThrow(key).streamEntries()) {
                         for ((item, components) in lockGroup.value.itemComponents.entries) {
                             getOrPut(item) { TypeEntry(components.type) }
-                                .addChecked(components, lockGroup, stacks[item] ?: emptySet())
+                                .addChecked(components, lockGroup, item, stacks[item] ?: emptySet())
                         }
                     }
                 }

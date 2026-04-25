@@ -65,7 +65,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
 
                 for ((item, componentValues) in lockGroup.itemComponents.entries)
                     for (value in componentValues.values)
-                        LockGroup.Manager.ItemComponentCache[player.registryManager][item]?.entries?.get(value)?.sample?.takeUnless { it.isEmpty }?.let { stack ->
+                        LockGroup.Manager.ItemComponentCache[player.registryManager][item]?.entries?.get(value)?.sample?.let { stack ->
                             add(DisplayedSlot(getTooltip {
                                 val context = Item.TooltipContext.create(player.registryManager)
                                 when (value) {
