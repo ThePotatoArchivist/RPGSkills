@@ -123,13 +123,13 @@ class TestSkillsLockGenerator(
                 },
                 "You don't know how to assemble this button",
             ),
-            itemComponents = LockList(mapOf(
+            itemComponents = mapOf(
                 Items.ENCHANTED_BOOK to ComponentValues(DataComponentTypes.STORED_ENCHANTMENTS, setOf(
                     ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT).apply {
                         add(registries.getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Enchantments.FIRE_ASPECT), 1)
                     }.build()
                 ))
-            ))
+            )
         ))
         provider.accept(testPackId("potato4"), LockGroup(
             requirements = listOf(mapOf(

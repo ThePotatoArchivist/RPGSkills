@@ -47,7 +47,7 @@ data class LockGroup(
     val entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
     val enchantments: LockList<RegistryIngredient.Composite<Enchantment>> = LockList.empty(),
     val recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
-    val itemComponents: LockList<Map<Item, ComponentValues<*>>> = LockList(mapOf())
+    val itemComponents: Map<Item, ComponentValues<*>> = mapOf()
 ) {
     fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.all {
         it.any { (skill, level) ->
@@ -105,7 +105,7 @@ data class LockGroup(
             LockList.createShortCodec(RegistryKeys.ENTITY_TYPE).optionalFieldOf("entities", LockList.empty()).forGetter(LockGroup::entities),
             LockList.createShortCodec(RegistryKeys.ENCHANTMENT).optionalFieldOf("enchantments", LockList.empty()).forGetter(LockGroup::enchantments),
             LockList.createShortCodec(RegistryKeys.ITEM).optionalFieldOf("recipes", LockList.empty()).forGetter(LockGroup::recipes),
-            LockList.createShortCodec(Codec.unboundedMap(Registries.ITEM.codec, ComponentValues.CODEC)).optionalFieldOf("item_components", LockList(mapOf())).forGetter(LockGroup::itemComponents),
+            Codec.unboundedMap(Registries.ITEM.codec, ComponentValues.CODEC).optionalFieldOf("item_components", mapOf()).forGetter(LockGroup::itemComponents),
         ).apply(it, ::LockGroup) }
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))
