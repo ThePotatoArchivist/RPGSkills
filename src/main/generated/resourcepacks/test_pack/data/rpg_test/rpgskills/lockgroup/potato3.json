@@ -15,6 +15,12 @@
           }
         }
       ]
+    },
+    "minecraft:goat_horn": {
+      "type": "minecraft:instrument",
+      "values": [
+        "minecraft:admire_goat_horn"
+      ]
     }
   },
   "items": {

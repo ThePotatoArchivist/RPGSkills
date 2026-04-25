@@ -11,6 +11,7 @@ import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.ItemEnchantmentsComponent
 import net.minecraft.enchantment.Enchantments
 import net.minecraft.entity.EntityType
+import net.minecraft.item.Instruments
 import net.minecraft.item.Items
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
@@ -128,6 +129,9 @@ class TestSkillsLockGenerator(
                     ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT).apply {
                         add(registries.getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Enchantments.FIRE_ASPECT), 1)
                     }.build()
+                )),
+                Items.GOAT_HORN to ComponentValues(DataComponentTypes.INSTRUMENT, setOf(
+                    registries.getWrapperOrThrow(RegistryKeys.INSTRUMENT).getOrThrow(Instruments.ADMIRE_GOAT_HORN)
                 ))
             )
         ))
