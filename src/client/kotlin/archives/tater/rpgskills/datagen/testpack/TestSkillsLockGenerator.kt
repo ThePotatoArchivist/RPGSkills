@@ -4,16 +4,21 @@ import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.data.LockGroup.LockList
 import archives.tater.rpgskills.data.LockGroupProvider
 import archives.tater.rpgskills.data.RegistryIngredient
+import archives.tater.rpgskills.util.ComponentValues
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.block.Blocks
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.ItemEnchantmentsComponent
 import net.minecraft.enchantment.Enchantments
 import net.minecraft.entity.EntityType
 import net.minecraft.item.Items
+import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.registry.tag.ItemTags
 import net.minecraft.util.Identifier
+import io.wispforest.accessories.api.caching.DataComponentsPredicate
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
@@ -118,6 +123,13 @@ class TestSkillsLockGenerator(
                 },
                 "You don't know how to assemble this button",
             ),
+            itemComponents = LockList(mapOf(
+                Items.ENCHANTED_BOOK to ComponentValues(DataComponentTypes.STORED_ENCHANTMENTS, setOf(
+                    ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT).apply {
+                        add(registries.getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Enchantments.FIRE_ASPECT), 1)
+                    }.build()
+                ))
+            ))
         ))
         provider.accept(testPackId("potato4"), LockGroup(
             requirements = listOf(mapOf(

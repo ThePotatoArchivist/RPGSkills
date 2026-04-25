@@ -9,6 +9,9 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.command.argument.EntityArgumentType.player
+import net.minecraft.component.ComponentHolder
+import net.minecraft.component.ComponentType
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
@@ -16,6 +19,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.BlockItem
 import net.minecraft.item.BoatItem
 import net.minecraft.item.Item
+import net.minecraft.item.ItemGroups
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.ProjectileItem
@@ -28,9 +32,11 @@ import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
+import net.minecraft.resource.featuretoggle.FeatureFlags
 import net.minecraft.text.Text
 import net.minecraft.util.UseAction
 import java.util.*
+import java.util.stream.Collectors.groupingBy
 import kotlin.jvm.optionals.getOrNull
 
 @JvmRecord
@@ -40,7 +46,8 @@ data class LockGroup(
     val blocks: LockList<RegistryIngredient.Composite<Block>> = LockList.empty(),
     val entities: LockList<RegistryIngredient.Composite<EntityType<*>>> = LockList.empty(),
     val enchantments: LockList<RegistryIngredient.Composite<Enchantment>> = LockList.empty(),
-    val recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty()
+    val recipes: LockList<RegistryIngredient.Composite<Item>> = LockList.empty(),
+    val itemComponents: LockList<Map<Item, ComponentValues<*>>> = LockList(mapOf())
 ) {
     fun isSatisfiedBy(levels: Map<RegistryEntry<Skill>, Int>) = requirements.all {
         it.any { (skill, level) ->
@@ -98,6 +105,7 @@ data class LockGroup(
             LockList.createShortCodec(RegistryKeys.ENTITY_TYPE).optionalFieldOf("entities", LockList.empty()).forGetter(LockGroup::entities),
             LockList.createShortCodec(RegistryKeys.ENCHANTMENT).optionalFieldOf("enchantments", LockList.empty()).forGetter(LockGroup::enchantments),
             LockList.createShortCodec(RegistryKeys.ITEM).optionalFieldOf("recipes", LockList.empty()).forGetter(LockGroup::recipes),
+            LockList.createShortCodec(Codec.unboundedMap(Registries.ITEM.codec, ComponentValues.CODEC)).optionalFieldOf("item_components", LockList(mapOf())).forGetter(LockGroup::itemComponents),
         ).apply(it, ::LockGroup) }
 
         override val key: RegistryKey<Registry<LockGroup>> = RegistryKey.ofRegistry(RPGSkills.id("lockgroup"))
@@ -108,21 +116,70 @@ data class LockGroup(
         private val ENCHANTMENT_CACHE = RegistryCache(key) { it.value.enchantments.entries.matchingEntries }
         private val RECIPE_CACHE = RegistryCache(key) { it.value.recipes.entries.matchingValues }
 
+        object ItemComponentCache {
+            @JvmRecord data class TypeEntry<T>(val type: ComponentType<T>, val entries: MutableMap<T, Entry> = mutableMapOf()) {
+                fun add(components: ComponentValues<T>, group: RegistryEntry.Reference<LockGroup>, stacks: Collection<ItemStack>) {
+                    for (value in components.values) {
+                        entries[value] = Entry(group, stacks.find { it[type] == value } ?: ItemStack.EMPTY)
+                    }
+                }
+
+                @Suppress("UNCHECKED_CAST")
+                fun addChecked(components: ComponentValues<*>, group: RegistryEntry.Reference<LockGroup>, stacks: Collection<ItemStack>) {
+                    if (components.type != type) {
+                        RPGSkills.logger.error("Cannot filter an item by both {} and {}", type, components.type)
+                        return
+                    }
+                    add(components as ComponentValues<T>, group, stacks)
+                }
+
+                operator fun get(holder: ComponentHolder) = entries[holder[type]]?.group
+            }
+            @JvmRecord data class Entry(val group: RegistryEntry.Reference<LockGroup>, val sample: ItemStack)
+
+            private val cache: MutableMap<RegistryWrapper.WrapperLookup, Map<Item, TypeEntry<*>>> = WeakHashMap()
+
+            private fun generate(registryManager: RegistryWrapper.WrapperLookup): Map<Item, TypeEntry<*>> {
+                ItemGroups.updateDisplayContext(FeatureFlags.DEFAULT_ENABLED_FEATURES, true, registryManager)
+                val stacks = Registries.ITEM_GROUP.stream()
+                    .flatMap { it.displayStacks.stream() }
+                    .collect(groupingBy(ItemStack::getItem))
+
+                return buildMap {
+                    for (lockGroup in registryManager.getWrapperOrThrow(key).streamEntries()) {
+                        for ((item, components) in lockGroup.value.itemComponents.entries) {
+                            getOrPut(item) { TypeEntry(components.type) }
+                                .addChecked(components, lockGroup, stacks[item] ?: emptySet())
+                        }
+                    }
+                }
+            }
+
+            operator fun get(registries: RegistryWrapper.WrapperLookup) = cache.computeIfAbsent(registries, ::generate)
+        }
+
+        private fun <T> find(cache: RegistryCache<T, LockGroup>, registries: RegistryWrapper.WrapperLookup, value: T): LockGroup? =
+            cache[registries][value]?.value
+
+        private fun itemGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack): LockGroup? =
+            find(ITEM_CACHE, registries, stack.item)
+                ?: ItemComponentCache[registries][stack.item]?.let { it[stack] }?.value
+
         fun useGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) =
-            ITEM_CACHE[registries][stack.item]?.value?.takeIf { isUsedItem(stack.item) }
-                ?: (stack.item as? BlockItem)?.let { BLOCK_CACHE[registries][it.block]?.value }
-                ?: ITEM_ENTITIES[stack.item]?.let { ENTITY_CACHE[registries][it]?.value }
+            itemGroupOf(registries, stack)?.takeIf { isUsedItem(stack.item) }
+                ?: (stack.item as? BlockItem)?.let { find(BLOCK_CACHE, registries, it.block) }
+                ?: ITEM_ENTITIES[stack.item]?.let { find(ENTITY_CACHE, registries, it) }
 
         fun placeGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) =
-            ITEM_CACHE[registries][stack.item]?.value?.takeIf { isPlacedItem(stack.item) }
+            itemGroupOf(registries, stack)?.takeIf { isPlacedItem(stack.item) }
 
         fun craftGroupOf(registries: RegistryWrapper.WrapperLookup, stack: ItemStack) =
-            RECIPE_CACHE[registries][stack.item]?.value
+            find(RECIPE_CACHE, registries, stack.item)
 
         private fun <T> findLocked(player: PlayerEntity, cache: RegistryCache<T, LockGroup>, value: T) =
-            cache[player.registryManager][value]?.value?.takeIf { !it.isSatisfiedBy(player) }
+            find(cache, player.registryManager, value)?.takeUnless { it.isSatisfiedBy(player) }
 
-        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = findLocked(player, ITEM_CACHE, stack.item)
+        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = itemGroupOf(player.registryManager, stack)?.takeUnless { it.isSatisfiedBy(player) }
         @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = findLocked(player, BLOCK_CACHE, state.block)
         @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = findLocked(player, ENTITY_CACHE, entity.type)
         @JvmStatic fun findLocked(player: PlayerEntity, enchantment: RegistryEntry<Enchantment>) = findLocked(player, ENCHANTMENT_CACHE, enchantment)

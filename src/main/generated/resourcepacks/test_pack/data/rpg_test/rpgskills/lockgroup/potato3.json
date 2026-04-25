@@ -5,6 +5,18 @@
     ],
     "message": "How to press?"
   },
+  "item_components": {
+    "minecraft:enchanted_book": {
+      "type": "minecraft:stored_enchantments",
+      "values": [
+        {
+          "levels": {
+            "minecraft:fire_aspect": 1
+          }
+        }
+      ]
+    }
+  },
   "items": {
     "entries": [
       "minecraft:red_concrete",
