@@ -19,9 +19,12 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.Items.ENCHANTED_BOOK
+import net.minecraft.item.tooltip.TooltipAppender
+import net.minecraft.item.tooltip.TooltipType
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
@@ -30,6 +33,7 @@ import net.minecraft.util.Identifier
 import dev.emi.emi.api.EmiApi
 import dev.emi.emi.api.stack.EmiIngredient
 import dev.emi.emi.api.stack.EmiStack
+import java.util.function.Consumer
 
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, level: Int, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
@@ -58,6 +62,18 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                 addAll(lockGroup.items.toDisplayedSlot({ it.name }) { if (LockGroup.isUsedItem(it)) it.defaultStack else null })
                 addAll(lockGroup.blocks.toDisplayedSlot({ it.name }) { itemOf(it) })
                 addAll(lockGroup.entities.toDisplayedSlot({ it.name }) { itemOf(it) })
+
+                for ((item, componentValues) in lockGroup.itemComponents.entries)
+                    for (value in componentValues.values)
+                        LockGroup.Manager.ItemComponentCache[player.registryManager][item]?.entries?.get(value)?.sample?.takeUnless { it.isEmpty }?.let { stack ->
+                            add(DisplayedSlot(getTooltip {
+                                val context = Item.TooltipContext.create(player.registryManager)
+                                when (value) {
+                                    is TooltipAppender -> value.appendTooltip(context, it::add, TooltipType.BASIC)
+                                    else -> stack.item.appendTooltip(stack, context, it, TooltipType.BASIC)
+                                }
+                            }, listOf(stack), null))
+                        }
             }
         ),
         Section(
@@ -138,7 +154,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {}
 
     @JvmRecord
-    private data class DisplayedSlot(val text: Text, val stacks: List<ItemStack>, val entry: RegistryIngredient.Entry<*>)
+    private data class DisplayedSlot(val text: Text, val stacks: List<ItemStack>, val entry: RegistryIngredient.Entry<*>?)
     @JvmRecord
     private data class Section(val title: Text, val slotTexture: Identifier, val slots: List<DisplayedSlot>)
 
@@ -188,6 +204,12 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                                 ?: entry.tag.fallbackText()
                     }, it, entry) }
             }
+
+        private fun getTooltip(execute: (MutableList<Text>) -> Unit): Text {
+            return buildList {
+                execute(this)
+            }.firstOrNull() ?: Text.empty()
+        }
     }
 
     object WidgetTexts {
