@@ -130,7 +130,7 @@ data class LockGroup(
                 @Suppress("UNCHECKED_CAST")
                 fun addChecked(components: ComponentValues<*>, group: RegistryEntry.Reference<LockGroup>, item: Item, stacks: Collection<ItemStack>) {
                     if (components.type != type) {
-                        RPGSkills.logger.error("Cannot filter an item by both {} and {}", type, components.type)
+                        RPGSkills.logger.error("Cannot filter {} by both {} and {}", item, type, components.type)
                         return
                     }
                     add(components as ComponentValues<T>, group, item, stacks)
