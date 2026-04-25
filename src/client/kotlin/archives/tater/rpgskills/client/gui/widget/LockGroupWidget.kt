@@ -72,7 +72,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                                     is TooltipAppender -> value.appendTooltip(context, it::add, TooltipType.BASIC)
                                     else -> stack.item.appendTooltip(stack, context, it, TooltipType.BASIC)
                                 }
-                            }.copy().formatted(stack.rarity.formatting), listOf(stack), null))
+                            }?.copy()?.formatted(stack.rarity.formatting) ?: stack.name, listOf(stack), null))
                         }
             }
         ),
@@ -205,10 +205,10 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                     }, it, entry) }
             }
 
-        private inline fun getTooltip(execute: (MutableList<Text>) -> Unit): Text {
+        private inline fun getTooltip(execute: (MutableList<Text>) -> Unit): Text? {
             return buildList {
                 execute(this)
-            }.firstOrNull() ?: Text.empty()
+            }.firstOrNull()
         }
     }
 
