@@ -14,6 +14,7 @@ class ItemTagGenerator(output: FabricDataOutput, completableFuture: CompletableF
     override fun configure(wrapperLookup: RegistryWrapper.WrapperLookup) {
         getOrCreateTagBuilder(RPGSkillsTags.NOT_PLACEABLE).add(
             Items.ENDER_EYE,
+            Items.POTION,
         )
     }
 }
