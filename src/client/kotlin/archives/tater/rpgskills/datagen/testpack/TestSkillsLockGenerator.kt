@@ -1,10 +1,10 @@
 package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.data.LockGroup
+import archives.tater.rpgskills.data.LockGroup.ComponentValues
 import archives.tater.rpgskills.data.LockGroup.LockList
 import archives.tater.rpgskills.data.LockGroupProvider
 import archives.tater.rpgskills.data.RegistryIngredient
-import archives.tater.rpgskills.util.ComponentValues
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.block.Blocks
 import net.minecraft.component.DataComponentTypes
@@ -131,8 +131,8 @@ class TestSkillsLockGenerator(
                     registries.getWrapperOrThrow(RegistryKeys.INSTRUMENT).getOrThrow(Instruments.ADMIRE_GOAT_HORN)
                 )),
                 Items.POTION to ComponentValues(DataComponentTypes.POTION_CONTENTS, setOf(
-                    PotionContentsComponent(Potions.FIRE_RESISTANCE)
-                ))
+                    PotionContentsComponent(Potions.TURTLE_MASTER)
+                ), 1)
             )
         ))
         provider.accept(testPackId("potato4"), LockGroup(

@@ -14,9 +14,10 @@
     },
     "minecraft:potion": {
       "type": "minecraft:potion_contents",
+      "tooltip_index": 1,
       "values": [
         {
-          "potion": "minecraft:fire_resistance"
+          "potion": "minecraft:turtle_master"
         }
       ]
     }
