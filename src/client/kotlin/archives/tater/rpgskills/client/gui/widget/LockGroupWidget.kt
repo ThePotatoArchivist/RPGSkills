@@ -25,6 +25,7 @@ import net.minecraft.item.Items
 import net.minecraft.item.Items.ENCHANTED_BOOK
 import net.minecraft.item.tooltip.TooltipAppender
 import net.minecraft.item.tooltip.TooltipType
+import net.minecraft.registry.DynamicRegistryManager
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
@@ -33,7 +34,6 @@ import net.minecraft.util.Identifier
 import dev.emi.emi.api.EmiApi
 import dev.emi.emi.api.stack.EmiIngredient
 import dev.emi.emi.api.stack.EmiStack
-import java.util.function.Consumer
 
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, level: Int, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
@@ -66,13 +66,11 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                 for ((item, componentValues) in lockGroup.itemComponents.entries)
                     for (value in componentValues.values)
                         LockGroup.Manager.ItemComponentCache[player.registryManager][item]?.entries?.get(value)?.sample?.let { stack ->
-                            add(DisplayedSlot(getTooltip {
-                                val context = Item.TooltipContext.create(player.registryManager)
-                                when (value) {
-                                    is TooltipAppender -> value.appendTooltip(context, it::add, TooltipType.BASIC)
-                                    else -> stack.item.appendTooltip(stack, context, it, TooltipType.BASIC)
-                                }
-                            }?.copy()?.formatted(stack.rarity.formatting) ?: stack.name, listOf(stack), null))
+                            add(DisplayedSlot(
+                                getComponentTooltip(value, stack, componentValues, player.registryManager),
+                                listOf(stack),
+                                null
+                            ))
                         }
             }
         ),
@@ -94,6 +92,23 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
             lockGroup.recipes.toDisplayedSlot({ it.name }) { it.defaultStack }
         ),
     )
+
+    private fun getComponentTooltip(
+        value: Any,
+        stack: ItemStack,
+        componentValues: LockGroup.ComponentValues<*>,
+        registries: DynamicRegistryManager
+    ): Text = mutableListOf<Text>().run {
+        val context = Item.TooltipContext.create(registries)
+        when (value) {
+            is TooltipAppender -> value.appendTooltip(context, ::add, TooltipType.BASIC)
+            else -> stack.item.appendTooltip(stack, context, this, TooltipType.BASIC)
+        }
+        getOrNull(if (componentValues.tooltipIndex < 0) size + componentValues.tooltipIndex else componentValues.tooltipIndex)
+    }
+        ?.copy()
+        ?.formatted(stack.rarity.formatting)
+        ?: stack.name
 
     private var hoveredSlot: DisplayedSlot? = null
 
@@ -204,12 +219,6 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                                 ?: entry.tag.fallbackText()
                     }, it, entry) }
             }
-
-        private inline fun getTooltip(execute: (MutableList<Text>) -> Unit): Text? {
-            return buildList {
-                execute(this)
-            }.firstOrNull()
-        }
     }
 
     object WidgetTexts {

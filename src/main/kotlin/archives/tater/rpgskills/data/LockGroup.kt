@@ -6,6 +6,7 @@ import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.mixin.locking.BoatItemAccessor
 import archives.tater.rpgskills.util.*
 import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
@@ -33,8 +34,12 @@ import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.resource.featuretoggle.FeatureFlags
+import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.UseAction
+import net.minecraft.util.Util.memoize
+import net.minecraft.util.dynamic.Codecs
+import com.github.L_Ender.cataclysm.util.EffectUtil.type
 import java.util.*
 import java.util.stream.Collectors.groupingBy
 import kotlin.jvm.optionals.getOrNull
@@ -90,6 +95,27 @@ data class LockGroup(
         }
     }
 
+    @JvmRecord
+    data class ComponentValues<T: Any>(
+        val type: ComponentType<T>,
+        val values: Set<T>,
+        val tooltipIndex: Int = 0,
+    ) {
+        fun contains(components: ComponentHolder) = type in components && components[type] in values
+
+        companion object {
+            private fun <T: Any> createCodec(type: ComponentType<T>): MapCodec<ComponentValues<T>> = RecordCodecBuilder.mapCodec { it.group(
+                type.codecOrThrow.listOf().xmap(List<T>::toSet, Set<T>::toList).fieldOf("values").forGetter(ComponentValues<T>::values),
+                Codec.INT.optionalFieldOf("tooltip_index", 0).forGetter(ComponentValues<T>::tooltipIndex)
+            ).apply(it) { values, tooltipIndex -> ComponentValues(type, values, tooltipIndex) } }
+
+            @Suppress("UNCHECKED_CAST")
+            private val CREATE_CODEC = memoize<ComponentType<*>, MapCodec<ComponentValues<*>>> { createCodec(it) as MapCodec<ComponentValues<*>> }
+
+            val CODEC: Codec<ComponentValues<*>> = ComponentType.PERSISTENT_CODEC.dispatch(ComponentValues<*>::type) { CREATE_CODEC.apply(it) }
+        }
+    }
+
     companion object Manager : RegistryKeyHolder<Registry<LockGroup>> {
         val DEFAULT_ITEM_MESSAGE = Translation.unit("rpgskills.lockgroup.item.message.default")
         val DEFAULT_ITEM_NAME = Translation.unit("rpgskills.lockgroup.item.name.default")
@@ -118,7 +144,7 @@ data class LockGroup(
 
         object ItemComponentCache {
             @JvmRecord
-            data class TypeEntry<T>(val type: ComponentType<T>, val entries: MutableMap<T, Entry> = mutableMapOf()) {
+            data class TypeEntry<T: Any>(val type: ComponentType<T>, val entries: MutableMap<T, Entry> = mutableMapOf()) {
                 fun add(components: ComponentValues<T>, group: RegistryEntry.Reference<LockGroup>, item: Item, stacks: Collection<ItemStack>) {
                     for (value in components.values) {
                         entries[value] = Entry(group, stacks.find { it[type] == value } ?: item.defaultStack.apply {
