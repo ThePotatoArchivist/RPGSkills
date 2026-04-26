@@ -17,6 +17,7 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
+import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
@@ -31,9 +32,11 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import net.minecraft.world.GameMode.getOrNull
 import dev.emi.emi.api.EmiApi
 import dev.emi.emi.api.stack.EmiIngredient
 import dev.emi.emi.api.stack.EmiStack
+import javax.tools.Tool
 
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, level: Int, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
@@ -67,7 +70,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                     for (value in componentValues.values)
                         LockGroup.Manager.ItemComponentCache[player.registryManager][item]?.entries?.get(value)?.sample?.let { stack ->
                             add(DisplayedSlot(
-                                getComponentTooltip(value, stack, componentValues, player.registryManager),
+                                getComponentTooltip(value, stack, componentValues, player),
                                 listOf(stack),
                                 null
                             ))
@@ -97,14 +100,21 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         value: Any,
         stack: ItemStack,
         componentValues: LockGroup.ComponentValues<*>,
-        registries: DynamicRegistryManager
-    ): Text = mutableListOf<Text>().run {
-        val context = Item.TooltipContext.create(registries)
+        player: PlayerEntity,
+    ): Text = run {
+        val context = Item.TooltipContext.create(player.registryManager)
         when (value) {
-            is TooltipAppender -> value.appendTooltip(context, ::add, TooltipType.BASIC)
-            else -> stack.item.appendTooltip(stack, context, this, TooltipType.BASIC)
+            is TooltipAppender -> mutableListOf<Text>().apply {
+                value.appendTooltip(context, ::add, TooltipType.BASIC)
+            }
+            else -> stack.getTooltip(context, player, TooltipType.BASIC)
         }
-        getOrNull(if (componentValues.tooltipIndex < 0) size + componentValues.tooltipIndex else componentValues.tooltipIndex)
+    }.run {
+        getOrNull(when {
+            componentValues.tooltipIndex < 0 -> size + componentValues.tooltipIndex
+            value is TooltipAppender -> componentValues.tooltipIndex
+            else -> componentValues.tooltipIndex + 1
+        })
     }
         ?.copy()
         ?.formatted(stack.rarity.formatting)
