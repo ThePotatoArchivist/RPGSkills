@@ -40,7 +40,7 @@ class StructuresSkillSourceComponent(val world: World) : Component {
     private fun getStructurePoints(key: RegistryKey<Structure>) =
         getStructure(key)?.let { RPGSkills.CONFIG.getStructurePoints(it) } ?: 0
 
-    companion object : ComponentKeyHolder<StructuresSkillSourceComponent, World> {
+    companion object : ComponentKeyHolder<StructuresSkillSourceComponent> {
         val CODEC = recordMutationCodec(
             Entry.CODEC.mutateCollection().fieldFor("structures", StructuresSkillSourceComponent::structures)
         )

@@ -203,16 +203,16 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         }
     }
 
-    companion object : ComponentKeyHolder<JobsComponent, PlayerEntity> {
+    companion object : ComponentKeyHolder<JobsComponent> {
         val CODEC = recordMutationCodec(
             JobInstance.CODEC.mutateCollection().fieldFor("active_jobs", JobsComponent::_active),
             Codec.unboundedMap(RegistryFixedCodec.of(Job.key), intRangeCodec(min = 1)).mutate().fieldFor("cooldowns", JobsComponent::_cooldowns),
         )
 
-        @JvmField
-        val KEY: ComponentKey<JobsComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("jobs"), JobsComponent::class.java)
+        override val key: ComponentKey<JobsComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("jobs"), JobsComponent::class.java)
 
-        override val key get() = KEY
+        @JvmField
+        val KEY = key
 
         const val JOB_SYNC_FREQUENCY = 20 * 60 // 1 minute
         const val JOB_SCREEN_SYNC_FREQUENCY = 20 * 2 // 2 seconds

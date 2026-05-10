@@ -11,13 +11,18 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType.getInteger
 import com.mojang.brigadier.arguments.IntegerArgumentType.integer
+import com.mojang.brigadier.builder.ArgumentBuilder
+import com.mojang.brigadier.context.CommandContext
 import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.command.argument.EntityArgumentType.*
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.getRegistryEntry
 import net.minecraft.command.argument.RegistryEntryReferenceArgumentType.registryEntry
+import net.minecraft.command.argument.TeamArgumentType.getTeam
+import net.minecraft.command.argument.TeamArgumentType.team
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
+import org.ladysnake.cca.api.v3.component.ComponentAccess
 
 object RPGSkillsCommands : CommandRegistrationCallback {
     val LIST_SKILLS_NONE = Translation.unit("commands.$MOD_ID.skills.list.none")
@@ -170,54 +175,66 @@ object RPGSkillsCommands : CommandRegistrationCallback {
                     }
                 }
                 sub("bosses") {
-                    sub("list") {
-                        executes { command ->
-                            val component = command.source.server.overworld[BossTrackerComponent]
-                            val defeated = component.defeated
-                            command.source.sendFeedback(LIST_BOSSES.text(component.defeatedCount, component.totalCount, defeated.joinToText { it.name }), false)
-                            defeated.size
+                    fun ArgumentBuilder<ServerCommandSource, *>.bossCommands(getOwner: (CommandContext<ServerCommandSource>) -> ComponentAccess) {
+                        sub("list") {
+                            executes { command ->
+                                val component = getOwner(command)[BossTrackerComponent]
+                                val defeated = component.defeated
+                                command.source.sendFeedback(
+                                    LIST_BOSSES.text(
+                                        component.defeatedCount,
+                                        component.totalCount,
+                                        defeated.joinToText { it.name }), false
+                                )
+                                defeated.size
+                            }
+                            subExec("all") { command ->
+                                val component = getOwner(command)[BossTrackerComponent]
+                                val all = component.increasesLevelCap.toList()
+                                command.source.sendFeedback(
+                                    LIST_BOSSES_ALL.text(
+                                        component.totalCount,
+                                        all.joinToText { it.value.name }), false
+                                )
+                                all.size
+                            }
                         }
-                        subExec("all") { command ->
-                            val component = command.source.server.overworld[BossTrackerComponent]
-                            val all = component.increasesLevelCap.toList()
-                            command.source.sendFeedback(LIST_BOSSES_ALL.text(component.totalCount, all.joinToText { it.value.name }), false)
-                            all.size
+                        subExec("reset") {
+                            getOwner(it)[BossTrackerComponent].reset()
+                            it.source.sendFeedback(RESET_BOSSES.text, false)
+                            0
+                        }
+                        sub("add") {
+                            argumentExec("entity", registryEntry(registryAccess, RegistryKeys.ENTITY_TYPE)) {
+                                val entity = getRegistryEntry(it, "entity", RegistryKeys.ENTITY_TYPE)
+                                if (!(entity.value isIn RPGSkillsTags.INCREASES_LEVEL_CAP)) {
+                                    it.source.sendError(INVALID_BOSS.text(entity.value.name))
+                                    return@argumentExec 0
+                                }
+                                getOwner(it)[BossTrackerComponent].add(entity.value)
+                                it.source.sendFeedback(ADD_BOSS.text(entity.value.name), true)
+                                1
+                            }
+                        }
+                        sub("remove") {
+                            argumentExec("entity", registryEntry(registryAccess, RegistryKeys.ENTITY_TYPE)) {
+                                val entity = getRegistryEntry(it, "entity", RegistryKeys.ENTITY_TYPE)
+                                if (!(entity.value isIn RPGSkillsTags.INCREASES_LEVEL_CAP)) {
+                                    it.source.sendError(INVALID_BOSS.text(entity.value.name))
+                                    return@argumentExec 0
+                                }
+                                getOwner(it)[BossTrackerComponent].remove(entity.value)
+                                it.source.sendFeedback(REMOVE_BOSS.text(entity.value.name), true)
+                                1
+                            }
                         }
                     }
-                    subExec("reset") {
-                        BossTrackerComponent.update(it.source.server) {
-                            reset()
-                            true
-                        }
-                        it.source.sendFeedback(RESET_BOSSES.text, false)
-                        0
-                    }
-                    sub("add") {
-                        argumentExec("entity", registryEntry(registryAccess, RegistryKeys.ENTITY_TYPE)) {
-                            val entity = getRegistryEntry(it, "entity", RegistryKeys.ENTITY_TYPE)
-                            if (!(entity.value isIn RPGSkillsTags.INCREASES_LEVEL_CAP)) {
-                                it.source.sendError(INVALID_BOSS.text(entity.value.name))
-                                return@argumentExec 0
-                            }
-                            BossTrackerComponent.update(it.source.server) {
-                                add(entity.value)
-                            }
-                            it.source.sendFeedback(ADD_BOSS.text(entity.value.name), true)
-                            1
-                        }
-                    }
-                    sub("remove") {
-                        argumentExec("entity", registryEntry(registryAccess, RegistryKeys.ENTITY_TYPE)) {
-                            val entity = getRegistryEntry(it, "entity", RegistryKeys.ENTITY_TYPE)
-                            if (!(entity.value isIn RPGSkillsTags.INCREASES_LEVEL_CAP)) {
-                                it.source.sendError(INVALID_BOSS.text(entity.value.name))
-                                return@argumentExec 0
-                            }
-                            BossTrackerComponent.update(it.source.server) {
-                                remove(entity.value)
-                            }
-                            it.source.sendFeedback(REMOVE_BOSS.text(entity.value.name), true)
-                            1
+
+                    bossCommands { it.source.server.scoreboard }
+
+                    sub("team") {
+                        argument("team", team()) {
+                            bossCommands { getTeam(it, "team") }
                         }
                     }
                 }

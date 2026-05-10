@@ -79,7 +79,7 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
         }
     }
 
-    companion object : ComponentKeyHolder<DefeatSourceComponent, MobEntity> {
+    companion object : ComponentKeyHolder<DefeatSourceComponent> {
         val CODEC = recordMutationCodec(
             Codec.unboundedMap(Uuids.STRING_CODEC, Codec.FLOAT).mutate().fieldFor("attackers", DefeatSourceComponent::_attackers),
             SkillSource.CODEC.fieldOf("skill_source").forAccess(DefeatSourceComponent::skillSource),

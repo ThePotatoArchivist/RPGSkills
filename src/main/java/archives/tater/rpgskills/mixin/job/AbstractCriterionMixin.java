@@ -18,6 +18,6 @@ public abstract class AbstractCriterionMixin<T extends AbstractCriterion.Conditi
             at = @At("HEAD")
     )
     private void triggerJobs(ServerPlayerEntity player, Predicate<T> predicate, CallbackInfo ci) {
-        JobsComponent.KEY.get(player).onCriterion(this, predicate);
+        player.getComponent(JobsComponent.KEY).onCriterion(this, predicate);
     }
 }

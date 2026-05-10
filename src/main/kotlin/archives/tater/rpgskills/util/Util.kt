@@ -46,6 +46,7 @@ import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import org.joml.Vector2i
 import org.ladysnake.cca.api.v3.component.Component
+import org.ladysnake.cca.api.v3.component.ComponentAccess
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.slf4j.Logger
 import java.util.*
@@ -118,14 +119,14 @@ operator fun <T> AttachmentTarget.get(attachmentType: AttachmentType<T>): T = ge
 @Suppress("UnstableApiUsage")
 operator fun <T> AttachmentTarget.get(holder: AttachmentTypeHolder<T>): T = this[holder.attachmentType]
 
-interface ComponentKeyHolder<C : Component, in T> {
+interface ComponentKeyHolder<C : Component> {
     val key: ComponentKey<C>
 }
 
-operator fun <C : Component, T : Any> T.get(keyHolder: ComponentKeyHolder<C, T>): C = keyHolder.key.get(this)
+operator fun <C : Component> ComponentAccess.get(keyHolder: ComponentKeyHolder<C>): C = getComponent(keyHolder.key)
 
 operator fun <C: Component> ComponentKey<C>.getValue(thisRef: Any, property: KProperty<*>): C = get(thisRef)
-operator fun <C: Component> ComponentKeyHolder<C, *>.provideDelegate(thisRef: Any, property: KProperty<*>) = key
+operator fun <C: Component> ComponentKeyHolder<C>.provideDelegate(thisRef: Any, property: KProperty<*>) = key
 
 operator fun <T> DFPair<T, *>.component1(): T = first
 operator fun <T> DFPair<*, T>.component2(): T = second

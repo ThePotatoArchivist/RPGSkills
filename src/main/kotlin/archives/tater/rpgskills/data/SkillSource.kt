@@ -2,7 +2,6 @@ package archives.tater.rpgskills.data
 
 import archives.tater.rpgskills.cca.SkillSourceComponent
 import archives.tater.rpgskills.cca.StructuresSkillSourceComponent
-import archives.tater.rpgskills.cca.skillSource
 import archives.tater.rpgskills.util.get
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
@@ -28,7 +27,7 @@ sealed interface SkillSource {
         inline val z get() = pos.z
 
         override fun getComponent(world: World): SkillSourceComponent =
-            world.getChunk(pos.x, pos.z).skillSource
+            world.getChunk(pos.x, pos.z)[SkillSourceComponent]
 
         constructor(x: Int, z: Int) : this(ChunkPos(x, z))
 
@@ -43,7 +42,7 @@ sealed interface SkillSource {
     @JvmRecord
     data class SpawnerSource(val pos: BlockPos): SkillSource {
         override fun getComponent(world: World): SkillSourceComponent? =
-            world.getBlockEntity(pos, BlockEntityType.MOB_SPAWNER).getOrNull()?.skillSource
+            world.getBlockEntity(pos, BlockEntityType.MOB_SPAWNER).getOrNull()?.get(SkillSourceComponent)
 
         companion object {
             val CODEC: MapCodec<SpawnerSource> = RecordCodecBuilder.mapCodec { it.group(

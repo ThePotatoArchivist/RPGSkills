@@ -1,6 +1,7 @@
 package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.cca.BossTrackerComponent.Companion.bossTracker
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
@@ -74,7 +75,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     val isPointsFull get() = level >= maxLevel
 
-    private val maxLevel get() = player.world[BossTrackerComponent].maxLevel.coerceAtMost(MAX_LEVEL)
+    private val maxLevel get() = player.bossTracker.maxLevel.coerceAtMost(MAX_LEVEL)
 
     private var modifiers: Map<RegistryEntry<EntityAttribute>, List<Identifier>> = mapOf()
 
@@ -163,7 +164,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         CODEC.encode(this, tag, registryLookup).logIfError()
     }
 
-    companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity> {
+    companion object : ComponentKeyHolder<SkillsComponent> {
 
         val CODEC = recordMutationCodec(
             RegistryFixedCodec.of(SkillClass.key).optionalFieldOf("class").forAccess(SkillsComponent::_skillClass),

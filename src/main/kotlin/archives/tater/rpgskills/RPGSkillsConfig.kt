@@ -73,6 +73,8 @@ class RPGSkillsConfig {
         private set
     var proximityDefeatRange: Int = 100
         private set
+    var attributeIncreasesIncludeUnteamed = true
+        private set
     var attributeIncreasesRaw: Map<RegistryKey<EntityAttribute>, AnonymousAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_ATTACK_DAMAGE to AnonymousAttributeModifier(1.0),
         EntityAttributes.GENERIC_MAX_HEALTH to AnonymousAttributeModifier(0.15, Operation.ADD_MULTIPLIED_BASE),
@@ -139,6 +141,7 @@ class RPGSkillsConfig {
             intRangeCodec(min = -1).fieldOf("level_cap_remove_boss_count").forAccess(RPGSkillsConfig::capRemoveBossCount),
             intRangeCodec(min = 0).fieldOf("proximity_defeat_range").forAccess(RPGSkillsConfig::proximityDefeatRange),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec()).fieldOf("attribute_increase_per_boss").forAccess(RPGSkillsConfig::attributeIncreasesRaw),
+            Codec.BOOL.fieldOf("attribute_increase_include_unteamed").forAccess(RPGSkillsConfig::attributeIncreasesIncludeUnteamed),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec(Operation.ADD_MULTIPLIED_BASE)).listOf().fieldOf("attribute_increases_boss").forAccess(RPGSkillsConfig::bossAttributeIncreasesRaw),
         )
 

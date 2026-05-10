@@ -19,6 +19,7 @@ import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 import net.minecraft.registry.RegistryWrapper
+import jdk.internal.org.jline.utils.Colors.s
 import java.util.concurrent.CompletableFuture
 
 class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>) :
@@ -46,9 +47,12 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(RPGSkillsCommands.DESPAWN_MULTIPLE, "Despawned %s entities")
             add(BossTrackerComponent.BOSS_DEFEAT_TITLE, "GREAT ENEMY FELLED")
             add(BossTrackerComponent.BOSS_DEFEAT_MESSAGE, "%s was vanquished!")
+            add(BossTrackerComponent.BOSS_DEFEAT_TEAM_MESSAGE, $$"%2$s was vanquished by %1$s!")
             add(BossTrackerComponent.ENEMIES_STRENGTHEN_MESSAGE, "Enemies became stronger")
             add(BossTrackerComponent.CAP_RAISE_MESSAGE, "Max level is now %s")
+            add(BossTrackerComponent.CAP_RAISE_TEAM_MESSAGE, "Max level for %s is now %s")
             add(BossTrackerComponent.CAP_REMOVED_MESSAGE, "There is no longer a level limit")
+            add(BossTrackerComponent.CAP_REMOVED_TEAM_MESSAGE, "There is no longer a level limit for %s")
             add(SkillsScreen.TITLE, "Skills")
             add(SkillsScreen.LEVEL, "Level %s")
             add(SkillsScreen.PROGRESS, "%s/%s Skill Points")
