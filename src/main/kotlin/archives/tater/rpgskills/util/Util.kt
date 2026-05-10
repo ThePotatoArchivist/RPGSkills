@@ -188,6 +188,7 @@ fun <T> FabricTagProvider<T>.FabricTagBuilder.addOptional(vararg ids: Identifier
 fun RegistryWrapper<*>.isEmpty() = streamEntries().findAny().isEmpty
 
 fun intRangeCodec(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Codec<Int> = Codec.intRange(min, max)
+fun floatRangeCodec(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE): Codec<Float> = Codec.floatRange(min, max)
 
 fun itemCriterionConditions(player: LootContextPredicate? = null, location: LootContextPredicate? = null) =
     ItemCriterion.Conditions(Optional.ofNullable(player), Optional.ofNullable(location))

@@ -121,7 +121,7 @@ class DefeatSourceComponent(val entity: MobEntity) : Component {
             if (entity !is MobEntity) return
             val world = entity.world as? ServerWorld ?: return
             for ((player, amount) in entity[DefeatSourceComponent].getSkillPointAmounts(
-                entity isIn RPGSkillsTags.REPEATED_DEFEAT_IGNORES_CUSTOM_SKILL_DROP && !world[BossTrackerComponent].hasDefeated(entity)
+                entity isIn RPGSkillsTags.REPEATED_DEFEAT_IGNORES_CUSTOM_SKILL_DROP && !world.scoreboard[BossTrackerComponent].hasDefeated(entity)
             ))
                 SkillPointOrbEntity.spawnOrbs(world, player, entity.pos, amount)
         }

@@ -13,7 +13,7 @@ class TestEntityTagGenerator(
     completableFuture: CompletableFuture<RegistryWrapper.WrapperLookup>
 ) : FabricTagProvider.EntityTypeTagProvider(output, completableFuture) {
     override fun configure(wrapperLookup: RegistryWrapper.WrapperLookup?) {
-        with (getOrCreateTagBuilder(RPGSkillsTags.INCREASES_LEVEL_CAP)) {
+        with (getOrCreateTagBuilder(RPGSkillsTags.BOSS)) {
             add(EntityType.ENDER_DRAGON, EntityType.WITHER)
         }
         with (getOrCreateTagBuilder(RPGSkillsTags.PROXIMITY_DEFEAT)) {

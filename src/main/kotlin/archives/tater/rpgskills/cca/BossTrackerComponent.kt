@@ -4,6 +4,7 @@ import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.get
+import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.mob.MobEntity
@@ -196,12 +197,9 @@ class BossTrackerComponent(private val owner: ComponentAccess, private val serve
 
             val server = entity.server ?: return
             val defeated = server.scoreboard[BossTrackerComponent].minDefeated
-            if (defeated < 0) return
+            if (defeated <= 0) return
 
-            if (entity isIn RPGSkillsTags.BOSS_ATTRIBUTE_AFFECTED)
-                for ((attribute, modifier) in RPGSkills.CONFIG.bossAttributeIncreases[defeated.coerceAtMost(RPGSkills.CONFIG.bossAttributeIncreases.size - 1)])
-                    entity.getAttributeInstance(attribute)?.addPersistentModifier(modifier.build(BOSS_DEFEAT_SCALING, 1.0))
-            else
+            if (!(entity isIn RPGSkillsTags.BOSS_ATTRIBUTE_AFFECTED))
                 for ((attribute, modifier) in RPGSkills.CONFIG.attributeIncreases)
                     entity.getAttributeInstance(attribute)?.addPersistentModifier(modifier.build(BOSS_DEFEAT_SCALING, defeated.toDouble()))
 
@@ -210,5 +208,14 @@ class BossTrackerComponent(private val owner: ComponentAccess, private val serve
         }
 
         val PlayerEntity.bossTracker get() = (scoreboardTeam ?: scoreboard)[BossTrackerComponent]
+        val PlayerEntity.bossAssist get() = (RPGSkills.CONFIG.maxBossAssist - bossTracker.defeatedCount).coerceAtLeast(0)
+
+        @JvmStatic
+        fun modifyDamageTaken(player: PlayerEntity, damage: Float) =
+            damage / (1 + player.bossAssist * RPGSkills.CONFIG.damageTakenDivisorPerBossAssist)
+
+        @JvmStatic
+        fun modifyDamageDealt(player: PlayerEntity, damage: Float) =
+            damage * (1 + player.bossAssist * RPGSkills.CONFIG.damageDealtMultiplierPerBossAssist)
     }
 }

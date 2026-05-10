@@ -4,6 +4,7 @@ import archives.tater.rpgskills.data.AnonymousAttributeModifier
 import archives.tater.rpgskills.util.CodecConfig
 import archives.tater.rpgskills.util.MutationCodec
 import archives.tater.rpgskills.util.ceilDiv
+import archives.tater.rpgskills.util.floatRangeCodec
 import archives.tater.rpgskills.util.forAccess
 import archives.tater.rpgskills.util.intRangeCodec
 import archives.tater.rpgskills.util.isIn
@@ -80,32 +81,14 @@ class RPGSkillsConfig {
         EntityAttributes.GENERIC_MAX_HEALTH to AnonymousAttributeModifier(0.15, Operation.ADD_MULTIPLIED_BASE),
     ).mapKeys { (id, _) -> id.key.orElseThrow() }
         private set
-
-    var bossAttributeIncreasesRaw: List<Map<RegistryKey<EntityAttribute>, AnonymousAttributeModifier>> = listOf(
-        Triple(-45, -50, -75),
-        Triple(-25, -30, -72),
-        Triple(-10, -15, -65),
-        Triple(0, 0, -55),
-        Triple(5, 8, -35),
-        Triple(10, 15, -18),
-        Triple(15, 20, 0),
-        Triple(20, 25, 8),
-        Triple(25, 30, 15),
-        Triple(30, 35, 22),
-        Triple(35, 40, 30),
-    ).map { (health, armor, damage) -> mapOf(
-        EntityAttributes.GENERIC_MAX_HEALTH.key.orElseThrow() to AnonymousAttributeModifier(health / 100.0, Operation.ADD_MULTIPLIED_BASE),
-        EntityAttributes.GENERIC_ARMOR.key.orElseThrow() to AnonymousAttributeModifier(armor / 100.0, Operation.ADD_MULTIPLIED_BASE),
-        EntityAttributes.GENERIC_ATTACK_DAMAGE.key.orElseThrow() to AnonymousAttributeModifier(damage / 100.0, Operation.ADD_MULTIPLIED_BASE),
-    ) }
+    var maxBossAssist: Int = 8
+    var damageDealtMultiplierPerBossAssist: Float = 0.25f
+        private set
+    var damageTakenDivisorPerBossAssist: Float = 0.25f
         private set
 
     val attributeIncreases: Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier> by lazy {
         attributeIncreasesRaw.mapKeys { (key, _) -> Registries.ATTRIBUTE.getEntry(key).orElseThrow() }
-    }
-
-    val bossAttributeIncreases: List<Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier>> by lazy {
-        bossAttributeIncreasesRaw.map { it.mapKeys { (key, _) -> Registries.ATTRIBUTE.getEntry(key).orElseThrow() } }
     }
 
     fun getStructurePoints(structure: RegistryEntry<Structure>) =
@@ -142,7 +125,9 @@ class RPGSkillsConfig {
             intRangeCodec(min = 0).fieldOf("proximity_defeat_range").forAccess(RPGSkillsConfig::proximityDefeatRange),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec()).fieldOf("attribute_increase_per_boss").forAccess(RPGSkillsConfig::attributeIncreasesRaw),
             Codec.BOOL.fieldOf("attribute_increase_include_unteamed").forAccess(RPGSkillsConfig::attributeIncreasesIncludeUnteamed),
-            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec(Operation.ADD_MULTIPLIED_BASE)).listOf().fieldOf("attribute_increases_boss").forAccess(RPGSkillsConfig::bossAttributeIncreasesRaw),
+            intRangeCodec(min = 0).fieldOf("boss_assist_max").forAccess(RPGSkillsConfig::maxBossAssist),
+            floatRangeCodec(min = 0f).fieldOf("boss_assist_dealt_multiplier").forAccess(RPGSkillsConfig::damageDealtMultiplierPerBossAssist),
+            floatRangeCodec(min = 0f).fieldOf("boss_assist_taken_divisor").forAccess(RPGSkillsConfig::damageTakenDivisorPerBossAssist),
         )
 
         override fun getDefault() = RPGSkillsConfig()

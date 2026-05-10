@@ -32,7 +32,7 @@ object RPGSkillsTags {
     val INCREASES_LEVEL_CAP = ofEntity("increases_level_cap")
     val IGNORES_SKILL_SOURCE = ofEntity("ignores_skill_source")
     val REPEATED_DEFEAT_IGNORES_CUSTOM_SKILL_DROP = ofEntity("repeated_defeat_ignores_custom_skill_drop")
-    val BOSS_ATTRIBUTE_AFFECTED = ofEntity("boss_attribute_affected")
+    @JvmField val BOSS_ATTRIBUTE_AFFECTED = ofEntity("boss_attribute_affected")
     val PROXIMITY_DEFEAT = ofEntity("proximity_defeat")
 
     val MID_STRUCTURES = ofStructure("skill/mid")
