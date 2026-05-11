@@ -14,7 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 public class PlayerEntityMixin {
     @ModifyVariable(
             method = "damage",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/damage/DamageSource;isScaledWithDifficulty()Z"),
+            at = @At("HEAD"),
             argsOnly = true
     )
     private float bossAssist(float amount, DamageSource source) {
