@@ -5,6 +5,7 @@ import archives.tater.rpgskills.RPGSkillsTags
 import archives.tater.rpgskills.cca.SkillsComponent
 import archives.tater.rpgskills.mixin.locking.BoatItemAccessor
 import archives.tater.rpgskills.util.*
+import net.fabricmc.fabric.api.entity.FakePlayer
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -40,9 +41,11 @@ import net.minecraft.util.UseAction
 import net.minecraft.util.Util.memoize
 import net.minecraft.util.dynamic.Codecs
 import com.github.L_Ender.cataclysm.util.EffectUtil.type
+import net.spell_engine.api.effect.EntityActionsAllowed
 import java.util.*
 import java.util.stream.Collectors.groupingBy
 import kotlin.jvm.optionals.getOrNull
+import kotlin.reflect.full.declaredMemberFunctions
 
 @JvmRecord
 data class LockGroup(
@@ -206,9 +209,10 @@ data class LockGroup(
             find(RECIPE_CACHE, registries, stack.item)
 
         private fun <T> findLocked(player: PlayerEntity, cache: RegistryCache<T, LockGroup>, value: T) =
-            find(cache, player.registryManager, value)?.takeUnless { it.isSatisfiedBy(player) }
+            if (player.isFakePlayer) null
+            else find(cache, player.registryManager, value)?.takeUnless { it.isSatisfiedBy(player) }
 
-        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = itemGroupOf(player.registryManager, stack)?.takeUnless { it.isSatisfiedBy(player) }
+        @JvmStatic fun findLocked(player: PlayerEntity, stack: ItemStack) = if (player.isFakePlayer) null else itemGroupOf(player.registryManager, stack)?.takeUnless { it.isSatisfiedBy(player) }
         @JvmStatic fun findLocked(player: PlayerEntity, state: BlockState) = findLocked(player, BLOCK_CACHE, state.block)
         @JvmStatic fun findLocked(player: PlayerEntity, entity: Entity) = findLocked(player, ENTITY_CACHE, entity.type)
         @JvmStatic fun findLocked(player: PlayerEntity, enchantment: RegistryEntry<Enchantment>) = findLocked(player, ENCHANTMENT_CACHE, enchantment)

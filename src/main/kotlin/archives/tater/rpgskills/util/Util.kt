@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
+import net.fabricmc.fabric.api.entity.FakePlayer
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import com.mojang.serialization.Codec
@@ -23,6 +24,7 @@ import net.minecraft.entity.attribute.AttributeContainer
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.data.TrackedData
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
@@ -37,6 +39,7 @@ import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceReloader
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.text.Texts
@@ -58,6 +61,10 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KProperty
+import kotlin.reflect.full.declaredMemberFunctions
+import kotlin.reflect.full.defaultType
+import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.full.starProjectedType
 import com.mojang.datafixers.util.Pair as DFPair
 
 internal inline fun <T: Any, C> MapCodec<Optional<T>>.forGetter(crossinline getter: (C) -> T?): RecordCodecBuilder<C, Optional<T>> =
@@ -336,3 +343,13 @@ fun AttributeContainer.addPersistentModifiers(modifiersMap: Multimap<RegistryEnt
         }
     }
 }
+
+// neoforge
+private val isFakePlayerMethod by lazy {
+    PlayerEntity::class.memberFunctions
+        .firstOrNull { it.name == "isFakePlayer" }
+        ?.takeIf { it.parameters.size == 1 && it.returnType == Boolean::class.starProjectedType }
+}
+
+val PlayerEntity.isFakePlayer get() = this is FakePlayer || this is ServerPlayerEntity && isFakePlayerMethod?.call(this) == true
+
