@@ -8,6 +8,7 @@
     "keybinding.KeyBindingAccessor",
     "keybinding.KeyBindingEntryMixin",
     "keybinding.KeyBindingMixin",
+    "locking.ClientPlayerInteractionManagerMixin",
     "locking.CraftingScreenMixin",
     "locking.EnchantingPhrasesAccessor",
     "locking.EnchantmentMixin",

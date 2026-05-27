@@ -1,4 +1,4 @@
-package archives.tater.rpgskills.mixin.locking;
+package archives.tater.rpgskills.mixin.client.locking;
 
 import archives.tater.rpgskills.data.LockGroup;
 
@@ -7,8 +7,14 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -21,18 +27,12 @@ import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-
-import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.Nullable;
 
-@Mixin(ServerPlayerInteractionManager.class)
-public class ServerPlayerInteractionManagerMixin {
+@Mixin(ClientPlayerInteractionManager.class)
+public class ClientPlayerInteractionManagerMixin {
     @WrapOperation(
-            method = "interactBlock",
+            method = "interactBlockInternal",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;onUseWithItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/Hand;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ItemActionResult;")
     )
     private ItemActionResult lockBlock(BlockState instance, ItemStack stack, World world, PlayerEntity playerEntity, Hand hand, BlockHitResult blockHitResult, Operation<ItemActionResult> original, @Share("lockGroup") LocalRef<@Nullable Text> preventionMessage) {
@@ -44,7 +44,7 @@ public class ServerPlayerInteractionManagerMixin {
     }
 
     @WrapOperation(
-            method = "interactBlock",
+            method = "interactBlockInternal",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;onUse(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/hit/BlockHitResult;)Lnet/minecraft/util/ActionResult;")
     )
     private ActionResult lockBlock(BlockState instance, World world, PlayerEntity playerEntity, BlockHitResult blockHitResult, Operation<ActionResult> original, @Share("lockGroup") LocalRef<@Nullable Text> preventionMessage) {
@@ -56,10 +56,10 @@ public class ServerPlayerInteractionManagerMixin {
     }
 
     @WrapOperation(
-            method = "interactBlock",
+            method = "interactBlockInternal",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;useOnBlock(Lnet/minecraft/item/ItemUsageContext;)Lnet/minecraft/util/ActionResult;")
     )
-    private ActionResult lockItem(ItemStack instance, ItemUsageContext context, Operation<ActionResult> original, ServerPlayerEntity player, @Share("lockGroup") LocalRef<@Nullable Text> preventionMessage) {
+    private ActionResult lockItem(ItemStack instance, ItemUsageContext context, Operation<ActionResult> original, ClientPlayerEntity player, @Share("lockGroup") LocalRef<@Nullable Text> preventionMessage) {
         var lockGroup = LockGroup.findLocked(player, instance);
         if (lockGroup == null) return original.call(instance, context);
 
@@ -68,10 +68,10 @@ public class ServerPlayerInteractionManagerMixin {
     }
 
     @ModifyReturnValue(
-            method = "interactBlock",
+            method = "interactBlockInternal",
             at = @At("TAIL")
     )
-    private ActionResult showMessage(ActionResult original, ServerPlayerEntity player, @Share("lockGroup") LocalRef<@Nullable Text> preventionMessage) {
+    private ActionResult showMessage(ActionResult original, ClientPlayerEntity player, @Share("lockGroup") LocalRef<@Nullable Text> preventionMessage) {
         if (preventionMessage.get() == null) return original;
 
         player.sendMessage(preventionMessage.get(), true);
