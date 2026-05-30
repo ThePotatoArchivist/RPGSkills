@@ -72,7 +72,7 @@ public class ClientPlayerInteractionManagerMixin {
             at = @At("TAIL")
     )
     private ActionResult showMessage(ActionResult original, ClientPlayerEntity player, @Share("lockGroup") LocalRef<@Nullable Text> preventionMessage) {
-        if (preventionMessage.get() == null) return original;
+        if (original != ActionResult.PASS || preventionMessage.get() == null) return original;
 
         player.sendMessage(preventionMessage.get(), true);
         return ActionResult.FAIL;
