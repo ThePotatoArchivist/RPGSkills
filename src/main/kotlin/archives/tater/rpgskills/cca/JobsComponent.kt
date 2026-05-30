@@ -119,7 +119,7 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
             SkillPointOrbEntity.spawnOrbs(player.serverWorld, player, player.pos, job.rewardPoints)
         } else with (player[SkillsComponent]) {
             if (!isPointsFull) {
-                points += job.rewardPoints
+                addPointsWithEffects(job.rewardPoints)
                 ServerPlayNetworking.send(player, SkillPointIncreasePayload)
             }
         }

@@ -1,12 +1,14 @@
 package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsStats
 import archives.tater.rpgskills.cca.BossTrackerComponent.Companion.bossTracker
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.*
+import archives.tater.rpgskills.util.value
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -53,10 +55,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     var points
         get() = _points
         set(value) {
-            val prevLevel = level
             _points = value
-            if (level > prevLevel)
-                player.playSoundToPlayer(SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
             sync()
         }
 
@@ -81,6 +80,15 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     private fun sync() {
         key.sync(player)
+    }
+
+    fun addPointsWithEffects(amount: Int) {
+        (player as? ServerPlayerEntity)?.increaseStat(RPGSkillsStats.SKILL_POINTS_COLLECTED, amount)
+
+        val prevLevel = level
+        points += amount
+        if (level > prevLevel)
+            player.playSoundToPlayer(SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
     }
 
     operator fun get(skill: RegistryEntry<Skill>) = _skills.getOrDefault(skill, 0)

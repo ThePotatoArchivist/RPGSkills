@@ -170,7 +170,7 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
         if (player !is ServerPlayerEntity || (ownerUuid != null && player != owner) || player.experiencePickUpDelay > 0 || player[SkillsComponent].isPointsFull) return
         player.experiencePickUpDelay = 2
         player.sendPickup(this, 1)
-        player[SkillsComponent].points += amount
+        player[SkillsComponent].addPointsWithEffects(amount)
         ServerPlayNetworking.send(player, SkillPointIncreasePayload)
         discard()
     }

@@ -11,5 +11,8 @@ object RPGSkillsStats {
     @JvmField
     val XP_POINTS_COLLECTED = register("xp_points_collected")
 
+    @JvmField
+    val SKILL_POINTS_COLLECTED = register("skill_points_collected")
+
     fun register() {}
 }
