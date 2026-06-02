@@ -5,11 +5,13 @@ import archives.tater.rpgskills.RPGSkillsAttributes
 import archives.tater.rpgskills.RPGSkillsClient
 import archives.tater.rpgskills.RPGSkillsCommands
 import archives.tater.rpgskills.cca.BossTrackerComponent
-import archives.tater.rpgskills.client.gui.JobCompletedToast
+import archives.tater.rpgskills.client.gui.toast.JobCompletedToast
 import archives.tater.rpgskills.client.gui.screen.ClassScreen
 import archives.tater.rpgskills.client.gui.screen.JobsScreen
 import archives.tater.rpgskills.client.gui.screen.SkillScreen
 import archives.tater.rpgskills.client.gui.screen.SkillsScreen
+import archives.tater.rpgskills.client.gui.toast.JobMenuToast
+import archives.tater.rpgskills.client.gui.toast.SkillMenuToast
 import archives.tater.rpgskills.client.gui.widget.*
 import archives.tater.rpgskills.data.LockGroup
 import archives.tater.rpgskills.item.RPGSkillsItems
@@ -17,6 +19,7 @@ import archives.tater.rpgskills.util.add
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 import net.minecraft.registry.RegistryWrapper
+import jdk.internal.org.jline.utils.Colors.s
 import java.util.concurrent.CompletableFuture
 
 class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFuture<RegistryWrapper.WrapperLookup>) :
@@ -44,9 +47,12 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(RPGSkillsCommands.DESPAWN_MULTIPLE, "Despawned %s entities")
             add(BossTrackerComponent.BOSS_DEFEAT_TITLE, "GREAT ENEMY FELLED")
             add(BossTrackerComponent.BOSS_DEFEAT_MESSAGE, "%s was vanquished!")
+            add(BossTrackerComponent.BOSS_DEFEAT_TEAM_MESSAGE, $$"%2$s was vanquished by %1$s!")
             add(BossTrackerComponent.ENEMIES_STRENGTHEN_MESSAGE, "Enemies became stronger")
             add(BossTrackerComponent.CAP_RAISE_MESSAGE, "Max level is now %s")
+            add(BossTrackerComponent.CAP_RAISE_TEAM_MESSAGE, "Max level for %s is now %s")
             add(BossTrackerComponent.CAP_REMOVED_MESSAGE, "There is no longer a level limit")
+            add(BossTrackerComponent.CAP_REMOVED_TEAM_MESSAGE, "There is no longer a level limit for %s")
             add(SkillsScreen.TITLE, "Skills")
             add(SkillsScreen.LEVEL, "Level %s")
             add(SkillsScreen.PROGRESS, "%s/%s Skill Points")
@@ -74,7 +80,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(LockGroupWidget.WidgetTexts.CAN_ENCHANT.additional, "Can enchant with: %s")
             add(LockGroupWidget.WidgetTexts.CAN_CRAFT.normal, "Can now craft")
             add(LockGroupWidget.WidgetTexts.CAN_CRAFT.additional, "Can craft with: %s")
-            add(LockGroupWidget.WidgetTexts.OR, " or ")
+            add(LockGroupWidget.WidgetTexts.AND, " and ")
             add(AttributesWidget.TITLE, "Attributes")
             add(JobUnlockWidget.TITLE, "Unlocks Job: %s")
             add(AvailableJobWidget.TOOLTIP_HINT, "Click to assign")
@@ -82,6 +88,8 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(AbstractJobWidget.TASK_COUNT, "%sx")
             add(AbstractJobWidget.TASK, "%s %s")
             add(JobCompletedToast.TITLE, "Job Complete!")
+            add(SkillMenuToast.TITLE, "Press [%s] to spend your level on a skill")
+            add(JobMenuToast.TITLE, "Press [%s] to see your jobs")
             add(LockGroup.DEFAULT_ITEM_NAME, "Unknown Item")
             add(LockGroup.DEFAULT_ITEM_MESSAGE, "You don't know how to use this item")
             add(LockGroup.DEFAULT_BLOCK_MESSAGE, "You don't know how to use this block")
@@ -94,7 +102,7 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(RequirementTooltip.USE_REQUIRES, "To use requires:")
             add(RequirementTooltip.PLACE_REQUIRES, "To place requires:")
             add(RequirementTooltip.CRAFT_REQUIRES, "To craft requires:")
-            add(RequirementTooltip.OR, " or")
+            add(RequirementTooltip.OR, " or ")
             add(SkillUpgradeButton.MAX, "MAX")
             add(RPGSkillsClient.RPG_SKILLS_CATEGORY, "RPG Skills")
             add(RPGSkillsClient.SKILLS_KEY_TRANSLATION, "Open Skills")
@@ -102,7 +110,8 @@ class LangGenerator(dataOutput: FabricDataOutput, registryLookup: CompletableFut
             add(RPGSkillsClient.REQUIREMENTS_KEY_TRANSLATION, "Show Item Requirements")
             add(RPGSkillsAttributes.BOW_DRAW_TIME, "Bow Draw Time")
             add(RPGSkillsAttributes.PROJECTILE_DIVERGENCE, "Projectile Divergence")
-            add(RPGSkillsItems.RESPEC_ITEM, "Respec Item")
+            add(RPGSkillsItems.REBIRTH_ELIXIR, "Elixir of Rebirth")
+            add(RPGSkillsItems.SKILL_NUGGET, "Skill Nugget")
         }
     }
 }

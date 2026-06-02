@@ -1,19 +1,27 @@
 package archives.tater.rpgskills.datagen.testpack
 
 import archives.tater.rpgskills.data.LockGroup
+import archives.tater.rpgskills.data.LockGroup.ComponentValues
 import archives.tater.rpgskills.data.LockGroup.LockList
 import archives.tater.rpgskills.data.LockGroupProvider
 import archives.tater.rpgskills.data.RegistryIngredient
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.block.Blocks
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.ItemEnchantmentsComponent
+import net.minecraft.component.type.PotionContentsComponent
 import net.minecraft.enchantment.Enchantments
 import net.minecraft.entity.EntityType
+import net.minecraft.item.Instruments
 import net.minecraft.item.Items
+import net.minecraft.potion.Potions
+import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.registry.tag.ItemTags
 import net.minecraft.util.Identifier
+import io.wispforest.accessories.api.caching.DataComponentsPredicate
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 
@@ -23,9 +31,9 @@ class TestSkillsLockGenerator(
 ) : LockGroupProvider(dataOutput, registriesFuture) {
     override fun configure(provider: BiConsumer<Identifier, LockGroup>, registries: RegistryWrapper.WrapperLookup) {
         provider.accept(testPackId("potato1"), LockGroup(
-            requirements = mapOf(
+            requirements = listOf(mapOf(
                 TestSkillGenerator.POTATO_SKILL.entry to 1
-            ),
+            )),
             items = LockList(
                 RegistryIngredient.ofItems {
                     +Items.POTATO
@@ -48,9 +56,10 @@ class TestSkillsLockGenerator(
             ),
         ))
         provider.accept(testPackId("potato2"), LockGroup(
-            requirements = mapOf(
-                TestSkillGenerator.POTATO_SKILL.entry to 2,
-                TestSkillGenerator.COW_SKILL.entry to 2,
+            requirements = listOf(
+                mapOf(TestSkillGenerator.POTATO_SKILL.entry to 2),
+                mapOf(TestSkillGenerator.COW_SKILL.entry to 2),
+                mapOf(TestSkillGenerator.GRASS_SKILL.entry to 2),
             ),
             items = LockList(
                 RegistryIngredient.ofItems {
@@ -118,11 +127,19 @@ class TestSkillsLockGenerator(
                 },
                 "You don't know how to assemble this button",
             ),
+            itemComponents = mapOf(
+                Items.GOAT_HORN to ComponentValues(DataComponentTypes.INSTRUMENT, setOf(
+                    registries.getWrapperOrThrow(RegistryKeys.INSTRUMENT).getOrThrow(Instruments.ADMIRE_GOAT_HORN)
+                )),
+                Items.POTION to ComponentValues(DataComponentTypes.POTION_CONTENTS, setOf(
+                    PotionContentsComponent(Potions.TURTLE_MASTER)
+                ), 1)
+            )
         ))
         provider.accept(testPackId("potato4"), LockGroup(
-            requirements = mapOf(
+            requirements = listOf(mapOf(
                 TestSkillGenerator.POTATO_SKILL.entry to 2,
-            ),
+            )),
             items = LockList(
                 RegistryIngredient.ofItems {
                     +Items.BARRIER

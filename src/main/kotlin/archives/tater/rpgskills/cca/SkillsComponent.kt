@@ -1,11 +1,14 @@
 package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
+import archives.tater.rpgskills.RPGSkillsStats
+import archives.tater.rpgskills.cca.BossTrackerComponent.Companion.bossTracker
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.*
+import archives.tater.rpgskills.util.value
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -20,6 +23,7 @@ import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Identifier
+import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
@@ -51,10 +55,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     var points
         get() = _points
         set(value) {
-            val prevLevel = level
             _points = value
-            if (level > prevLevel)
-                player.playSoundToPlayer(SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
             sync()
         }
 
@@ -73,12 +74,34 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
 
     val isPointsFull get() = level >= maxLevel
 
-    private val maxLevel get() = player.world[BossTrackerComponent].maxLevel.coerceAtMost(MAX_LEVEL)
+    private val maxLevel get() = player.bossTracker.maxLevel.coerceAtMost(MAX_LEVEL)
 
     private var modifiers: Map<RegistryEntry<EntityAttribute>, List<Identifier>> = mapOf()
 
     private fun sync() {
         key.sync(player)
+    }
+
+    fun addPointsWithEffects(amount: Int) {
+        val maxPoints = LEVEL_REQUIREMENTS[maxLevel]
+
+        val skillAmount = amount.coerceAtMost(maxPoints - points)
+        val remainder = amount - skillAmount
+
+        if (remainder > 0)
+            player.addExperience(remainder)
+
+        if (skillAmount <= 0) return
+
+        if (player is ServerPlayerEntity) {
+            player.increaseStat(RPGSkillsStats.SKILL_POINTS_COLLECTED, skillAmount)
+            ServerPlayNetworking.send(player, SkillPointIncreasePayload)
+        }
+
+        val prevLevel = level
+        points += skillAmount
+        if (level > prevLevel)
+            player.playSoundToPlayer(SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
     }
 
     operator fun get(skill: RegistryEntry<Skill>) = _skills.getOrDefault(skill, 0)
@@ -162,7 +185,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         CODEC.encode(this, tag, registryLookup).logIfError()
     }
 
-    companion object : ComponentKeyHolder<SkillsComponent, PlayerEntity> {
+    companion object : ComponentKeyHolder<SkillsComponent> {
 
         val CODEC = recordMutationCodec(
             RegistryFixedCodec.of(SkillClass.key).optionalFieldOf("class").forAccess(SkillsComponent::_skillClass),

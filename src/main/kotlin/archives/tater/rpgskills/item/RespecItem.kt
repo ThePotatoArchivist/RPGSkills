@@ -29,7 +29,7 @@ class RespecItem(settings: Settings) : Item(settings) {
             user[SkillsComponent].resetSkillsToClass()
             world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, user.x, user.getBodyY(0.5), user.z, 16, user.width.toDouble() / 2, user.height.toDouble() / 2, user.width.toDouble() / 2, 0.0)
         }
-        user.playSound(SoundEvents.ENTITY_PLAYER_LEVELUP)
+        user.playSound(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f)
         stack.decrement(1)
         return stack
     }

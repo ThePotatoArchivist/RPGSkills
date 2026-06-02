@@ -26,11 +26,14 @@ object RPGSkillsTags {
     val EARLY_BOSS = ofEntity("bosses/early")
     val MID_BOSS = ofEntity("bosses/mid")
     val FINAL_BOSS = ofEntity("bosses/final")
-    val DLC_BOSS = ofEntity("bosses/dlc")
+
+    val BOSS = ofEntity("boss")
 
     val INCREASES_LEVEL_CAP = ofEntity("increases_level_cap")
     val IGNORES_SKILL_SOURCE = ofEntity("ignores_skill_source")
-    val BOSS_ATTRIBUTE_AFFECTED = ofEntity("boss_attribute_affected")
+    val REPEATED_DEFEAT_IGNORES_CUSTOM_SKILL_DROP = ofEntity("repeated_defeat_ignores_custom_skill_drop")
+    @JvmField val BOSS_ATTRIBUTE_AFFECTED = ofEntity("boss_attribute_affected")
+    val PROXIMITY_DEFEAT = ofEntity("proximity_defeat")
 
     val MID_STRUCTURES = ofStructure("skill/mid")
     val HARD_STRUCTURES = ofStructure("skill/hard")

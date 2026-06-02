@@ -24,9 +24,9 @@ interface MutationCodec<A> : Encoder<A> {
 
         override fun <T> decode(ops: DynamicOps<T>, input: T): DataResult<Pair<A, T>> {
             return createDefault().apply {
-                var error: DataResult.Error<*>? = null
-                this@MutationCodec.update(this, ops, input).ifError { error = it }
-                error?.let { return DataResult.error(it.messageSupplier, Pair(this, input), it.lifecycle) }
+                (update(this, ops, input) as? DataResult.Error)?.let {
+                    return DataResult.error(it.messageSupplier, Pair(this, input), it.lifecycle)
+                }
             }.let {
                 DataResult.success(Pair(it, input))
             }

@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
+import net.fabricmc.fabric.api.entity.FakePlayer
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import com.mojang.serialization.Codec
@@ -24,6 +25,7 @@ import net.minecraft.entity.attribute.AttributeContainer
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.data.TrackedData
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
@@ -38,6 +40,7 @@ import net.minecraft.registry.entry.RegistryEntryList
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.resource.ResourceManager
 import net.minecraft.resource.ResourceReloader
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.text.Texts
@@ -47,6 +50,7 @@ import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import org.joml.Vector2i
 import org.ladysnake.cca.api.v3.component.Component
+import org.ladysnake.cca.api.v3.component.ComponentAccess
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.slf4j.Logger
 import java.util.*
@@ -58,6 +62,10 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KProperty
+import kotlin.reflect.full.declaredMemberFunctions
+import kotlin.reflect.full.defaultType
+import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.full.starProjectedType
 import com.mojang.datafixers.util.Pair as DFPair
 
 internal inline fun <T: Any, C> MapCodec<Optional<T>>.forGetter(crossinline getter: (C) -> T?): RecordCodecBuilder<C, Optional<T>> =
@@ -119,14 +127,14 @@ operator fun <T> AttachmentTarget.get(attachmentType: AttachmentType<T>): T = ge
 @Suppress("UnstableApiUsage")
 operator fun <T> AttachmentTarget.get(holder: AttachmentTypeHolder<T>): T = this[holder.attachmentType]
 
-interface ComponentKeyHolder<C : Component, in T> {
+interface ComponentKeyHolder<C : Component> {
     val key: ComponentKey<C>
 }
 
-operator fun <C : Component, T : Any> T.get(keyHolder: ComponentKeyHolder<C, T>): C = keyHolder.key.get(this)
+operator fun <C : Component> ComponentAccess.get(keyHolder: ComponentKeyHolder<C>): C = getComponent(keyHolder.key)
 
 operator fun <C: Component> ComponentKey<C>.getValue(thisRef: Any, property: KProperty<*>): C = get(thisRef)
-operator fun <C: Component> ComponentKeyHolder<C, *>.provideDelegate(thisRef: Any, property: KProperty<*>) = key
+operator fun <C: Component> ComponentKeyHolder<C>.provideDelegate(thisRef: Any, property: KProperty<*>) = key
 
 operator fun <T> DFPair<T, *>.component1(): T = first
 operator fun <T> DFPair<*, T>.component2(): T = second
@@ -188,6 +196,7 @@ fun <T> FabricTagProvider<T>.FabricTagBuilder.addOptional(vararg ids: Identifier
 fun RegistryWrapper<*>.isEmpty() = streamEntries().findAny().isEmpty
 
 fun intRangeCodec(min: Int = Int.MIN_VALUE, max: Int = Int.MAX_VALUE): Codec<Int> = Codec.intRange(min, max)
+fun floatRangeCodec(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE): Codec<Float> = Codec.floatRange(min, max)
 
 fun itemCriterionConditions(player: LootContextPredicate? = null, location: LootContextPredicate? = null) =
     ItemCriterion.Conditions(Optional.ofNullable(player), Optional.ofNullable(location))
@@ -337,3 +346,12 @@ fun AttributeContainer.addPersistentModifiers(modifiersMap: Multimap<RegistryEnt
 }
 
 inline val HasReloadableRegistries.reloadableRegistries: DynamicRegistryManager get() = relreg_reloadableRegistries()
+
+// neoforge
+private val isFakePlayerMethod by lazy {
+    PlayerEntity::class.memberFunctions
+        .firstOrNull { it.name == "isFakePlayer" }
+        ?.takeIf { it.parameters.size == 1 && it.returnType == Boolean::class.starProjectedType }
+}
+
+val PlayerEntity.isFakePlayer get() = this is FakePlayer || this is ServerPlayerEntity && isFakePlayerMethod?.call(this) == true

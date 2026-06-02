@@ -17,7 +17,9 @@
     ],
     "message": "You don't know how to cook this potato"
   },
-  "requirements": {
-    "rpg_test:potato": 1
-  }
+  "requirements": [
+    {
+      "rpg_test:potato": 1
+    }
+  ]
 }

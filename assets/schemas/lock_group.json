@@ -43,15 +43,6 @@
           "$ref": "#/definitions/RegistryEntryList"
         }
       ]
-    },
-    "Requirement": {
-      "type": "object",
-      "additionalProperties": false,
-      "patternProperties": {
-        "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {
-          "type": "integer"
-        }
-      }
     }
   },
   "type": "object",
@@ -72,18 +63,43 @@
     "recipes": {
       "$ref": "#/definitions/LockList"
     },
-    "requirements": {
-      "anyOf": [
-        {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Requirement"
-          }
-        },
-        {
-          "$ref": "#/definitions/Requirement"
+    "item_components": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "$ref": "#/definitions/Identifier"
+            },
+            "values": {
+              "type": "array",
+              "minItems": 1
+            },
+            "tooltip_index": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "type",
+            "values"
+          ]
         }
-      ]
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "patternProperties": {
+          "^[a-z0-9_.-]+:[a-z0-9/._-]+$": {
+            "type": "integer"
+          }
+        }
+      }
     }
   },
   "required": [

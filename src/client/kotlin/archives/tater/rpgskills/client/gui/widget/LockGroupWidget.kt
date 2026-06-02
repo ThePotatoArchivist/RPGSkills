@@ -17,36 +17,39 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder
 import net.minecraft.client.gui.widget.ClickableWidget
+import net.minecraft.command.argument.EntityArgumentType.player
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.item.Items.ENCHANTED_BOOK
+import net.minecraft.item.tooltip.TooltipAppender
+import net.minecraft.item.tooltip.TooltipType
+import net.minecraft.registry.DynamicRegistryManager
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import net.minecraft.world.GameMode.getOrNull
 import dev.emi.emi.api.EmiApi
 import dev.emi.emi.api.stack.EmiIngredient
 import dev.emi.emi.api.stack.EmiStack
+import javax.tools.Tool
 
 class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: RegistryEntry<Skill>, level: Int, player: PlayerEntity) :
     ClickableWidget(x, y, width, 0, Text.empty()) {
 
-    private val additionalRequirements = lockGroup.requirementsContaining(skill, level)
-        .mapIndexedNotNull { index, requirement ->
-            requirement.entries
-                .filter { it.key != skill }
-                .takeUnless { it.isEmpty() }
-                ?.let {
-                    RequirementTooltip.getRequirement(it, player, tooltip = false).apply {
-                        withColor(getColor(index))
-                    }
-                }
+    private val additionalRequirements = lockGroup.requirements
+        .filter { requirement -> requirement[skill] != level }
+        .mapIndexed { index, requirement ->
+            RequirementTooltip.getRequirement(requirement.entries, player, tooltip = false).apply {
+                withColor(getColor(index))
+            }
         }
         .takeUnless { it.isEmpty() }
-        ?.joinToText(WidgetTexts.OR.text)
+        ?.joinToText(WidgetTexts.AND.text)
 
     private val requireTooltip = buildList {
         RequirementTooltip.appendRequirements(lockGroup, player, this)
@@ -62,6 +65,16 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
                 addAll(lockGroup.items.toDisplayedSlot({ it.name }) { if (LockGroup.isUsedItem(it)) it.defaultStack else null })
                 addAll(lockGroup.blocks.toDisplayedSlot({ it.name }) { itemOf(it) })
                 addAll(lockGroup.entities.toDisplayedSlot({ it.name }) { itemOf(it) })
+
+                for ((item, componentValues) in lockGroup.itemComponents.entries)
+                    for (value in componentValues.values)
+                        LockGroup.Manager.ItemComponentCache[player.registryManager][item]?.entries?.get(value)?.sample?.let { stack ->
+                            add(DisplayedSlot(
+                                getComponentTooltip(value, stack, componentValues, player),
+                                listOf(stack),
+                                null
+                            ))
+                        }
             }
         ),
         Section(
@@ -82,6 +95,30 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
             lockGroup.recipes.toDisplayedSlot({ it.name }) { it.defaultStack }
         ),
     )
+
+    private fun getComponentTooltip(
+        value: Any,
+        stack: ItemStack,
+        componentValues: LockGroup.ComponentValues<*>,
+        player: PlayerEntity,
+    ): Text = run {
+        val context = Item.TooltipContext.create(player.registryManager)
+        when (value) {
+            is TooltipAppender -> mutableListOf<Text>().apply {
+                value.appendTooltip(context, ::add, TooltipType.BASIC)
+            }
+            else -> stack.getTooltip(context, player, TooltipType.BASIC)
+        }
+    }.run {
+        getOrNull(when {
+            componentValues.tooltipIndex < 0 -> size + componentValues.tooltipIndex
+            value is TooltipAppender -> componentValues.tooltipIndex
+            else -> componentValues.tooltipIndex + 1
+        })
+    }
+        ?.copy()
+        ?.formatted(stack.rarity.formatting)
+        ?: stack.name
 
     private var hoveredSlot: DisplayedSlot? = null
 
@@ -142,7 +179,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
     override fun appendClickableNarrations(builder: NarrationMessageBuilder?) {}
 
     @JvmRecord
-    private data class DisplayedSlot(val text: Text, val stacks: List<ItemStack>, val entry: RegistryIngredient.Entry<*>)
+    private data class DisplayedSlot(val text: Text, val stacks: List<ItemStack>, val entry: RegistryIngredient.Entry<*>?)
     @JvmRecord
     private data class Section(val title: Text, val slotTexture: Identifier, val slots: List<DisplayedSlot>)
 
@@ -204,7 +241,7 @@ class LockGroupWidget(x: Int, y: Int, width: Int, lockGroup: LockGroup, skill: R
         val CAN_PLACE = of("can_place")
         val CAN_ENCHANT = of("can_enchant")
         val CAN_CRAFT = of("can_craft")
-        val OR = unit("or")
+        val AND = unit("and")
 
         data class SectionTitle(val normal: UnitTranslation, val additional: ArgTranslation) {
             fun getText(additional: Text?) =

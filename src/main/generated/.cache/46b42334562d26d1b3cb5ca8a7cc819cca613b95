@@ -1,2 +1,8 @@
+<<<<<<< HEAD
 // 1.21.1	2026-01-22T00:57:59.008332407	rpgskills:test_pack/Tags for minecraft:entity_type
 02b6a7799286f073bd43ecf20b3eab2e16d73deb resourcepacks/test_pack/data/rpgskills/tags/entity_type/increases_level_cap.json
+=======
+// 1.21.1	2026-05-10T02:12:44.212327435	rpgskills:test_pack/Tags for minecraft:entity_type
+02b6a7799286f073bd43ecf20b3eab2e16d73deb resourcepacks/test_pack/data/rpgskills/tags/entity_type/boss.json
+e00f2931577049b9a4400a87ed9c249373be376c resourcepacks/test_pack/data/rpgskills/tags/entity_type/proximity_defeat.json
+>>>>>>> main

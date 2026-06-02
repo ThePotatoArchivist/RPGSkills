@@ -100,7 +100,7 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
         if (age % EXPENSIVE_UPDATE_INTERVAL == 1)
             nearOwner = owner?.let { it.squaredDistanceTo(this) <= 64.0 } ?: false
 
-        if (owner?.let { it.isSpectator || it.isDead || it[SkillsComponent].isPointsFull } == true)
+        if (owner?.isPartOfGame == false)
             nearOwner = false
 
         if (nearOwner) owner?.let { owner ->
@@ -167,11 +167,10 @@ class SkillPointOrbEntity(type: EntityType<out SkillPointOrbEntity>, world: Worl
     override fun getSoundCategory(): SoundCategory = SoundCategory.AMBIENT
 
     override fun onPlayerCollision(player: PlayerEntity?) {
-        if (player !is ServerPlayerEntity || (ownerUuid != null && player != owner) || player.experiencePickUpDelay > 0 || player[SkillsComponent].isPointsFull) return
+        if (player !is ServerPlayerEntity || (ownerUuid != null && player != owner) || player.experiencePickUpDelay > 0) return
         player.experiencePickUpDelay = 2
         player.sendPickup(this, 1)
-        player[SkillsComponent].points += amount
-        ServerPlayNetworking.send(player, SkillPointIncreasePayload)
+        player[SkillsComponent].addPointsWithEffects(amount)
         discard()
     }
 

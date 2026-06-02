@@ -4,6 +4,7 @@ import archives.tater.rpgskills.data.AnonymousAttributeModifier
 import archives.tater.rpgskills.util.CodecConfig
 import archives.tater.rpgskills.util.MutationCodec
 import archives.tater.rpgskills.util.ceilDiv
+import archives.tater.rpgskills.util.floatRangeCodec
 import archives.tater.rpgskills.util.forAccess
 import archives.tater.rpgskills.util.intRangeCodec
 import archives.tater.rpgskills.util.isIn
@@ -13,19 +14,24 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.advancement.AdvancementRewards
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.ai.TargetPredicate
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation
 import net.minecraft.entity.attribute.EntityAttributes
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.Box
 import net.minecraft.util.math.intprovider.IntProvider
 import net.minecraft.util.math.intprovider.UniformIntProvider
 import net.minecraft.world.gen.structure.Structure
+import java.util.Optional
 
 class RPGSkillsConfig {
     var chunkSkillPoints: Int = 7
@@ -46,7 +52,6 @@ class RPGSkillsConfig {
         RPGSkillsTags.EARLY_BOSS to 500,
         RPGSkillsTags.MID_BOSS to 800,
         RPGSkillsTags.FINAL_BOSS to 4000,
-        RPGSkillsTags.DLC_BOSS to 8000, // TODO tweak value
     )
         private set
     var maxDefaultEntitySkillPoints: Int = 100
@@ -65,49 +70,41 @@ class RPGSkillsConfig {
         private set
     var levelCapIncreasePerBoss: Int = 10
         private set
+    var capRemoveBossCount: Int = -1
+        private set
+    var proximityDefeatRange: Int = 100
+        private set
+    var attributeIncreasesIncludeUnteamed = true
+        private set
     var attributeIncreasesRaw: Map<RegistryKey<EntityAttribute>, AnonymousAttributeModifier> = mapOf(
         EntityAttributes.GENERIC_ATTACK_DAMAGE to AnonymousAttributeModifier(1.0),
         EntityAttributes.GENERIC_MAX_HEALTH to AnonymousAttributeModifier(0.15, Operation.ADD_MULTIPLIED_BASE),
     ).mapKeys { (id, _) -> id.key.orElseThrow() }
         private set
-
-    var bossAttributeIncreasesRaw: List<Map<RegistryKey<EntityAttribute>, AnonymousAttributeModifier>> = listOf(
-        Triple(-45, -50, -75),
-        Triple(-25, -30, -72),
-        Triple(-10, -15, -65),
-        Triple(0, 0, -55),
-        Triple(5, 8, -35),
-        Triple(10, 15, -18),
-        Triple(15, 20, 0),
-        Triple(20, 25, 8),
-        Triple(25, 30, 15),
-        Triple(30, 35, 22),
-        Triple(35, 40, 30),
-    ).map { (health, armor, damage) -> mapOf(
-        EntityAttributes.GENERIC_MAX_HEALTH.key.orElseThrow() to AnonymousAttributeModifier(health / 100.0, Operation.ADD_MULTIPLIED_BASE),
-        EntityAttributes.GENERIC_ARMOR.key.orElseThrow() to AnonymousAttributeModifier(armor / 100.0, Operation.ADD_MULTIPLIED_BASE),
-        EntityAttributes.GENERIC_ATTACK_DAMAGE.key.orElseThrow() to AnonymousAttributeModifier(damage / 100.0, Operation.ADD_MULTIPLIED_BASE),
-    ) }
+    var maxBossAssist: Int = 8
+    var damageDealtMultiplierPerBossAssist: Float = 0.25f
+        private set
+    var damageTakenDivisorPerBossAssist: Float = 0.25f
         private set
 
     val attributeIncreases: Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier> by lazy {
         attributeIncreasesRaw.mapKeys { (key, _) -> Registries.ATTRIBUTE.getEntry(key).orElseThrow() }
     }
 
-    val bossAttributeIncreases: List<Map<RegistryEntry<EntityAttribute>, AnonymousAttributeModifier>> by lazy {
-        bossAttributeIncreasesRaw.map { it.mapKeys { (key, _) -> Registries.ATTRIBUTE.getEntry(key).orElseThrow() } }
-    }
-
     fun getStructurePoints(structure: RegistryEntry<Structure>) =
         structureSkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { structure isIn tag } } ?: defaultStructureSkillPoints
 
-    fun getEntityPoints(entity: LivingEntity, firstDefeat: Boolean) =
-        (if (firstDefeat) entitySkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { entity isIn tag } } else null)
+    fun getEntityPoints(entity: LivingEntity, ignoreCustom: Boolean) =
+        (if (!ignoreCustom) entitySkillPoints.firstNotNullOfOrNull { (tag, points) -> points.takeIf { entity isIn tag } } else null)
             ?: (entity.getXpToDrop(entity.world as ServerWorld, null) ceilDiv defaultEntitySkillPointDivisor).coerceAtMost(maxDefaultEntitySkillPoints)
 
     fun getBlockPoints(experiencePoints: Int) = experiencePoints ceilDiv blockSkillPointDivisor
 
     fun getAdvancementPoints(rewards: AdvancementRewards) = rewards.experience ceilDiv advancementSkillPointDivisor
+
+    fun getPlayersInProximity(entity: LivingEntity): List<ServerPlayerEntity> =
+        entity.world.getPlayers(TargetPredicate.DEFAULT, entity, Box.of(entity.pos, 2.0 * proximityDefeatRange, 2.0 * proximityDefeatRange, 2.0 * proximityDefeatRange))
+            .map { it as ServerPlayerEntity }
 
     companion object : CodecConfig<RPGSkillsConfig>(RPGSkills.MOD_ID, RPGSkills.logger) {
         override val codec: MutationCodec<RPGSkillsConfig> = recordMutationCodec(
@@ -124,8 +121,13 @@ class RPGSkillsConfig {
             IntProvider.POSITIVE_CODEC.fieldOf("skill_points_from_breeding").forAccess(RPGSkillsConfig::breedingSkillPoints),
             intRangeCodec(min = 0).fieldOf("level_cap_base").forAccess(RPGSkillsConfig::baseLevelCap),
             intRangeCodec(min = 0).fieldOf("level_cap_increase_per_boss").forAccess(RPGSkillsConfig::levelCapIncreasePerBoss),
+            intRangeCodec(min = -1).fieldOf("level_cap_remove_boss_count").forAccess(RPGSkillsConfig::capRemoveBossCount),
+            intRangeCodec(min = 0).fieldOf("proximity_defeat_range").forAccess(RPGSkillsConfig::proximityDefeatRange),
             Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec()).fieldOf("attribute_increase_per_boss").forAccess(RPGSkillsConfig::attributeIncreasesRaw),
-            Codec.unboundedMap(RegistryKey.createCodec(RegistryKeys.ATTRIBUTE), AnonymousAttributeModifier.shortCodec(Operation.ADD_MULTIPLIED_BASE)).listOf().fieldOf("attribute_increases_boss").forAccess(RPGSkillsConfig::bossAttributeIncreasesRaw),
+            Codec.BOOL.fieldOf("attribute_increase_include_unteamed").forAccess(RPGSkillsConfig::attributeIncreasesIncludeUnteamed),
+            intRangeCodec(min = 0).fieldOf("boss_assist_max").forAccess(RPGSkillsConfig::maxBossAssist),
+            floatRangeCodec(min = 0f).fieldOf("boss_assist_dealt_multiplier").forAccess(RPGSkillsConfig::damageDealtMultiplierPerBossAssist),
+            floatRangeCodec(min = 0f).fieldOf("boss_assist_taken_divisor").forAccess(RPGSkillsConfig::damageTakenDivisorPerBossAssist),
         )
 
         override fun getDefault() = RPGSkillsConfig()

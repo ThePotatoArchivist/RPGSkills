@@ -45,17 +45,14 @@ class SkillSourceComponent(private val initialPoints: Int, private val markDirty
         }
     }
 
-    companion object {
+    companion object : ComponentKeyHolder<SkillSourceComponent> {
         val CODEC = recordMutationCodec(
             Codec.unboundedMap(Uuids.STRING_CODEC, Codec.INT).mutate().fieldFor("remaining_points", SkillSourceComponent::remainingSkillPoints)
         )
 
         fun createCodec(initialPoints: Int = 0) = CODEC.codec { SkillSourceComponent(initialPoints) }
 
-        val KEY: ComponentKey<SkillSourceComponent> =
+        override val key: ComponentKey<SkillSourceComponent> =
             ComponentRegistry.getOrCreate(RPGSkills.id("skill_source"), SkillSourceComponent::class.java)
     }
 }
-
-val MobSpawnerBlockEntity.skillSource by SkillSourceComponent.KEY
-val Chunk.skillSource by SkillSourceComponent.KEY

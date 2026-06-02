@@ -117,12 +117,8 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         val job = instance.job.value
         if (job.spawnAsOrbs) {
             SkillPointOrbEntity.spawnOrbs(player.serverWorld, player, player.pos, job.rewardPoints)
-        } else with (player[SkillsComponent]) {
-            if (!isPointsFull) {
-                points += job.rewardPoints
-                ServerPlayNetworking.send(player, SkillPointIncreasePayload)
-            }
-        }
+        } else
+            player[SkillsComponent].addPointsWithEffects(job.rewardPoints)
         instance.resetTasks()
         _cooldowns[instance.job] = job.cooldownTicks
         ServerPlayNetworking.send(player, JobCompletedPayload(instance.job))
@@ -203,16 +199,16 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         }
     }
 
-    companion object : ComponentKeyHolder<JobsComponent, PlayerEntity> {
+    companion object : ComponentKeyHolder<JobsComponent> {
         val CODEC = recordMutationCodec(
             JobInstance.CODEC.mutateCollection().fieldFor("active_jobs", JobsComponent::_active),
             Codec.unboundedMap(RegistryFixedCodec.of(Job.key), intRangeCodec(min = 1)).mutate().fieldFor("cooldowns", JobsComponent::_cooldowns),
         )
 
-        @JvmField
-        val KEY: ComponentKey<JobsComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("jobs"), JobsComponent::class.java)
+        override val key: ComponentKey<JobsComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("jobs"), JobsComponent::class.java)
 
-        override val key get() = KEY
+        @JvmField
+        val KEY = key
 
         const val JOB_SYNC_FREQUENCY = 20 * 60 // 1 minute
         const val JOB_SCREEN_SYNC_FREQUENCY = 20 * 2 // 2 seconds
