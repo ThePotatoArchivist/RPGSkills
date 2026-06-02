@@ -83,10 +83,23 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
     }
 
     fun addPointsWithEffects(amount: Int) {
-        (player as? ServerPlayerEntity)?.increaseStat(RPGSkillsStats.SKILL_POINTS_COLLECTED, amount)
+        val maxPoints = LEVEL_REQUIREMENTS[maxLevel]
+
+        val skillAmount = amount.coerceAtMost(maxPoints - points)
+        val remainder = amount - skillAmount
+
+        if (remainder > 0)
+            player.addExperience(remainder)
+
+        if (skillAmount <= 0) return
+
+        if (player is ServerPlayerEntity) {
+            player.increaseStat(RPGSkillsStats.SKILL_POINTS_COLLECTED, skillAmount)
+            ServerPlayNetworking.send(player, SkillPointIncreasePayload)
+        }
 
         val prevLevel = level
-        points += amount
+        points += skillAmount
         if (level > prevLevel)
             player.playSoundToPlayer(SoundEvents.ENTITY_PLAYER_LEVELUP, player.soundCategory, 1f, 1f)
     }

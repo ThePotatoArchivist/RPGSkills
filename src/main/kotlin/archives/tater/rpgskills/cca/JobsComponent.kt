@@ -117,12 +117,8 @@ class JobsComponent(private val player: PlayerEntity) : RespawnableComponent<Job
         val job = instance.job.value
         if (job.spawnAsOrbs) {
             SkillPointOrbEntity.spawnOrbs(player.serverWorld, player, player.pos, job.rewardPoints)
-        } else with (player[SkillsComponent]) {
-            if (!isPointsFull) {
-                addPointsWithEffects(job.rewardPoints)
-                ServerPlayNetworking.send(player, SkillPointIncreasePayload)
-            }
-        }
+        } else
+            player[SkillsComponent].addPointsWithEffects(job.rewardPoints)
         instance.resetTasks()
         _cooldowns[instance.job] = job.cooldownTicks
         ServerPlayNetworking.send(player, JobCompletedPayload(instance.job))
