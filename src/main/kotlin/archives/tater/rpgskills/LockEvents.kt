@@ -29,8 +29,10 @@ internal fun registerLockEvents() {
         TypedActionResult(failIfLocked(player, LockGroup::itemMessage) { LockGroup.findLocked(player, stack) }, stack)
     }
 
-    UseEntityCallback.EVENT.register { player, _, _, entity, _ ->
+    UseEntityCallback.EVENT.register { player, _, hand, entity, _ ->
         failIfLocked(player, LockGroup::entityMessage) { LockGroup.findLocked(player, entity) }
+            .takeUnless { it == ActionResult.PASS }
+            ?: failIfLocked(player, LockGroup::itemMessage) { LockGroup.findLocked(player, player.getStackInHand(hand)) }
     }
 
 //    UseBlockCallback.EVENT.register { player, world, hand, hit ->
