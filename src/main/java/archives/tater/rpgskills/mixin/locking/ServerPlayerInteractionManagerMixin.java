@@ -30,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.Nullable;
 
-@Debug(export = true)
 @Mixin(ServerPlayerInteractionManager.class)
 public class ServerPlayerInteractionManagerMixin {
     @WrapOperation(
