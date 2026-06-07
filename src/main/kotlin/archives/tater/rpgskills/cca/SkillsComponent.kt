@@ -212,7 +212,8 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         fun getPointsForNextLevel(currentLevel: Int) = when {
             currentLevel < 16 -> 2 * currentLevel + 7
             currentLevel < 31 -> 5 * currentLevel - 28
-            else -> 9 * currentLevel - 158
+            currentLevel < 40 -> 9 * currentLevel - 158
+            else -> 200
         }
 
         fun getLevelForPoints(points: Int): Int =
