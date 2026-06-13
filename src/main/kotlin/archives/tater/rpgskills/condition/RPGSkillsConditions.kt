@@ -13,6 +13,7 @@ object RPGSkillsConditions {
 
     val IS_MONSTER = register("is_monster", IsMonsterLootCondition.CODEC)
     val MAX_AGE = register("block_max_age", MaxAgeLootCondition.CODEC)
+    val SUITABLE_TOOL = register("tool_suitable_for_block", SuitableToolLootCondition.CODEC)
 
     fun register() {
 

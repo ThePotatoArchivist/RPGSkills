@@ -7,7 +7,7 @@ import net.minecraft.loot.context.LootContext
 import net.minecraft.loot.context.LootContextParameters
 import net.minecraft.state.property.Properties
 
-object MaxAgeLootCondition : LootCondition {
+data object MaxAgeLootCondition : LootCondition {
     override fun getType(): LootConditionType = RPGSkillsConditions.MAX_AGE
 
     override fun test(context: LootContext): Boolean =
