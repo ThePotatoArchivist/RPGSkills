@@ -2,6 +2,7 @@ package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
 import net.minecraft.block.entity.MobSpawnerBlockEntity
+import net.minecraft.entity.ItemEntity
 import net.minecraft.entity.mob.MobEntity
 import org.ladysnake.cca.api.v3.block.BlockComponentFactoryRegistry
 import org.ladysnake.cca.api.v3.block.BlockComponentInitializer
@@ -20,6 +21,7 @@ object RPGSkillsComponents : EntityComponentInitializer, ChunkComponentInitializ
         registry.registerForPlayers(SkillsComponent.key, ::SkillsComponent)
         registry.registerForPlayers(JobsComponent.key, ::JobsComponent)
         registry.registerFor(MobEntity::class.java, DefeatSourceComponent.key, ::DefeatSourceComponent)
+        registry.registerFor(ItemEntity::class.java, FreshCraftComponent.key) { FreshCraftComponent() }
     }
 
     override fun registerChunkComponentFactories(registry: ChunkComponentFactoryRegistry) {
