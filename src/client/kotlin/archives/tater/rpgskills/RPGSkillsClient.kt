@@ -50,6 +50,7 @@ object RPGSkillsClient : ClientModInitializer {
     const val JOBS_KEY_TRANSLATION = "key.$MOD_ID.screen.jobs"
     const val REQUIREMENTS_KEY_TRANSLATION = "key.$MOD_ID.tooltip.requirements"
 
+    @JvmField
 	val skillsKey: KeyBinding = KeyBindingHelper.registerKeyBinding(KeyBinding(
 		SKILLS_KEY_TRANSLATION,
 		InputUtil.Type.KEYSYM,
@@ -57,6 +58,7 @@ object RPGSkillsClient : ClientModInitializer {
 		RPG_SKILLS_CATEGORY,
 	))
 
+    @JvmField
     val jobsKey: KeyBinding = KeyBindingHelper.registerKeyBinding(KeyBinding(
         JOBS_KEY_TRANSLATION,
         InputUtil.Type.KEYSYM,
@@ -64,6 +66,7 @@ object RPGSkillsClient : ClientModInitializer {
         RPG_SKILLS_CATEGORY,
     ))
 
+    @JvmField
     val requirementsKey = ScreenKeyBinding(
         REQUIREMENTS_KEY_TRANSLATION,
         GLFW.GLFW_KEY_LEFT_SHIFT,

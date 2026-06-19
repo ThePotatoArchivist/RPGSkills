@@ -18,7 +18,7 @@ public class ItemScattererMixin {
             at = @At(value = "NEW", target = "(Lnet/minecraft/world/World;DDDLnet/minecraft/item/ItemStack;)Lnet/minecraft/entity/ItemEntity;")
     )
     private static ItemEntity setFresh(ItemEntity original) {
-        if (FreshCraftComponent.IS_FRESH_CRAFT.get())
+        if (FreshCraftComponent.isFreshCraft())
             original.getComponent(FreshCraftComponent.KEY).setFreshCount(original.getStack().getCount());
 
         return original;

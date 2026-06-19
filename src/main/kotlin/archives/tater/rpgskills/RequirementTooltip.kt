@@ -7,7 +7,10 @@ import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.Skill.Companion.name
 import archives.tater.rpgskills.util.Translation
 import archives.tater.rpgskills.util.get
+import archives.tater.rpgskills.util.getValue
 import archives.tater.rpgskills.util.joinToText
+import archives.tater.rpgskills.util.setValue
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.entry.RegistryEntry
@@ -15,6 +18,7 @@ import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.text.Texts
 import net.minecraft.util.Formatting
+import com.sun.jna.platform.win32.WinDef
 import java.util.function.Consumer
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -76,6 +80,18 @@ object RequirementTooltip {
     }
 
     @JvmStatic
+    fun appendTooltip(enchantment: RegistryEntry<Enchantment>, player: PlayerEntity, tooltip: Consumer<Text>, keyPressed: Boolean, keybinding: Text) {
+        val group = LockGroup.findLocked(player, enchantment) ?: return
+
+        if (!keyPressed) {
+            tooltip.accept(HINT.text(keybinding))
+            return
+        }
+
+        appendRequirements(group, player, tooltip)
+    }
+
+    @JvmStatic
     fun appendTooltip(stack: ItemStack, player: PlayerEntity, tooltip: MutableList<Text>, keyPressed: Boolean, keybinding: Text) {
         val useLock = LockGroup.useGroupOf(player.registryManager, stack)
         val placeLock = LockGroup.placeGroupOf(player.registryManager, stack)
@@ -101,4 +117,7 @@ object RequirementTooltip {
             appendRequirements(it, player, tooltip, CRAFT_REQUIRES.text())
         }
     }
+
+    @JvmStatic
+    var isBookTooltip: Boolean by ThreadLocal.withInitial { false }
 }

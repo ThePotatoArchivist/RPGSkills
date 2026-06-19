@@ -1,5 +1,7 @@
 package archives.tater.rpgskills.mixin.client.locking;
 
+import archives.tater.rpgskills.RPGSkills;
+import archives.tater.rpgskills.RPGSkillsClient;
 import archives.tater.rpgskills.RequirementTooltip;
 import archives.tater.rpgskills.data.LockGroup;
 
@@ -12,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 
@@ -25,10 +28,12 @@ public class ItemEnchantmentsComponentMixin {
     )
     private void addTooltip(Consumer<Text> instance, Object t, Operation<Object> original, @Local RegistryEntry<Enchantment> enchantment) {
         original.call(instance, t);
+
+        if (!RequirementTooltip.isBookTooltip()) return;
+
         var player = MinecraftClient.getInstance().player;
         if (player == null) return;
-        var lockGroup = LockGroup.findLocked(player, enchantment);
-        if (lockGroup == null) return;
-        RequirementTooltip.appendRequirements(lockGroup, player, instance);
+
+        RequirementTooltip.appendTooltip(enchantment, player, instance, RPGSkillsClient.requirementsKey.isDown(), Text.keybind(RPGSkillsClient.requirementsKey.getTranslationKey()));
     }
 }

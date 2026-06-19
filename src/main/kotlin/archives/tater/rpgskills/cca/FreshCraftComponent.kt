@@ -2,6 +2,8 @@ package archives.tater.rpgskills.cca
 
 import archives.tater.rpgskills.RPGSkills
 import archives.tater.rpgskills.util.ComponentKeyHolder
+import archives.tater.rpgskills.util.getValue
+import archives.tater.rpgskills.util.setValue
 import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.nbt.NbtCompound
@@ -37,6 +39,7 @@ class FreshCraftComponent : Component {
 
         @JvmField val KEY = key
 
-        @JvmField val IS_FRESH_CRAFT: ThreadLocal<Boolean> = ThreadLocal.withInitial { false }
+        @JvmStatic
+        var isFreshCraft: Boolean by ThreadLocal.withInitial { false }
     }
 }

@@ -353,3 +353,5 @@ private val isFakePlayerMethod by lazy {
 
 val PlayerEntity.isFakePlayer get() = this is FakePlayer || this is ServerPlayerEntity && isFakePlayerMethod?.call(this) == true
 
+operator fun <T> ThreadLocal<T>.getValue(thisRef: Any, property: KProperty<*>): T = get()
+operator fun <T> ThreadLocal<T>.setValue(thisRef: Any, property: KProperty<*>, value: T) = set(value)

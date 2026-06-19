@@ -25,5 +25,9 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "plugin": "archives.tater.rpgskills.RPGSkillsMixinConfigPlugin"
+  "plugin": "archives.tater.rpgskills.RPGSkillsMixinConfigPlugin",
+  "mixins": [
+    "locking.ItemStackMixin",
+    "locking.PenchantmentHelperMixin"
+  ]
 }
