@@ -6,6 +6,7 @@ import archives.tater.rpgskills.cca.BossTrackerComponent.Companion.bossTracker
 import archives.tater.rpgskills.data.Job
 import archives.tater.rpgskills.data.Skill
 import archives.tater.rpgskills.data.SkillClass
+import archives.tater.rpgskills.mixin.xp.ServerPlayerEntityAccessor
 import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.value
@@ -21,6 +22,7 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.registry.RegistryWrapper
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.entry.RegistryFixedCodec
+import net.minecraft.scoreboard.ScoreboardCriterion
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Identifier
@@ -51,6 +53,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
         set(value) {
             field = value.coerceAtMost(LEVEL_REQUIREMENTS[maxLevel])
             level = getLevelForPoints(field)
+            (player as? ServerPlayerEntityAccessor)?.invokeUpdateScores(RPGSkillsStats.LEVEL, level);
         }
     var points
         get() = _points

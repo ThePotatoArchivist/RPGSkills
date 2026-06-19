@@ -2,6 +2,7 @@ package archives.tater.rpgskills
 
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
+import net.minecraft.scoreboard.ScoreboardCriterion
 import net.minecraft.util.Identifier
 
 object RPGSkillsStats {
@@ -13,6 +14,9 @@ object RPGSkillsStats {
 
     @JvmField
     val SKILL_POINTS_COLLECTED = register("skill_points_collected")
+
+    @JvmField
+    val LEVEL = ScoreboardCriterion.create("${RPGSkills.MOD_ID}:level", true, ScoreboardCriterion.RenderType.INTEGER)
 
     fun register() {}
 }
