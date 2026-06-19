@@ -66,6 +66,7 @@ class RPGSkillsConfig {
         private set
     var breedingSkillPoints: IntProvider = UniformIntProvider.create(1, 2)
         private set
+    var deathSkillPointsLoss: Int = 20
     var baseLevelCap: Int = 10
         private set
     var levelCapIncreasePerBoss: Int = 10
@@ -119,6 +120,7 @@ class RPGSkillsConfig {
             intRangeCodec(min = 1).fieldOf("skill_point_divisor_advancement").forAccess(RPGSkillsConfig::advancementSkillPointDivisor),
             IntProvider.POSITIVE_CODEC.fieldOf("skill_points_from_fishing").forAccess(RPGSkillsConfig::fishingSkillPoints),
             IntProvider.POSITIVE_CODEC.fieldOf("skill_points_from_breeding").forAccess(RPGSkillsConfig::breedingSkillPoints),
+            intRangeCodec(min = -1).fieldOf("skill_point_death_loss").forAccess(RPGSkillsConfig::deathSkillPointsLoss),
             intRangeCodec(min = 0).fieldOf("level_cap_base").forAccess(RPGSkillsConfig::baseLevelCap),
             intRangeCodec(min = 0).fieldOf("level_cap_increase_per_boss").forAccess(RPGSkillsConfig::levelCapIncreasePerBoss),
             intRangeCodec(min = -1).fieldOf("level_cap_remove_boss_count").forAccess(RPGSkillsConfig::capRemoveBossCount),

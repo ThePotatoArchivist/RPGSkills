@@ -9,6 +9,7 @@ import archives.tater.rpgskills.data.SkillClass
 import archives.tater.rpgskills.networking.*
 import archives.tater.rpgskills.util.*
 import archives.tater.rpgskills.util.value
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
 import com.google.common.collect.HashMultimap
 import com.mojang.serialization.Codec
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -23,7 +24,6 @@ import net.minecraft.registry.entry.RegistryFixedCodec
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Identifier
-import it.unimi.dsi.fastutil.ints.Int2IntAVLTreeMap
 import org.ladysnake.cca.api.v3.component.ComponentKey
 import org.ladysnake.cca.api.v3.component.ComponentRegistry
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
@@ -195,7 +195,7 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
             Codec.unboundedMap(EntityAttribute.CODEC, Identifier.CODEC.listOf()).fieldOf("attribute_modifiers").forAccess(SkillsComponent::modifiers),
         )
 
-        override val key: ComponentKey<SkillsComponent> = ComponentRegistry.getOrCreate<SkillsComponent>(RPGSkills.id("skills"), SkillsComponent::class.java)
+        override val key: ComponentKey<SkillsComponent> = ComponentRegistry.getOrCreate(RPGSkills.id("skills"), SkillsComponent::class.java)
 
         const val MAX_LEVEL = 500
 
@@ -264,6 +264,20 @@ class SkillsComponent(private val player: PlayerEntity) : RespawnableComponent<S
                 val player = handler.player
                 if (player[SkillsComponent].skillClass != null || server.registryManager[SkillClass].isEmpty()) return@register
                 openClassScreen(player)
+            }
+
+            ServerPlayerEvents.AFTER_RESPAWN.register { _, newPlayer, alive ->
+                if (alive) return@register
+
+                with (newPlayer[SkillsComponent]) {
+                    val min = LEVEL_LOOKUP.floorKey(points) ?: 0
+
+                    when (val loss = RPGSkills.CONFIG.deathSkillPointsLoss) {
+                        0 -> {}
+                        -1 -> points = min
+                        else -> points = (points - loss).coerceAtLeast(min)
+                    }
+                }
             }
         }
     }
